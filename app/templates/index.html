@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bezpiecznik.pl - Zaawansowany Audytor Ofert i Umów</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans selection:bg-indigo-500 selection:text-white">
+    <div class="max-w-3xl mx-auto px-4 py-16">
+        <!-- Nagłówek -->
+        <header class="text-center mb-12">
+            <div class="inline-flex items-center justify-center bg-indigo-500/10 border border-indigo-500/20 rounded-full px-4 py-1.5 mb-4 text-indigo-400 text-sm font-medium">
+                🛡️ Bezpiecznik.pl &bull; Inteligentna Tarcza Prawna
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+                Audyt Ofert i Umów <span class="text-indigo-400">AI</span>
+            </h1>
+            <p class="text-slate-400 text-lg max-w-xl mx-auto">
+                Wklej treść ogłoszenia lub umowy. System wykryje ukryte ryzyka prawne, haczyki i policzy rzeczywisty TCO.
+            </p>
+        </header>
+
+        <!-- Karta Formularza -->
+        <div class="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-slate-700/60">
+            <form action="/generate-report" method="POST" class="space-y-6">
+                <!-- Wybór branży -->
+                <div>
+                    <label for="industry" class="block text-sm font-semibold text-slate-300 mb-2">
+                        Wybierz profil / branżę analizy
+                    </label>
+                    <select id="industry" name="industry" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3.5 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-medium">
+                        <option value="real_estate">🏠 Nieruchomości (Mieszkania / Działki / Deweloperzy)</option>
+                        <option value="automotive">🚗 Motoryzacja (Auta Używane / Import / Krajowe / USA)</option>
+                        <option value="heavy_machinery">🚜 Maszyny i Sprzęt Budowlany / Rolniczy</option>
+                        <option value="medical_devices">🩺 Sprzęt Medyczny i Kontrakty B2B</option>
+                        <option value="bicycles">🚲 Rowery i E-bike Premium</option>
+                        <option value="general">📋 Analiza Ogólna (Uniwersalna)</option>
+                    </select>
+                </div>
+
+                <!-- Link do ogłoszenia -->
+                <div>
+                    <label for="target_url" class="block text-sm font-semibold text-slate-300 mb-2">
+                        Link do ogłoszenia <span class="text-slate-500 font-normal">(opcjonalnie)</span>
+                    </label>
+                    <input type="url" id="target_url" name="target_url" placeholder="https://www.olx.pl/d/oferta/..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                </div>
+
+                <!-- Treść ogłoszenia -->
+                <div>
+                    <label for="listing_text" class="block text-sm font-semibold text-slate-300 mb-2">
+                        Treść ogłoszenia lub zapisy umowy <span class="text-indigo-400">*</span>
+                    </label>
+                    <textarea id="listing_text" name="listing_text" rows="7" required placeholder="Wklej tutaj treść ogłoszenia, klauzule umowy lub specyfikację pojazdu/nieruchomości..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-y"></textarea>
+                </div>
+
+                <!-- Przycisk wysłania -->
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-indigo-600/30 transition-all duration-200 text-lg flex items-center justify-center space-x-2">
+                    <span>⚡ Uruchom Audyt Risk-TCO</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Stopka -->
+        <footer class="text-center mt-12 text-slate-500 text-sm">
+            Bezpiecznik.pl &bull; System Ochrony Konsumenta i Analizy Ryzyk Biznesowych
+        </footer>
+    </div>
+</body>
+</html>

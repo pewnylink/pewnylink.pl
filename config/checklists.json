@@ -1,0 +1,54 @@
+{
+  "real_estate": {
+    "name": "Nieruchomości",
+    "checkpoints": [
+      "Stan prawny księgi wieczystej i hipoteka",
+      "Ograniczenia w użytkowaniu i służebności",
+      "Koszty czynszu, funduszu remontowego i opłat stałych",
+      "Zapisy o zadatku vs zaliczce w umowie przedwstępnej"
+    ]
+  },
+  "automotive": {
+    "name": "Motoryzacja",
+    "checkpoints": [
+      "Wyłączenia rękojmi (faktura VAT-marża / sprzedaż prywatna / umowa na Niemca)",
+      "Zgodność przebiegu i wpisów w historii pojazdu (CEPik / Carfax)",
+      "Status po wypadku / szkoda całkowita / pojazd z salvage title",
+      "Ukryte koszty rejestracji, akcyzy, podatku PCC-3 i badania technicznego",
+      "Zapisy o zły stanie technicznym w umowie (\"kupujący zapoznał się ze stanem\")"
+    ]
+  },
+  "heavy_machinery": {
+    "name": "Maszyny i Sprzęt Budowlany",
+    "checkpoints": [
+      "Godziny pracy (motogodziny) vs stan faktyczny",
+      "Dozór techniczny UDT i aktualność badań",
+      "Leasing / weryfikacja zastawu rejestrowego",
+      "Transport gabarytowy i koszty uruchomienia"
+    ]
+  },
+  "medical_devices": {
+    "name": "Sprzęt Medyczny",
+    "checkpoints": [
+      "Paszport techniczny i ważność przeglądów",
+      "Certyfikaty CE i zgodność z MDR",
+      "Koszty autoryzowanego serwisu i części zamiennych"
+    ]
+  },
+  "bicycles": {
+    "name": "Rowery i E-bike Premium",
+    "checkpoints": [
+      "Dowód zakupu i weryfikacja numeru ramy w bazach kradzieżowych",
+      "Stan baterii (SOH) i silnika w rowerach elektrycznych",
+      "Gwarancja producenta na ramę i osprzęt"
+    ]
+  },
+  "general": {
+    "name": "Analiza Ogólna",
+    "checkpoints": [
+      "Równowaga stron w zapisach umowy",
+      "Ukryte koszty dodatkowe i kary umowne",
+      "Warunki odstąpienia i zwrotu"
+    ]
+  }
+}
