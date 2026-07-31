@@ -1,13 +1,19 @@
-from fastapi import FastAPI, Query, HTTPException, Request
-from fastapi.responses import HTMLResponse
+import os
 import html
 import urllib.parse
+from fastapi import FastAPI, Query, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI(
     title="pewnylink.pl",
     version="2.0.0",
     description="Automatyczny Skaner Bezpieczeństwa Ofert, Audyt TCO i System Ochrony Kupującego"
 )
+
+# Podpięcie katalogu z szablonami HTML
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 # ==============================================================================
 # STAŁE I TEKSTY PRAWNE
@@ -22,6 +28,8 @@ LEGAL_DISCLAIMER = (
 )
 
 FOOTER_TEXT = "pewnylink.pl • Technologia Ochrony Konsumenta & Audytu TCO"
+FOOTER_COPYRIGHT = "© 2026 - SevArt sp. z o.o. Wszelkie prawa zastrzeżone"
+
 
 # ==============================================================================
 # 1. STRONA GŁÓWNA (LANDING PAGE)
@@ -59,11 +67,8 @@ LANDING_HTML = f"""<!DOCTYPE html>
             <div class="flex items-center gap-3">
                 <a href="/login" class="text-sm font-semibold border border-slate-700 hover:bg-slate-800 text-slate-200 px-4 py-2 rounded-xl transition-all">
                     Zaloguj się
-                </a>
-                <a href="#cennik" class="text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl shadow-lg shadow-emerald-600/20 transition-all">
-                    Darmowe skanowanie
-                </a>
-            </div>
+                </a>    
+
         </div>
     </header>
 
@@ -79,7 +84,7 @@ LANDING_HTML = f"""<!DOCTYPE html>
             </h1>
             
             <p class="text-slate-300 text-lg sm:text-xl leading-relaxed mb-8">
-                Wklej odnośnik do dowolnej aukcji, pojazdu, maszyny, nieruchomości lub e-sklepu. Nasz algorytm natychmiast wykryje haczyki prawne, niezgodności NIP/KRS oraz ukryte koszty TCO.
+                Wklej odnośnik do dowolnej aukcji, oferty sklepu czy dowolnego ogłoszenia. Nasz algorytm natychmiast wykryje kruczki prawne, haczyki nieuczciwych sprzedawców, niezgodności w rejestrach państwowych, ukryte koszty TCO oraz zaproponuje na podstawie dogłębnej analizy trzy pytania do sprzedającego.
             </p>
 
             <!-- FORMULARZ SKANOWANIA Z LINKU -->
@@ -98,7 +103,7 @@ LANDING_HTML = f"""<!DOCTYPE html>
             
             <!-- TYTUŁ / TEKST POD OKIENKIEM LINKU -->
             <div class="mt-4 p-3 bg-slate-800/40 border border-slate-800 rounded-xl text-xs sm:text-sm text-slate-400 font-medium">
-                ✅ <strong>Zakres obsługi:</strong> Obsługujemy portale ogłoszeniowe, niezależne e-sklepy, marketplaces i prywatne domeny.
+                Obsługujemy portale ogłoszeniowe i aukcyjne, marketplace'y, niezależne e-sklepy i prywatne domeny.
             </div>
         </div>
 

@@ -3,26 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bezpiecznik.pl - Zaawansowany Audytor Ofert i Umów</title>
+    <title>pewnylink.pl - Zaawansowany Audytor Ofert i Umów</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans selection:bg-indigo-500 selection:text-white">
-    <div class="max-w-3xl mx-auto px-4 py-16">
-        <!-- Nagłówek -->
+    <div class="max-w-4xl mx-auto px-4 py-12">
+        
+        <!-- NAGŁÓWEK -->
         <header class="text-center mb-12">
             <div class="inline-flex items-center justify-center bg-indigo-500/10 border border-indigo-500/20 rounded-full px-4 py-1.5 mb-4 text-indigo-400 text-sm font-medium">
-                🛡️ Bezpiecznik.pl &bull; Inteligentna Tarcza Prawna
+                🛡️ pewnylink.pl &bull; Inteligentna Tarcza Prawna
             </div>
             <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
                 Audyt Ofert i Umów <span class="text-indigo-400">AI</span>
             </h1>
-            <p class="text-slate-400 text-lg max-w-xl mx-auto">
-                Wklej treść ogłoszenia lub umowy. System wykryje ukryte ryzyka prawne, haczyki i policzy rzeczywisty TCO.
-            </p>
+            <div class="text-slate-400 text-base md:text-lg max-w-2xl mx-auto space-y-2 leading-relaxed">
+                <p>Wklej odnośnik do dowolnej aukcji, oferty sklepu czy dowolnego ogłoszenia.</p>
+                <p>Nasz algorytm natychmiast wykryje kruczki prawne, haczyki nieuczciwych sprzedawców oraz niezgodności w rejestrach państwowych.</p>
+                <p>Obliczy ukryte koszty TCO i na podstawie dogłębnej analizy zaproponuje trzy kluczowe pytania do sprzedającego.</p>
+            </div>
         </header>
 
-        <!-- Karta Formularza -->
-        <div class="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-slate-700/60">
+        <!-- KARTA FORMULARZA -->
+        <div class="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-2xl p-6 sm:p-8 border border-slate-700/60 mb-16">
             <form action="/generate-report" method="POST" class="space-y-6">
                 <!-- Wybór branży -->
                 <div>
@@ -45,6 +48,9 @@
                         Link do ogłoszenia <span class="text-slate-500 font-normal">(opcjonalnie)</span>
                     </label>
                     <input type="url" id="target_url" name="target_url" placeholder="https://www.olx.pl/d/oferta/..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                    <p class="text-xs text-slate-400 mt-2">
+                        Obsługujemy portale ogłoszeniowe i aukcyjne, marketplace'y, niezależne e-sklepy i prywatne domeny.
+                    </p>
                 </div>
 
                 <!-- Treść ogłoszenia -->
@@ -62,10 +68,89 @@
             </form>
         </div>
 
-        <!-- Stopka -->
-        <footer class="text-center mt-12 text-slate-500 text-sm">
-            Bezpiecznik.pl &bull; System Ochrony Konsumenta i Analizy Ryzyk Biznesowych
-        </footer>
+        <!-- CENNIK / PAKIETY -->
+        <section class="mb-16">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Pakiety Audytowe</h2>
+                <p class="text-slate-400 text-sm sm:text-base">Wybierz elastyczny pakiet dopasowany do Twoich potrzeb</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <!-- Pakiet Start -->
+                <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6 text-center flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-2">Pakiet Start</h3>
+                        <div class="text-3xl font-black text-indigo-400 mb-2">9 zł</div>
+                        <p class="text-xs text-slate-400 mb-4">Szybka weryfikacja pojedynczej oferty</p>
+                    </div>
+                    <div class="text-xs text-slate-300 font-semibold bg-slate-900/60 py-2.5 rounded-lg border border-slate-700">
+                        1 Raport Audytowy
+                    </div>
+                </div>
+
+                <!-- Pakiet Standard -->
+                <div class="bg-slate-800/90 border-2 border-indigo-500 rounded-2xl p-6 text-center flex flex-col justify-between relative shadow-xl shadow-indigo-500/10">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-[10px] font-extrabold tracking-wider px-3 py-0.5 rounded-full uppercase">
+                        Najpopularniejszy
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-2 mt-1">Pakiet Standard</h3>
+                        <div class="text-3xl font-black text-indigo-400 mb-2">49 zł</div>
+                        <p class="text-xs text-slate-400 mb-4">Dla osób aktywnie poszukujących ofert</p>
+                    </div>
+                    <div class="text-xs text-indigo-300 font-semibold bg-indigo-950/60 py-2.5 rounded-lg border border-indigo-800">
+                        10 Raportów Audytowych
+                    </div>
+                </div>
+
+                <!-- Pakiet VIP -->
+                <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6 text-center flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-2">Pakiet VIP</h3>
+                        <div class="text-3xl font-black text-indigo-400 mb-2">599 zł</div>
+                        <p class="text-xs text-slate-400 mb-4">Dla firm, inwestorów i profesjonalistów</p>
+                    </div>
+                    <div class="text-xs text-slate-300 font-semibold bg-slate-900/60 py-2.5 rounded-lg border border-slate-700">
+                        100 raportów na 30 dni
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wspólny zakres wszystkich pakietów -->
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6">
+                <h4 class="text-sm font-bold text-slate-200 mb-4 text-center">Każdy pakiet zawiera pełny zakres weryfikacji:</h4>
+                <div class="grid sm:grid-cols-2 gap-3 text-xs text-slate-300">
+                    <div class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded-lg border border-slate-800">
+                        <span class="text-emerald-400">✅</span> Wykrywanie klauzul abuzywnych i haczyków prawnych
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded-lg border border-slate-800">
+                        <span class="text-emerald-400">✅</span> Estymacja TCO (Całkowitego Kosztu Posiadania)
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded-lg border border-slate-800">
+                        <span class="text-emerald-400">✅</span> Dedykowany zestaw 3 pytań weryfikacyjnych do sprzedawcy
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded-lg border border-slate-800">
+                        <span class="text-emerald-400">✅</span> Analiza zgodności z Dyrektywą Omnibus i Ustawą o Prawach Konsumenta
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STOPKA -->
+        <footer class="text-center mt-16 pb-8 text-slate-500 text-xs leading-relaxed space-y-4 border-t border-slate-800/80 pt-8 w-full max-w-4xl mx-auto">
+    <p class="font-medium text-slate-400">
+        pewnylink.pl • Technologia Ochrony Konsumenta & Audytu TCO
+    </p>
+    <p class="text-center font-semibold text-slate-400">
+        © 2026 - SevArt sp. z o.o. Wszelkie prawa zastrzeżone
+    </p>
+    <div class="max-w-2xl mx-auto space-y-2 text-slate-500">
+        <p class="text-[11px] leading-normal text-slate-600">
+            Serwis, jego struktura, algorytmy oceny ryzyka, baza danych oraz generowane raporty z analizy ogłoszeń (w tym opisy, struktura punktowa i układ kryteriów) stanowią utwory w rozumieniu ustawy o prawie autorskim i prawach pokrewnych oraz podlegają ochronie jako bazy danych na podstawie ustawy o ochronie baz danych.
+        </p>
+    </div>
+</footer>
+
     </div>
 </body>
 </html>
