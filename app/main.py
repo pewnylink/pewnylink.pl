@@ -4,7 +4,14 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from app.routers import admin, pages
+
+# 1. Tworzymy instancję aplikacji FastAPI
 app = FastAPI(title="pewnylink.pl API", version="1.0.0")
+
+# 2. Podłączamy routery (po utworzeniu obiektu app)
+app.include_router(pages.router)
+app.include_router(admin.router)
 
 # Ścieżka do katalogu z szablonami
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
