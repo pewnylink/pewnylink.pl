@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pl" class="h-full bg-slate-900 text-slate-100 selection:bg-indigo-500 selection:text-white">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <title>{% block title %}pewnylink.pl - Inteligentna Tarcza Prawna & Audyt Ofert{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex flex-col min-h-full font-sans antialiased bg-slate-900 text-slate-100">
+
+    <!-- NAV BAR - RESPONSIVE -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex justify-between items-center">
+            <a href="/" class="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                <span class="text-indigo-500">🛡️</span>
+                <span>pewnylink<span class="text-indigo-400">.pl</span></span>
+            </a>
+            <nav class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm font-medium">
+                <a href="/#cennik" class="text-slate-400 hover:text-white transition-colors py-2 px-1">Cennik</a>
+                <a href="/login" class="text-slate-400 hover:text-white transition-colors py-2 px-1">Zaloguj się</a>
+                <a href="/register" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-2 rounded-xl transition-all shadow-md shadow-indigo-600/20 font-semibold">
+                    Rejestracja
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <main class="flex-grow max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER - CORPORATE & LEGAL GOVERNANCE -->
+<footer class="border-t border-slate-800/80 py-8 sm:py-12 bg-slate-950/80 text-center text-xs leading-relaxed text-slate-500 mt-auto">
+    <div class="max-w-5xl mx-auto px-4 space-y-6">
+        
+        <!-- ODSYŁACZE PRAWNE (WYMÓG FORMALNY) -->
+        <div class="flex flex-wrap justify-center items-center gap-4 sm:gap-6 text-slate-400 font-medium text-xs border-b border-slate-800/60 pb-6">
+            <a href="/regulamin" class="hover:text-indigo-400 transition-colors">Regulamin Serwisu</a>
+            <span class="text-slate-700">&bull;</span>
+            <a href="/polityka-privatnosci" class="hover:text-indigo-400 transition-colors">Polityka Prywatności i RODO</a>
+            <span class="text-slate-700">&bull;</span>
+            <a href="/polityka-cookies" class="hover:text-indigo-400 transition-colors">Polityka Plików Cookies</a>
+            <span class="text-slate-700">&bull;</span>
+            <a href="/prawa-konsumenta" class="hover:text-indigo-400 transition-colors">Pouczenie o Odstąpieniu od Umowy</a>
+            <span class="text-slate-700">&bull;</span>
+            <a href="/kontakt" class="hover:text-indigo-400 transition-colors">Kontakt i Reklamacje</a>
+        </div>
+
+        <div class="space-y-2">
+            <p class="font-semibold text-slate-300 tracking-wide">
+                pewnylink.pl &bull; Technologia Ochrony Konsumenta & Audytu TCO
+            </p>
+            <p class="font-bold text-slate-400">
+                © 2026 SevArt sp. z o.o. Wszelkie prawa zastrzeżone.
+            </p>
+        </div>
+
+        <p class="text-[11px] leading-relaxed text-slate-500 max-w-4xl mx-auto text-justify sm:text-center">
+            Serwis, jego struktura, algorytmy oceny ryzyka, baza danych oraz generowane raporty z analizy ogłoszeń (w tym opisy, struktura punktowa i układ kryteriów) stanowią utwory w rozumieniu ustawy o prawie autorskim i prawach pokrewnych oraz podlegają ochronie jako bazy danych na podstawie ustawy o ochronie baz danych.
+        </p>
+
+        <div class="text-[10px] text-slate-600 border-t border-slate-800/50 pt-4 max-w-3xl mx-auto">
+            <p>
+                <strong>Nota prawna:</strong> Generowane raporty mają charakter pomocniczo-informacyjny i nie stanowią oficjalnej opinii prawnej ani rzeczoznawczej. SevArt sp. z o.o. nie ponosi odpowiedzialności za indywidualne decyzje transakcyjne użytkowników.
+            </p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

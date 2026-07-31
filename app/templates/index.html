@@ -1,156 +1,111 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pewnylink.pl - Zaawansowany Audytor Ofert i Umów</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans selection:bg-indigo-500 selection:text-white">
-    <div class="max-w-4xl mx-auto px-4 py-12">
-        
-        <!-- NAGŁÓWEK -->
-        <header class="text-center mb-12">
-            <div class="inline-flex items-center justify-center bg-indigo-500/10 border border-indigo-500/20 rounded-full px-4 py-1.5 mb-4 text-indigo-400 text-sm font-medium">
-                🛡️ pewnylink.pl &bull; Inteligentna Tarcza Prawna
-            </div>
-            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
-                Audyt Ofert i Umów <span class="text-indigo-400">AI</span>
-            </h1>
-            <div class="text-slate-400 text-base md:text-lg max-w-2xl mx-auto space-y-2 leading-relaxed">
-                <p>Wklej odnośnik do dowolnej aukcji, oferty sklepu czy dowolnego ogłoszenia.</p>
-                <p>Nasz algorytm natychmiast wykryje kruczki prawne, haczyki nieuczciwych sprzedawców oraz niezgodności w rejestrach państwowych.</p>
-                <p>Obliczy ukryte koszty TCO i na podstawie dogłębnej analizy zaproponuje trzy kluczowe pytania do sprzedającego.</p>
-            </div>
-        </header>
+{% extends "base.html" %}
 
-        <!-- KARTA FORMULARZA -->
-        <div class="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-2xl p-6 sm:p-8 border border-slate-700/60 mb-16">
-            <form action="/generate-report" method="POST" class="space-y-6">
-                <!-- Wybór branży -->
-                <div>
-                    <label for="industry" class="block text-sm font-semibold text-slate-300 mb-2">
-                        Wybierz profil / branżę analizy
-                    </label>
-                    <select id="industry" name="industry" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3.5 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-medium">
-                        <option value="real_estate">🏠 Nieruchomości (Mieszkania / Działki / Deweloperzy)</option>
-                        <option value="automotive">🚗 Motoryzacja (Auta Używane / Import / Krajowe / USA)</option>
-                        <option value="heavy_machinery">🚜 Maszyny i Sprzęt Budowlany / Rolniczy</option>
-                        <option value="medical_devices">🩺 Sprzęt Medyczny i Kontrakty B2B</option>
-                        <option value="bicycles">🚲 Rowery i E-bike Premium</option>
-                        <option value="general">📋 Analiza Ogólna (Uniwersalna)</option>
-                    </select>
-                </div>
+{% block content %}
+<div class="flex flex-col items-center">
 
-                <!-- Link do ogłoszenia -->
-                <div>
-                    <label for="target_url" class="block text-sm font-semibold text-slate-300 mb-2">
-                        Link do ogłoszenia <span class="text-slate-500 font-normal">(opcjonalnie)</span>
-                    </label>
-                    <input type="url" id="target_url" name="target_url" placeholder="https://www.olx.pl/d/oferta/..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-                    <p class="text-xs text-slate-400 mt-2">
-                        Obsługujemy portale ogłoszeniowe i aukcyjne, marketplace'y, niezależne e-sklepy i prywatne domeny.
-                    </p>
-                </div>
-
-                <!-- Treść ogłoszenia -->
-                <div>
-                    <label for="listing_text" class="block text-sm font-semibold text-slate-300 mb-2">
-                        Treść ogłoszenia lub zapisy umowy <span class="text-indigo-400">*</span>
-                    </label>
-                    <textarea id="listing_text" name="listing_text" rows="7" required placeholder="Wklej tutaj treść ogłoszenia, klauzule umowy lub specyfikację pojazdu/nieruchomości..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-y"></textarea>
-                </div>
-
-                <!-- Przycisk wysłania -->
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-indigo-600/30 transition-all duration-200 text-lg flex items-center justify-center space-x-2">
-                    <span>⚡ Uruchom Audyt Risk-TCO</span>
-                </button>
-            </form>
-        </div>
-
-        <!-- CENNIK / PAKIETY -->
-        <section class="mb-16">
-            <div class="text-center mb-10">
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Pakiety Audytowe</h2>
-                <p class="text-slate-400 text-sm sm:text-base">Wybierz elastyczny pakiet dopasowany do Twoich potrzeb</p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-6 mb-8">
-                <!-- Pakiet Start -->
-                <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6 text-center flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-lg font-bold text-white mb-2">Pakiet Start</h3>
-                        <div class="text-3xl font-black text-indigo-400 mb-2">9 zł</div>
-                        <p class="text-xs text-slate-400 mb-4">Szybka weryfikacja pojedynczej oferty</p>
-                    </div>
-                    <div class="text-xs text-slate-300 font-semibold bg-slate-900/60 py-2.5 rounded-lg border border-slate-700">
-                        1 Raport Audytowy
-                    </div>
-                </div>
-
-                <!-- Pakiet Standard -->
-                <div class="bg-slate-800/90 border-2 border-indigo-500 rounded-2xl p-6 text-center flex flex-col justify-between relative shadow-xl shadow-indigo-500/10">
-                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-[10px] font-extrabold tracking-wider px-3 py-0.5 rounded-full uppercase">
-                        Najpopularniejszy
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white mb-2 mt-1">Pakiet Standard</h3>
-                        <div class="text-3xl font-black text-indigo-400 mb-2">49 zł</div>
-                        <p class="text-xs text-slate-400 mb-4">Dla osób aktywnie poszukujących ofert</p>
-                    </div>
-                    <div class="text-xs text-indigo-300 font-semibold bg-indigo-950/60 py-2.5 rounded-lg border border-indigo-800">
-                        10 Raportów Audytowych
-                    </div>
-                </div>
-
-                <!-- Pakiet VIP -->
-                <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6 text-center flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-lg font-bold text-white mb-2">Pakiet VIP</h3>
-                        <div class="text-3xl font-black text-indigo-400 mb-2">599 zł</div>
-                        <p class="text-xs text-slate-400 mb-4">Dla firm, inwestorów i profesjonalistów</p>
-                    </div>
-                    <div class="text-xs text-slate-300 font-semibold bg-slate-900/60 py-2.5 rounded-lg border border-slate-700">
-                        100 raportów na 30 dni
-                    </div>
-                </div>
-            </div>
-
-            <!-- Wspólny zakres wszystkich pakietów -->
-            <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6">
-                <h4 class="text-sm font-bold text-slate-200 mb-4 text-center">Każdy pakiet zawiera pełny zakres weryfikacji:</h4>
-                <div class="grid sm:grid-cols-2 gap-3 text-xs text-slate-300">
-                    <div class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded-lg border border-slate-800">
-                        <span class="text-emerald-400">✅</span> Wykrywanie klauzul abuzywnych i haczyków prawnych
-                    </div>
-                    <div class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded-lg border border-slate-800">
-                        <span class="text-emerald-400">✅</span> Estymacja TCO (Całkowitego Kosztu Posiadania)
-                    </div>
-                    <div class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded-lg border border-slate-800">
-                        <span class="text-emerald-400">✅</span> Dedykowany zestaw 3 pytań weryfikacyjnych do sprzedawcy
-                    </div>
-                    <div class="flex items-center gap-2 bg-slate-900/50 p-2.5 rounded-lg border border-slate-800">
-                        <span class="text-emerald-400">✅</span> Analiza zgodności z Dyrektywą Omnibus i Ustawą o Prawach Konsumenta
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- STOPKA -->
-        <footer class="text-center mt-16 pb-8 text-slate-500 text-xs leading-relaxed space-y-4 border-t border-slate-800/80 pt-8 w-full max-w-4xl mx-auto">
-    <p class="font-medium text-slate-400">
-        pewnylink.pl • Technologia Ochrony Konsumenta & Audytu TCO
-    </p>
-    <p class="text-center font-semibold text-slate-400">
-        © 2026 - SevArt sp. z o.o. Wszelkie prawa zastrzeżone
-    </p>
-    <div class="max-w-2xl mx-auto space-y-2 text-slate-500">
-        <p class="text-[11px] leading-normal text-slate-600">
-            Serwis, jego struktura, algorytmy oceny ryzyka, baza danych oraz generowane raporty z analizy ogłoszeń (w tym opisy, struktura punktowa i układ kryteriów) stanowią utwory w rozumieniu ustawy o prawie autorskim i prawach pokrewnych oraz podlegają ochronie jako bazy danych na podstawie ustawy o ochronie baz danych.
+    <!-- HERO SECTION -->
+    <div class="text-center max-w-3xl mx-auto mb-8 sm:mb-12 space-y-4">
+    <div class="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold px-3 py-1.5 rounded-full">
+        <span>🛡️ pewnylink.pl &bull; Inteligentna Tarcza Prawna</span>
+    </div>
+    <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+        Prześwietl dowolną&nbsp;ofertę minimalizując&nbsp;ryzyko z naszym raportem <span class="text-indigo-400">AI</span>
+    </h1>
+    <div class="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl mx-auto space-y-2 font-normal">
+        <p>Wklej odnośnik do&nbsp;dowolnej aukcji, oferty sklepu lub&nbsp;ogłoszenia.</p>
+        <p class="text-slate-400">
+            Nasz algorytm natychmiast wykryje kruczki prawne, haczyki nieuczciwych sprzedawców, niezgodności w&nbsp;rejestrach państwowych oraz&nbsp;ukryte koszty TCO.
+        </p>
+        <p class="text-slate-400">
+            Na&nbsp;podstawie dogłębnej analizy wygeneruje również 3&nbsp;precyzyjne pytania do&nbsp;sprzedającego.
         </p>
     </div>
-</footer>
+</div>
 
+    <!-- FORMULARZ SKANOWANIA -->
+    <div class="max-w-2xl mx-auto w-full bg-slate-800/80 border border-slate-700/60 p-4 sm:p-8 rounded-2xl shadow-2xl backdrop-blur-xl mb-12 sm:mb-16">
+        <form action="/report" method="GET" class="flex flex-col sm:flex-row gap-3">
+            <input 
+                type="url" 
+                name="url" 
+                required 
+                placeholder="https://www.olx.pl/d/oferta/..." 
+                class="flex-grow bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 text-slate-200 placeholder-slate-500 text-sm rounded-xl px-4 py-3.5 outline-none transition-all"
+            >
+            <button 
+                type="submit" 
+                class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm px-6 py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 whitespace-nowrap active:scale-[0.98]"
+            >
+                <span>⚡ Audytuj Link</span>
+            </button>
+        </form>
+        <p class="text-[11px] sm:text-xs text-slate-400 text-center mt-3">
+            Obsługujemy portale ogłoszeniowe, marketplace'y oraz niezależne sklepy internetowe.
+        </p>
     </div>
-</body>
-</html>
+
+    <!-- CENNIK PAKIETOWY -->
+    <section id="cennik" class="w-full mb-8">
+        <div class="text-center mb-8">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Pakiety Audytowe</h2>
+            <p class="text-slate-400 text-xs sm:text-sm">Jednorazowa opłata. Brak automatycznych subskrypcji i ukrytych opłat.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            
+            <!-- PAKIET START -->
+            <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6 flex flex-col justify-between text-center">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-900 px-2.5 py-1 rounded-full border border-slate-700">Dla każdego</span>
+                    <h3 class="text-lg font-bold text-white mt-3 mb-1">Start</h3>
+                    <div class="text-3xl font-black text-indigo-400 mb-1">9,99 zł</div>
+                    <p class="text-xs text-slate-400 mb-4">Opłata za pojedynczy raport</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-xs text-slate-200 font-semibold bg-slate-900/80 py-2.5 rounded-lg border border-slate-700">
+                        1 Raport Audytowy
+                    </div>
+                    <p class="text-[11px] text-slate-500">Bez rejestracji konta</p>
+                </div>
+            </div>
+
+            <!-- PAKIET STANDARD -->
+            <div class="bg-slate-800/90 border-2 border-indigo-500 rounded-2xl p-6 flex flex-col justify-between text-center relative shadow-xl shadow-indigo-500/10">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-[10px] font-extrabold tracking-wider px-3 py-0.5 rounded-full uppercase">
+                    Najpopularniejszy
+                </div>
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-950 px-2.5 py-1 rounded-full border border-indigo-800">Dla zalogowanych</span>
+                    <h3 class="text-lg font-bold text-white mt-3 mb-1">Standard</h3>
+                    <div class="text-3xl font-black text-indigo-400 mb-1">79,99 zł</div>
+                    <p class="text-xs text-slate-400 mb-4">Ważność pakietu: 30 dni</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-xs text-indigo-300 font-semibold bg-indigo-950/80 py-2.5 rounded-lg border border-indigo-800">
+                        10 Raportów Audytowych
+                    </div>
+                    <p class="text-[11px] text-indigo-400/80">Zakup jednorazowy (brak autoodnawiania)</p>
+                </div>
+            </div>
+
+            <!-- PAKIET PRO -->
+            <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6 flex flex-col justify-between text-center">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-900 px-2.5 py-1 rounded-full border border-slate-700">Dla zalogowanych</span>
+                    <h3 class="text-lg font-bold text-white mt-3 mb-1">PRO</h3>
+                    <div class="text-3xl font-black text-indigo-400 mb-1">229,99 zł</div>
+                    <p class="text-xs text-slate-400 mb-4">Ważność pakietu: 30 dni</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-xs text-slate-200 font-semibold bg-slate-900/80 py-2.5 rounded-lg border border-slate-700">
+                        30 Raportów Audytowych
+                    </div>
+                    <p class="text-[11px] text-slate-500">Zakup jednorazowy (brak autoodnawiania)</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+</div>
+{% endblock %}
