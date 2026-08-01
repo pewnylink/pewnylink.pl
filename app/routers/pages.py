@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Query
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import os
 
-# KLUCZOWA LINIA - bez tego Uvicorn wyrzuca AttributeError!
+from app.services.audit_service import AuditEngine
+
 router = APIRouter(tags=["pages"])
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -15,9 +16,12 @@ async def home(request: Request):
     return templates.TemplateResponse(request=request, name="index.html")
 
 @router.get("/report", response_class=HTMLResponse)
-async def report(request: Request, url: str = ""):
+async def report(request: Request, url: str = Query(..., description="URL ogłoszenia do audytu")):
+    # Wywołujemy nasz silnik analityczny
+    report_data = await AuditEngine.analyze_url(url)
+    
     return templates.TemplateResponse(
         request=request, 
         name="report_view.html", 
-        context={"target_url": url}
+        context={"report": report_data}
     )
