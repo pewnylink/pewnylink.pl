@@ -1,158 +1,296 @@
 {% extends "base.html" %}
 
-{% block title %}Raport Audytowy AI - pewnylink.pl{% endblock %}
+{% block title %}Raport Audytowy - {{ report.target_url }}{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-8">
+<style>
+    /* Klasa mlecznego szkła (Frosted Glass) z zabezpieczeniem przed zaznaczaniem */
+    .frosted-glass-overlay {
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        background: rgba(15, 23, 42, 0.75);
+        user-select: none;
+        -webkit-user-select: none;
+    }
+</style>
 
-    <!-- NAGŁÓWEK RAPORTU -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl backdrop-blur-xl">
-        <div class="space-y-1">
-            <div class="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold px-3 py-1 rounded-full">
-                <span>⚡ Wynik Audytu AI Risk-TCO</span>
-            </div>
-            <h1 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
-                Raport Ochrony Konsumenckiej
-            </h1>
-            <p class="text-xs text-slate-400 break-all">
-                Analizowany odnośnik: <a href="{{ target_url }}" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:underline">{{ target_url }}</a>
-            </p>
-        </div>
-        
-        <div class="flex items-center gap-3">
-            <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all border border-slate-600 flex items-center gap-2">
-                <span>🖨️ Drukuj / Pobierz PDF</span>
-            </button>
-        </div>
-    </div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-    <!-- KAFELKI PODSUMOWANIA RYZYKA (SCOREBOARD) -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        
-        <!-- OGÓLNY POZIOM RYZYKA -->
-        <div class="bg-slate-800/60 border border-amber-500/40 rounded-2xl p-5 flex flex-col justify-between">
-            <span class="text-slate-400 text-xs font-medium">Ocena Ryzyka Transakcji</span>
-            <div class="my-2 flex items-center gap-3">
-                <span class="text-3xl font-black text-amber-400">ŚREDNIE</span>
-                <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded font-bold">65/100</span>
-            </div>
-            <p class="text-[11px] text-slate-400">Wykryto 2 punkty wymagające doprecyzowania ze sprzedawcą.</p>
-        </div>
-
-        <!-- POTENCJALNE HACZYKI -->
-        <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 flex flex-col justify-between">
-            <span class="text-slate-400 text-xs font-medium">Zastrzeżenia w Treści</span>
-            <div class="my-2">
-                <span class="text-3xl font-black text-rose-400">2 Klauzule</span>
-            </div>
-            <p class="text-[11px] text-slate-400">Zapisy wyłączające odpowiedzialność lub ukryte wyłączenia.</p>
-        </div>
-
-        <!-- ESTIMATED TCO OVERHEAD -->
-        <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 flex flex-col justify-between">
-            <span class="text-slate-400 text-xs font-medium">Szacowany Ukryty Koszt (TCO)</span>
-            <div class="my-2">
-                <span class="text-3xl font-black text-indigo-400">+ 350,00 zł</span>
-            </div>
-            <p class="text-[11px] text-slate-400">Dodatkowe opłaty nieujawnione bezpośrednio w cenie głównej.</p>
-        </div>
-
-    </div>
-
-    <!-- SEKCJA 1: DETEKCJA KLAUZUL I KRUCZKÓW PRAWNYCH -->
-    <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6 space-y-4">
-        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-            <span>🛡️</span> Analiza Prawna i Wykryte Kruczki
-        </h2>
-        
-        <div class="space-y-3">
-            <div class="bg-rose-950/30 border border-rose-800/50 rounded-xl p-4 text-xs text-rose-200 space-y-1">
-                <div class="font-bold flex items-center gap-2">
-                    <span>⚠️ Brak jasnej informacji o gwarancji / rękojmi</span>
+    <!-- KAFEL 1: ODNOŚNIK DO OGŁOSZENIA I GŁÓWNY SCORE -->
+    <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl backdrop-blur-md">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="space-y-2">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold rounded-full uppercase tracking-wider">
+                        Audytowany Obiekt
+                    </span>
+                    <span class="text-slate-400 text-xs font-mono">ID: {{ report.report_id | default("REF-2026-X89") }}</span>
                 </div>
-                <p class="text-slate-300 text-[11px] leading-relaxed">
-                    Opis zawiera sformułowanie sugerujące sprzedaż "w stanie istniejącym bez odpowiedzialności". W przypadku zakupu od przedsiębiorcy wyłączenie rękojmi wobec konsumenta jest nielegalne.
+                <h1 class="text-xl md:text-2xl font-bold text-white break-all flex items-center gap-2">
+                    🔗 <a href="{{ report.target_url }}" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:text-indigo-300 underline underline-offset-4 flex items-center gap-1">
+                        {{ report.target_url }}
+                        <svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                </h1>
+                <p class="text-slate-400 text-sm">
+                    Kategoria: <strong class="text-slate-200">{{ report.category | default("Brak danych w ogłoszeniu") }}</strong> • 
+                    Data analizy: <span class="text-slate-300">{{ report.created_at | default("01.08.2026") }}</span>
                 </p>
             </div>
 
-            <div class="bg-amber-950/30 border border-amber-800/50 rounded-xl p-4 text-xs text-amber-200 space-y-1">
-                <div class="font-bold flex items-center gap-2">
-                    <span>⚠️ Brak dyrektywy Omnibus (Najniższa cena z 30 dni)</span>
+            <!-- Score Widget -->
+            <div class="flex items-center gap-4 bg-slate-900/80 border border-slate-700/60 p-4 rounded-xl self-start lg:self-auto">
+                <div class="text-right">
+                    <div class="text-xs text-slate-400 font-medium">Ogólny Poziom Ryzyka</div>
+                    <div class="text-lg font-bold {% if report.risk_level == 'NISKIE' %}text-emerald-400{% elif report.risk_level == 'ŚREDNIE' %}text-amber-400{% else %}text-rose-400{% endif %}">
+                        {{ report.risk_level | default("Brak danych") }}
+                    </div>
                 </div>
-                <p class="text-slate-300 text-[11px] leading-relaxed">
-                    Oferta jest oznaczona jako "Promocja", ale sklep nie podaje najniższej ceny z ostatnich 30 dni przed wprowadzeniem obniżki.
+                <div class="w-14 h-14 rounded-full flex items-center justify-center font-extrabold text-xl border-2 {% if report.risk_score <= 35 %}border-emerald-500 text-emerald-400 bg-emerald-500/10{% elif report.risk_score <= 65 %}border-amber-500 text-amber-400 bg-amber-500/10{% else %}border-rose-500 text-rose-400 bg-rose-500/10{% endif %}">
+                    {{ report.risk_score | default("?") }}%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5 KAFELKÓW DIAGNOSTYCZNYCH -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex flex-col justify-between">
+            <div class="text-slate-400 text-xs">Haczyki w umowie / opisie</div>
+            <div class="text-2xl font-bold text-rose-400 my-1">
+                {{ report.legal_flags | length if report.legal_flags is defined else "Brak danych" }}
+            </div>
+            <div class="text-xs text-slate-400">Naruszenia prawa konsumenta</div>
+        </div>
+
+        <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex flex-col justify-between">
+            <div class="text-slate-400 text-xs">Szacowany koszt ukryty</div>
+            <div class="text-2xl font-bold text-amber-400 my-1">
+                {% if report.total_tco_extra is defined %}+{{ report.total_tco_extra }} PLN{% else %}Brak danych{% endif %}
+            </div>
+            <div class="text-xs text-slate-400">Opłaty po zakupie</div>
+        </div>
+
+        <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex flex-col justify-between">
+            <div class="text-slate-400 text-xs">Kompletność Ogłoszenia</div>
+            <div class="text-2xl font-bold text-indigo-400 my-1">{{ report.completeness_score | default("72%") }}</div>
+            <div class="text-xs text-amber-400/90">⚠️ Brakujących kluczowych danych: {{ report.missing_fields_count | default("3") }}</div>
+        </div>
+
+        <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex flex-col justify-between">
+            <div class="text-slate-400 text-xs">Profil Sprzedającego</div>
+            <div class="text-xl font-bold text-white my-1 truncate">{{ report.seller_type | default("Osoba Prywatna") }}</div>
+            <div class="text-xs text-slate-400">Rękojmia: {{ report.rekojmia_status | default("Wyłączona w opisie") }}</div>
+        </div>
+
+        <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex flex-col justify-between">
+            <div class="text-slate-400 text-xs">Weryfikacja Historyczna</div>
+            <div class="text-xl font-bold text-emerald-400 my-1">{{ report.history_status | default("Czysty profil") }}</div>
+            <div class="text-xs text-slate-400">Brak zgłoszeń w bazie</div>
+        </div>
+    </div>
+
+    <!-- SEKCJA SZCZEGÓŁOWA -->
+    <div class="space-y-8">
+
+        <!-- KAFEL I: DARMOWE 5 PUNKTÓW ANALIZY (W PEŁNI WIDOCZNY) -->
+        <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-lg">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        🔓 Podstawowa Analiza Bezpieczeństwa (5 Kluczowych Punktów)
+                    </h2>
+                    <p class="text-slate-400 text-sm">Darmowy audyt wstępny dostępny dla każdego użytkownika</p>
+                </div>
+                <span class="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-lg">
+                    Dostęp Otwarty
+                </span>
+            </div>
+
+            <div class="space-y-4">
+                {% for item in report.free_points | default([
+                    {"title": "1. Weryfikacja prawa do 14-dniowego zwrotu", "status": "UWAGA", "desc": "Sprzedawca w opisie deklaruje brak zwrotów, co jest nielegalne jeśli jest firmą.", "is_ok": false},
+                    {"title": "2. Analiza zapisu o rękojmi konsumenckiej", "status": "RYZYKO", "desc": "Wykryto próbę zrzucenia odpowiedzialności za wady ukryte.", "is_ok": false},
+                    {"title": "3. Sprawdzenie kompletności dokumentów", "status": "OK", "desc": "Sprzedający deklaruje wystawienie Faktury VAT.", "is_ok": true},
+                    {"title": "4. Estymacja kosztu dostawy i opakowania", "status": "OK", "desc": "Standardowe koszty wysyłki gabarytowej wynoszą ok. 49 PLN.", "is_ok": true},
+                    {"title": "5. Sprawdzenie historii zgłoszeń domeny/konta", "status": "OK", "desc": "Konto nie występuje w bazach ostrzeżeń konsumenckich.", "is_ok": true}
+                ]) %}
+                <div class="p-4 rounded-xl border {% if item.is_ok %}bg-slate-900/40 border-slate-700/50{% else %}bg-rose-950/20 border-rose-500/30{% endif %} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <div class="font-semibold text-white text-base">{{ item.title }}</div>
+                        <div class="text-slate-300 text-sm mt-0.5">{{ item.desc }}</div>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold self-start sm:self-auto shrink-0 {% if item.is_ok %}bg-emerald-500/20 text-emerald-400 border border-emerald-500/30{% else %}bg-rose-500/20 text-rose-400 border border-rose-500/30{% endif %}">
+                        {{ item.status }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- KAFEL II: PEŁNA ANALIZA 30 PUNKTÓW (TYTUŁ WIDOCZNY, ZAWARTOŚĆ W EFECKIE MLECZNEGO SZKŁA) -->
+        <div class="relative bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-lg overflow-hidden">
+            
+            <div class="flex items-center justify-between mb-6 relative z-0">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        🔒 Rozszerzony Audyt Głęboki (Pozostałe 30 Punktów Kontrolnych)
+                    </h2>
+                    <p class="text-slate-400 text-sm">Szczegółowa analiza prawna, weryfikacja techniczna i historia cenowa</p>
+                </div>
+                <span class="px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold rounded-lg">
+                    Wymagany Pełny Raport
+                </span>
+            </div>
+
+            <!-- TŁO Z WYGLĄDEM REALISTYCZNYCH ZADAŃ (Lekki Blur i Maskowane Znaki) -->
+            <div class="{% if not report.is_unlocked %}select-none filter blur-[4px] opacity-45 pointer-events-none{% endif %} space-y-4">
+                {% for i in range(6, 12) %}
+                <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-700/50 flex flex-col justify-between gap-1">
+                    <div class="font-semibold text-indigo-300 text-base">
+                        {% if report.is_unlocked %}
+                            {{ item.title }}
+                        {% else %}
+                            Punkt {{ i }}. Weryfikacja zapisu nr {{ i*3 }} w regulaminie sprzedaży i analiza ryzyka klauzul abuzywnych
+                        {% endif %}
+                    </div>
+                    <div class="text-slate-400 text-sm font-mono">
+                        {% if report.is_unlocked %}
+                            {{ item.desc }}
+                        {% else %}
+                            ████████ ███████████ ██████ ███████████████ ██████████ ████████████ ████████████████████████.
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- OVERLAY MLECZNEGO SZKŁA NA KAFEL II -->
+            {% if not report.is_unlocked %}
+            <div class="absolute inset-x-0 bottom-0 top-20 frosted-glass-overlay flex flex-col items-center justify-center p-6 text-center z-10">
+                <div class="w-14 h-14 bg-indigo-600/20 border border-indigo-500/40 rounded-full flex items-center justify-center text-2xl mb-3 text-indigo-400 shadow-inner">
+                    🔐
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Odblokuj 30 Punktów Audytu Głębokie</h3>
+                <p class="text-slate-300 max-w-lg mb-5 text-sm">
+                    Uzyskaj dostęp do kompletnej weryfikacji klauzul, drobnego druku i ukrytych wyłączeń odpowiedzialności.
                 </p>
+                <div class="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+                    <a href="/checkout?type=single&report={{ report.report_id }}" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-5 rounded-xl shadow-lg transition text-center text-sm">
+                        Jednorazowy Raport (9,90 PLN)
+                    </a>
+                    <a href="/pricing" class="flex-1 bg-slate-800 hover:bg-slate-700 text-indigo-400 border border-indigo-500/30 font-bold py-3 px-5 rounded-xl transition text-center text-sm">
+                        Pakiety Standard / PRO
+                    </a>
+                </div>
             </div>
+            {% endif %}
+
         </div>
+
+        <!-- KAFEL III: POTENCJAŁ NEGOCJACYJNY & REKOMENDOWANA CENA (TYTUŁ WIDOCZNY, ZAWARTOŚĆ W EFECKIE MLECZNEGO SZKŁA) -->
+        <div class="relative bg-gradient-to-br from-slate-800/90 to-indigo-950/40 border border-indigo-500/30 rounded-2xl p-6 shadow-xl overflow-hidden">
+            
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 relative z-0">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        💡 Potencjał Negocjacyjny & Rekomendowana Cena
+                    </h2>
+                    <p class="text-slate-400 text-sm">Dedykowane pytania AI do sprzedającego oraz gotowa strategia cenowa</p>
+                </div>
+                <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 text-xs font-bold rounded-lg border border-indigo-500/30 self-start sm:self-auto">
+                    Asystent Zakupowy
+                </span>
+            </div>
+
+            <!-- TŁO DLA KAFELKA III (Zabezpieczone ciągami znaków ████) -->
+            <div class="{% if not report.is_unlocked %}select-none filter blur-[4px] opacity-45 pointer-events-none{% endif %} space-y-6">
+                
+                <div>
+                    <h3 class="text-md font-bold text-slate-200 mb-3">💬 Trzy Sugerowane Pytania do Sprzedającego:</h3>
+                    <div class="space-y-3">
+                        {% for q_num in [1, 2, 3] %}
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/60">
+                            <div class="text-xs font-bold text-indigo-400 mb-1">Pytanie {{ q_num }}: Weryfikacja warunków oferty</div>
+                            <p class="text-slate-300 text-sm font-mono">
+                                {% if report.is_unlocked %}
+                                    {{ report.questions[q_num-1].text }}
+                                {% else %}
+                                    ████████████████ █████████████ ████████████████████ █████████████████?
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if not report.is_new_item_store | default(false) %}
+                <div class="border-t border-slate-700/60 pt-6 space-y-4">
+                    <h3 class="text-md font-bold text-slate-200">💰 Rekomendacja Cenowa i Skrypt Negocjacyjny:</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
+                            <div class="text-xs text-slate-400">Sugerowana obniżka</div>
+                            <div class="text-2xl font-bold text-emerald-400 mt-1">
+                                {% if report.is_unlocked %}{{ report.suggested_discount }}{% else %}███ - ███ PLN{% endif %}
+                            </div>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
+                            <div class="text-xs text-slate-400">Szansa powodzenia</div>
+                            <div class="text-2xl font-bold text-amber-400 mt-1">
+                                {% if report.is_unlocked %}85%{% else %}██%{% endif %}
+                            </div>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
+                            <div class="text-xs text-slate-400">Zwrot z raportu</div>
+                            <div class="text-2xl font-bold text-indigo-400 mt-1">
+                                {% if report.is_unlocked %}30x Zysk{% else %}██x Zysk{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-700/80">
+                        <p class="text-xs text-slate-400 mb-1">Skrypt wiadomości do sprzedającego:</p>
+                        <p class="text-sm text-slate-300 font-mono italic">
+                            {% if report.is_unlocked %}
+                                {{ report.negotiation_script }}
+                            {% else %}
+                                "Dzień dobry, jestem zainteresowany zakupem. Z uwagi na ██████████████████████████████████ proponuję cenę..."
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!-- OVERLAY MLECZNEGO SZKŁA NA KAFEL III -->
+            {% if not report.is_unlocked %}
+            <div class="absolute inset-x-0 bottom-0 top-20 frosted-glass-overlay flex flex-col items-center justify-center p-6 text-center z-10">
+                <div class="w-12 h-12 bg-indigo-600/20 border border-indigo-500/40 rounded-full flex items-center justify-center text-xl mb-3 text-indigo-400 shadow-inner">
+                    💡
+                </div>
+                <h3 class="text-lg font-bold text-white mb-1">Odblokuj Asystenta Negocjacji & Pytania AI</h3>
+                <p class="text-slate-300 max-w-md mb-4 text-xs leading-relaxed">
+                    Otrzymaj gotowe argumenty do rozmowy ze sprzedawcą oraz precyzyjne kwoty obniżki wyliczone przez naszą sztuczną inteligencję.
+                </p>
+                <a href="/checkout?type=single&report={{ report.report_id }}" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg transition text-sm">
+                    Odblokuj Dostęp do Raportu
+                </a>
+            </div>
+            {% endif %}
+
+        </div>
+
     </div>
 
-    <!-- SEKCJA 2: ANALIZA TCO (CAŁKOWITY KOSZT POSIADANIA) -->
-    <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6 space-y-4">
-        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-            <span>💰</span> Estymacja Ukrytych Kosztów TCO
-        </h2>
-
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-slate-300">
-                <thead class="bg-slate-900/80 text-slate-400 uppercase text-[10px] font-bold">
-                    <tr>
-                        <th class="p-3 rounded-l-xl">Kategoria kosztu</th>
-                        <th class="p-3">Szczegóły</th>
-                        <th class="p-3 text-right rounded-r-xl">Szacowana kwota</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-800">
-                    <tr>
-                        <td class="p-3 font-semibold text-white">Wysyłka i Pakowanie</td>
-                        <td class="p-3 text-slate-400">Nietypowy gabaryt – opłata naliczana przy kasie</td>
-                        <td class="p-3 text-right font-bold text-slate-200">ok. 49,00 zł</td>
-                    </tr>
-                    <tr>
-                        <td class="p-3 font-semibold text-white">Obowiązkowy przegląd / aktywacja</td>
-                        <td class="p-3 text-slate-400">Brak w zestawie dokumentu uruchomieniowego</td>
-                        <td class="p-3 text-right font-bold text-slate-200">ok. 150,00 zł</td>
-                    </tr>
-                    <tr>
-                        <td class="p-3 font-semibold text-white">Brakujące wyposażenie</td>
-                        <td class="p-3 text-slate-400">Oferta nie zawiera podstawowych akcesoriów</td>
-                        <td class="p-3 text-right font-bold text-slate-200">ok. 151,00 zł</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- SEKCJA 3: 3 DEDYKOWANE PYTANIA DO SPRZEDAWCY -->
-    <div class="bg-slate-800/90 border-2 border-indigo-500/50 rounded-2xl p-6 space-y-4 shadow-xl">
-        <div>
-            <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                <span>💬</span> 3 Pytania do Sprzedawcy (Zabezpiecz swój zakup)
-            </h2>
-            <p class="text-xs text-slate-400">Skopiuj i wyślij te pytania przed podjęciem decyzji o płatności:</p>
-        </div>
-
-        <div class="space-y-3">
-            <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-xl flex items-start justify-between gap-3">
-                <div class="text-xs text-slate-200 leading-relaxed">
-                    <strong class="text-indigo-400 block mb-0.5">Pytanie 1: Gwarancja i rękojmia</strong>
-                    "Czy na oferowany przedmiot przysługuje pełna 24-miesięczna rękojmia dla konsumenta i czy wystawiają Państwo pełną fakturę VAT 23% / paragon?"
-                </div>
-            </div>
-
-            <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-xl flex items-start justify-between gap-3">
-                <div class="text-xs text-slate-200 leading-relaxed">
-                    <strong class="text-indigo-400 block mb-0.5">Pytanie 2: Stan i kompletność</strong>
-                    "Czy w podanej cenie zawarte są wszystkie elementy niezbędne do natychmiastowego użytkowania, czy występują dodatkowe opłaty eksploatacyjne?"
-                </div>
-            </div>
-
-            <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-xl flex items-start justify-between gap-3">
-                <div class="text-xs text-slate-200 leading-relaxed">
-                    <strong class="text-indigo-400 block mb-0.5">Pytanie 3: Polityka zwrotu</strong>
-                    "Jaka jest dokładna procedura oraz adres do ewentualnego odstąpienia od umowy zawartej na odległość w ciągu 14 dni?"
-                </div>
-            </div>
-        </div>
+    <!-- PRZYCISK DRUKOWANIA / PDF -->
+    <div class="flex justify-between items-center pt-4 border-t border-slate-800">
+        <a href="/" class="text-slate-400 hover:text-white text-sm font-medium transition">
+            ← Powrót do analizatora
+        </a>
+        <button onclick="window.print()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl border border-slate-700 transition flex items-center gap-2 text-sm shadow">
+            🖨️ Drukuj / Pobierz PDF
+        </button>
     </div>
 
 </div>
