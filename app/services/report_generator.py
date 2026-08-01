@@ -66,9 +66,10 @@ async def generate_audit_report(listing_text: str, target_url: str, industry: st
     # 4. Zapis dokumentu w MongoDB
     result = reports_collection.insert_one(report_document)
     
-    # 5. Przypisanie id z MongoDB oraz id raportu w formacie tekstowym
+    # 5. Przypisanie bezpiecznych identyfikatorów tekstowych (konwersja ObjectId)
     generated_id = str(result.inserted_id)
     report_document["id"] = generated_id
+    report_document["_id"] = generated_id  # Nadpisujemy surowy ObjectId ciągiem znaków dla bezpieczeństwa Jinja2
     report_document["report_id"] = audit_results.get("report_id", f"REP-{generated_id[-6:].upper()}")
 
     return report_document

@@ -128,7 +128,7 @@
             </div>
         </div>
 
-        <!-- KAFEL II: PEŁNA ANALIZA 30 PUNKTÓW (TYTUŁ WIDOCZNY, ZAWARTOŚĆ W EFECKIE MLECZNEGO SZKŁA) -->
+        <!-- KAFEL II: PEŁNA ANALIZA 30 PUNKTÓW (TYTUŁ WIDOCZNY, ZAWARTOŚĆ W EFEKCIE MLECZNEGO SZKŁA) -->
         <div class="relative bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-lg overflow-hidden">
             
             <div class="flex items-center justify-between mb-6 relative z-0">
@@ -143,26 +143,31 @@
                 </span>
             </div>
 
-            <!-- TŁO Z WYGLĄDEM REALISTYCZNYCH ZADAŃ (Lekki Blur i Maskowane Znaki) -->
+            <!-- TŁO Z WYGLĄDEM REALISTYCZNYCH ZADAŃ -->
             <div class="{% if not report.is_unlocked %}select-none filter blur-[4px] opacity-45 pointer-events-none{% endif %} space-y-4">
-                {% for i in range(6, 12) %}
-                <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-700/50 flex flex-col justify-between gap-1">
-                    <div class="font-semibold text-indigo-300 text-base">
-                        {% if report.is_unlocked %}
+                {% if report.is_unlocked and report.extended_points is defined %}
+                    {% for item in report.extended_points %}
+                    <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-700/50 flex flex-col justify-between gap-1">
+                        <div class="font-semibold text-indigo-300 text-base">
                             {{ item.title }}
-                        {% else %}
-                            Punkt {{ i }}. Weryfikacja zapisu nr {{ i*3 }} w regulaminie sprzedaży i analiza ryzyka klauzul abuzywnych
-                        {% endif %}
-                    </div>
-                    <div class="text-slate-400 text-sm font-mono">
-                        {% if report.is_unlocked %}
+                        </div>
+                        <div class="text-slate-300 text-sm">
                             {{ item.desc }}
-                        {% else %}
-                            ████████ ███████████ ██████ ███████████████ ██████████ ████████████ ████████████████████████.
-                        {% endif %}
+                        </div>
                     </div>
-                </div>
-                {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    {% for i in range(6, 12) %}
+                    <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-700/50 flex flex-col justify-between gap-1">
+                        <div class="font-semibold text-indigo-300 text-base">
+                            Punkt {{ i }}. Weryfikacja zapisu nr {{ i*3 }} w regulaminie sprzedaży i analiza ryzyka klauzul abuzywnych
+                        </div>
+                        <div class="text-slate-400 text-sm font-mono">
+                            ████████ ███████████ ██████ ███████████████ ██████████ ████████████ ████████████████████████.
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
             </div>
 
             <!-- OVERLAY MLECZNEGO SZKŁA NA KAFEL II -->
@@ -188,7 +193,7 @@
 
         </div>
 
-        <!-- KAFEL III: POTENCJAŁ NEGOCJACYJNY & REKOMENDOWANA CENA (TYTUŁ WIDOCZNY, ZAWARTOŚĆ W EFECKIE MLECZNEGO SZKŁA) -->
+        <!-- KAFEL III: POTENCJAŁ NEGOCJACYJNY & REKOMENDOWANA CENA (TYTUŁ WIDOCZNY, ZAWARTOŚĆ W EFEKCIE MLECZNEGO SZKŁA) -->
         <div class="relative bg-gradient-to-br from-slate-800/90 to-indigo-950/40 border border-indigo-500/30 rounded-2xl p-6 shadow-xl overflow-hidden">
             
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 relative z-0">
@@ -203,7 +208,7 @@
                 </span>
             </div>
 
-            <!-- TŁO DLA KAFELKA III (Zabezpieczone ciągami znaków ████) -->
+            <!-- TŁO DLA KAFELKA III -->
             <div class="{% if not report.is_unlocked %}select-none filter blur-[4px] opacity-45 pointer-events-none{% endif %} space-y-6">
                 
                 <div>
@@ -213,7 +218,7 @@
                         <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/60">
                             <div class="text-xs font-bold text-indigo-400 mb-1">Pytanie {{ q_num }}: Weryfikacja warunków oferty</div>
                             <p class="text-slate-300 text-sm font-mono">
-                                {% if report.is_unlocked %}
+                                {% if report.is_unlocked and report.questions is defined and report.questions | length >= q_num %}
                                     {{ report.questions[q_num-1].text }}
                                 {% else %}
                                     ████████████████ █████████████ ████████████████████ █████████████████?
@@ -231,19 +236,19 @@
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
                             <div class="text-xs text-slate-400">Sugerowana obniżka</div>
                             <div class="text-2xl font-bold text-emerald-400 mt-1">
-                                {% if report.is_unlocked %}{{ report.suggested_discount }}{% else %}███ - ███ PLN{% endif %}
+                                {% if report.is_unlocked %}{{ report.suggested_discount | default("-150 PLN") }}{% else %}███ - ███ PLN{% endif %}
                             </div>
                         </div>
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
                             <div class="text-xs text-slate-400">Szansa powodzenia</div>
                             <div class="text-2xl font-bold text-amber-400 mt-1">
-                                {% if report.is_unlocked %}85%{% else %}██%{% endif %}
+                                {% if report.is_unlocked %}{{ report.negotiation_success_rate | default("85%") }}{% else %}██%{% endif %}
                             </div>
                         </div>
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
                             <div class="text-xs text-slate-400">Zwrot z raportu</div>
                             <div class="text-2xl font-bold text-indigo-400 mt-1">
-                                {% if report.is_unlocked %}30x Zysk{% else %}██x Zysk{% endif %}
+                                {% if report.is_unlocked %}{{ report.roi_multiplier | default("30x") }} Zysk{% else %}██x Zysk{% endif %}
                             </div>
                         </div>
                     </div>
@@ -252,7 +257,7 @@
                         <p class="text-xs text-slate-400 mb-1">Skrypt wiadomości do sprzedającego:</p>
                         <p class="text-sm text-slate-300 font-mono italic">
                             {% if report.is_unlocked %}
-                                {{ report.negotiation_script }}
+                                {{ report.negotiation_script | default("Dzień dobry, z uwagi na stan przedmiotu proponuję cenę...") }}
                             {% else %}
                                 "Dzień dobry, jestem zainteresowany zakupem. Z uwagi na ██████████████████████████████████ proponuję cenę..."
                             {% endif %}
