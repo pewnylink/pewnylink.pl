@@ -1,9 +1,38 @@
+# Środowisko wirtualne Python
 venv/
 .venv/
+ENV/
+
+# Pamięć podręczna i kompilacja Pythona
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Środowiskowe pliki konfiguracyjne (KRYTYCZNE: sekrety, klucze API)
 .env
+.env.*
+!.env.example
+
+# Bazy danych (lokalne SQLite)
+*.db
+*.sqlite
+*.sqlite3
+sql_app.db
+
+# Pliki środowisk programistycznych / edytorów
 .vscode/
+.idea/
+*.swp
+
+# Pliki Tymczasowe / Raporty / Archiwa
 *.zip
+*.tar.gz
 *.txt
 *login_haslo*
+
+# Narzędzia testowe i lintery
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/

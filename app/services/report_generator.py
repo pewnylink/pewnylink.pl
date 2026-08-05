@@ -1,11 +1,11 @@
 import json
 import re
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, List
 
 from app.config import settings
-from app.database import reports_collection
 from app.models.report import ChecklistPoint, FreemiumPreview, NegotiationAssistant
 from app.services.audit_service import AuditEngine
 
@@ -47,7 +47,8 @@ async def generate_audit_report(
     target_url: str, 
     industry: str = "general", 
     is_unlocked: bool = False
-) -> dict:
+) -> Dict[str, Any]:
+    """Generuje kompletny dokument raportu audytowego gotowy do wyświetlenia lub zapisu."""
     config = load_checklist_config()
     clean_text = anonymize_text(listing_text)
     
@@ -80,8 +81,15 @@ async def generate_audit_report(
     if len(questions_to_seller) < 3:
         questions_to_seller = default_questions
 
-    # 4. Przygotowanie dokumentu raportu z pełnym zestawem danych dla MongoDB oraz Jinja2
+    # 4. Generowanie unikalnych identyfikatorów raportu (Standard SaaS UUID4)
+    report_uuid = str(uuid.uuid4())
+    short_code = report_uuid.replace("-", "")[:8].upper()
+
+    # 5. Przygotowanie dokumentu raportu dla widoków Jinja2 oraz bazy PostgreSQL
     report_document = {
+        "id": report_uuid,
+        "_id": report_uuid,
+        "report_id": f"REP-{short_code}",
         "created_at": datetime.now(timezone.utc),
         "created_at_formatted": datetime.now(timezone.utc).strftime("%d.%m.%Y"),
         "source_url": target_url,
@@ -126,19 +134,10 @@ async def generate_audit_report(
             "questions_to_seller": questions_to_seller[:3]
         },
         
-        # Dodatkowe statusy pomocnicze dla szablonów HTML
+        # Statusy pomocnicze dla szablonów HTML
         "risk_score": audit_results.get("risk_score", 30),
         "risk_level": audit_results.get("risk_level", "NISKIE"),
         "rekojmia_status": audit_results.get("rekojmia_status", "Obowiązuje")
     }
-
-    # 5. Zapis dokumentu w MongoDB
-    result = reports_collection.insert_one(report_document)
-    
-    # 6. Konwersja identyfikatorów
-    generated_id = str(result.inserted_id)
-    report_document["id"] = generated_id
-    report_document["_id"] = generated_id
-    report_document["report_id"] = f"REP-{generated_id[-6:].upper()}"
 
     return report_document

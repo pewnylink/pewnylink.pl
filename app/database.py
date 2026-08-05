@@ -1,27 +1,53 @@
 import os
-from pathlib import Path
-from pymongo import MongoClient
+from typing import AsyncGenerator
 from dotenv import load_dotenv
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
+from sqlalchemy.orm import DeclarativeBase
 
-# Wskazanie pliku .env w głównym katalogu projektu
-BASE_DIR = Path(__file__).resolve().parent.parent
-ENV_PATH = BASE_DIR / ".env"
+# Wczytanie zmiennych z pliku .env
+load_dotenv()
 
-load_dotenv(dotenv_path=ENV_PATH)
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME")
 
-MONGO_URI = os.getenv("MONGO_URI")
+# Budowa URL z wymuszonym szyfrowaniem SSL (standard m.in. w Neon.tech i Supabase)
+DATABASE_URL = (
+    f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}"
+    f"@{DB_HOST}:{DB_PORT}/{DB_NAME}?ssl=require"
+)
 
-if not MONGO_URI:
-    raise ValueError(
-        f"Brak zmiennej MONGO_URI! Szukano w ścieżce: {ENV_PATH}."
-    )
+# Tworzenie asynchronicznego silnika bazy danych
+engine = create_async_engine(
+    DATABASE_URL,
+    echo=False,          # Ustaw True, aby widzieć zapytania SQL w konsoli podczas developmentu
+    pool_size=5,         # Liczba stałych połączeń w puli
+    max_overflow=10,     # Maksymalna liczba dodatkowych połączeń przy obciążeniu
+    pool_recycle=300,    # Odświeżanie połączeń co 5 minut (zapobiega zrywaniu przez chmurę)
+)
 
-# Inicjalizacja połączenia z klientem MongoDB
-client = MongoClient(MONGO_URI)
+# Fabryka asynchronicznych sesji
+AsyncSessionLocal = async_sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autoflush=False,
+)
 
-# JAWNE WSKAZANIE NAZWY BAZY DANYCH
-# Dzięki temu kod zadziała niezależnie od postaci URI w pliku .env
-db = client.get_database("bezpiecznik_db")
+# Klasa bazowa dla wszystkich modeli tabel (SQLAlchemy 2.0 style)
+class Base(DeclarativeBase):
+    pass
 
-# Kolekcja dla raportów
-reports_collection = db["reports"]
+# Generator sesji do użycia w aplikacjach (np. FastAPI lub skryptach)
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+        finally:
+            await session.close()

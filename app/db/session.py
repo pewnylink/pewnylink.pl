@@ -1,9 +1,10 @@
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
+from app.core.config import settings
 
-# Domyślnie SQLite async pod dev, w produkcji podmieniane na postgresql+asyncpg://...
-DATABASE_URL = "sqlite+aiosqlite:///./sql_app.db"
+# Pobieranie adresu bazy z pliku .env / app/core/config.py
+DATABASE_URL = settings.DATABASE_URL
 
 class Base(DeclarativeBase):
     """Główna klasa bazowa dla wszystkich modeli ORM"""
@@ -23,6 +24,6 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    """Dependency do wstrzykiwania sesji w endpointach FastAPI"""
+    """Dependency do wstrzykiwania sesji bazy danych w endpointach FastAPI"""
     async with AsyncSessionLocal() as session:
         yield session

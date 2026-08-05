@@ -1,17 +1,18 @@
 import os
-from fastapi import FastAPI, Request, Query, Form, HTTPException
+from fastapi import FastAPI, Request, Query, Form, HTTPException, Depends, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from bson import ObjectId
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.routers import admin, pages
 from app.services.report_generator import generate_audit_report
-from app.database import reports_collection
 from app.services.audit_service import AuditEngine
+from app.database import get_db  # Pobiera asynchroniczną sesję z PostgreSQL
 
 # 1. Tworzymy instancję aplikacji FastAPI
-app = FastAPI(title="bezpiecznik.pl API", version="1.0.0")
+app = FastAPI(title="pewnylink.pl API", version="1.0.0")
 
 # 2. Podłączamy routery
 app.include_router(pages.router)
@@ -26,6 +27,20 @@ if os.path.exists(STATIC_DIR):
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
+
+
+# 3. ENDPOINT DLA CRON-JOB.ORG (PODTRZYMANIE BAZY I SERWERA)
+@app.get("/health", tags=["Monitoring"])
+async def health_check(db: AsyncSession = Depends(get_db)):
+    try:
+        # Wykonuje szybkie zapytanie SELECT 1 do PostgreSQL na Neon.tech
+        await db.execute(text("SELECT 1"))
+        return {"status": "ok", "database": "connected"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Baza danych nie odpowiada: {str(e)}"
+        )
 
 
 # GŁÓWNA STRONA (LANDING PAGE)
@@ -80,7 +95,7 @@ async def create_report_post(
     return RedirectResponse(url=f"/report/{report_doc['id']}", status_code=303)
 
 
-# PODGLĄD ZAPISANEGO RAPORTU PO ID Z MONGODB LUB WIDOK DEMO
+# PODGLĄD ZAPISANEGO RAPORTU PO ID LUB WIDOK DEMO
 @app.get("/report/{report_id}", response_class=HTMLResponse)
 async def get_report_by_id(
     request: Request, 
@@ -89,7 +104,7 @@ async def get_report_by_id(
 ):
     doc = None
     
-    # 1. OBSŁUGA RAPORTU TESTOWEGO / DEMO (Omija bazę MongoDB)
+    # OBSŁUGA RAPORTU TESTOWEGO / DEMO
     if report_id.startswith("REP-DEMO") or report_id == "demo":
         doc = await AuditEngine.analyze_url(
             url="https://www.olx.pl/d/oferta/priorytetowy-audyt-testowy-ID999.html",
@@ -98,25 +113,11 @@ async def get_report_by_id(
         )
         doc["id"] = report_id
     else:
-        # 2. Dualne wyszukiwanie w MongoDB: ObjectId vs String
-        if ObjectId.is_valid(report_id):
-            try:
-                doc = reports_collection.find_one({"_id": ObjectId(report_id)})
-            except Exception:
-                doc = None
-
-        if not doc:
-            doc = reports_collection.find_one({"_id": report_id})
-
-        if not doc:
-            raise HTTPException(status_code=404, detail="Raport nie został odnaleziony")
-
-        doc["id"] = str(doc["_id"])
-        doc["_id"] = str(doc["_id"])
-
-        if unlocked:
-            doc["is_unlocked"] = True
-            doc["is_paid"] = True
+        # Miejsce na zapytanie SQLAlchemy do bazy PostgreSQL
+        raise HTTPException(
+            status_code=404, 
+            detail="Raporty z bazy danych będą dostępne po zdefiniowaniu modeli PostgreSQL."
+        )
 
     return templates.TemplateResponse(
         request=request, 
