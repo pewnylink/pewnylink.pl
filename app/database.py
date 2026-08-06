@@ -1,3 +1,4 @@
+import json
 import os
 from typing import AsyncGenerator
 from dotenv import load_dotenv
@@ -23,13 +24,16 @@ DATABASE_URL = (
     f"@{DB_HOST}:{DB_PORT}/{DB_NAME}?ssl=require"
 )
 
-# Tworzenie asynchronicznego silnika bazy danych
+# Tworzenie asynchronicznego silnika bazy danych z własnym serializatorem JSON (konwersja datetime -> str)
 engine = create_async_engine(
     DATABASE_URL,
     echo=False,          # Ustaw True, aby widzieć zapytania SQL w konsoli podczas developmentu
     pool_size=5,         # Liczba stałych połączeń w puli
     max_overflow=10,     # Maksymalna liczba dodatkowych połączeń przy obciążeniu
     pool_recycle=300,    # Odświeżanie połączeń co 5 minut (zapobiega zrywaniu przez chmurę)
+    json_serializer=lambda obj: json.dumps(
+        obj, default=str, ensure_ascii=False
+    ),
 )
 
 # Fabryka asynchronicznych sesji
