@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Dict, Any, List
 
 from app.config import settings
-from app.models.report import ChecklistPoint, FreemiumPreview, NegotiationAssistant
 from app.services.audit_service import AuditEngine
 
 
@@ -29,7 +28,7 @@ def anonymize_text(text: str) -> str:
 
 
 def _build_checkpoints_list(raw_points: List[str]) -> List[dict]:
-    """Przekształca listę tekstowych punktów kontrolnych na obiekty ze słownika ChecklistPoint."""
+    """Przekształca listę tekstowych punktów kontrolnych na obiekty słownika."""
     checkpoints = []
     for idx, point_title in enumerate(raw_points, start=1):
         checkpoints.append({
@@ -48,7 +47,7 @@ async def generate_audit_report(
     industry: str = "general", 
     is_unlocked: bool = False
 ) -> Dict[str, Any]:
-    """Generuje kompletny dokument raportu audytowego gotowy do wyświetlenia lub zapisu."""
+    """Generuje kompletny słownik raportu audytowego gotowy do zapisu w repozytorium SQL lub wyświetlenia w HTML."""
     config = load_checklist_config()
     clean_text = anonymize_text(listing_text)
     
@@ -81,14 +80,13 @@ async def generate_audit_report(
     if len(questions_to_seller) < 3:
         questions_to_seller = default_questions
 
-    # 4. Generowanie unikalnych identyfikatorów raportu (Standard SaaS UUID4)
+    # 4. Generowanie unikalnego identyfikatora UUID v4 (PostgreSQL STANDARD)
     report_uuid = str(uuid.uuid4())
     short_code = report_uuid.replace("-", "")[:8].upper()
 
-    # 5. Przygotowanie dokumentu raportu dla widoków Jinja2 oraz bazy PostgreSQL
+    # 5. Przygotowanie dokumentu raportu
     report_document = {
         "id": report_uuid,
-        "_id": report_uuid,
         "report_id": f"REP-{short_code}",
         "created_at": datetime.now(timezone.utc),
         "created_at_formatted": datetime.now(timezone.utc).strftime("%d.%m.%Y"),
@@ -134,7 +132,7 @@ async def generate_audit_report(
             "questions_to_seller": questions_to_seller[:3]
         },
         
-        # Statusy pomocnicze dla szablonów HTML
+        # Statusy pomocnicze
         "risk_score": audit_results.get("risk_score", 30),
         "risk_level": audit_results.get("risk_level", "NISKIE"),
         "rekojmia_status": audit_results.get("rekojmia_status", "Obowiązuje")

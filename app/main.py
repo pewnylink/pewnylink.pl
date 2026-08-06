@@ -1,4 +1,6 @@
+# app/main.py
 import os
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Query, Form, HTTPException, Depends, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -9,12 +11,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.routers import admin, pages
 from app.services.report_generator import generate_audit_report
 from app.services.audit_service import AuditEngine
-from app.database import get_db  # Pobiera asynchroniczną sesję z PostgreSQL
+from app.services.report_repository import ReportRepository
+from app.database import engine, Base, get_db
+import app.models.db_models  # Rejestracja modeli w SQLAlchemy przed migracją
 
-# 1. Tworzymy instancję aplikacji FastAPI
-app = FastAPI(title="pewnylink.pl API", version="1.0.0")
 
-# 2. Podłączamy routery
+# 1. Zarządzanie cyklem życia aplikacji (Lifespan)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Automatyczne tworzenie tabel w PostgreSQL (Neon.tech) przy starcie serwera
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+
+
+# 2. Tworzymy instancję aplikacji FastAPI z cyklem życia lifespan
+app = FastAPI(title="pewnylink.pl API", version="1.0.0", lifespan=lifespan)
+
+# 3. Podłączamy routery
 app.include_router(pages.router)
 app.include_router(admin.router)
 
@@ -29,11 +43,10 @@ if os.path.exists(STATIC_DIR):
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 
-# 3. ENDPOINT DLA CRON-JOB.ORG (PODTRZYMANIE BAZY I SERWERA)
+# 4. ENDPOINT MONITORINGU DLA CRON-JOB.ORG
 @app.get("/health", tags=["Monitoring"])
 async def health_check(db: AsyncSession = Depends(get_db)):
     try:
-        # Wykonuje szybkie zapytanie SELECT 1 do PostgreSQL na Neon.tech
         await db.execute(text("SELECT 1"))
         return {"status": "ok", "database": "connected"}
     except Exception as e:
@@ -55,12 +68,14 @@ async def get_report(
     request: Request, 
     url: str = Query(..., description="Adres URL oferty"), 
     admin: bool = Query(False, description="Flaga dostępu administratora"),
-    industry: str = Query("general", description="Kategoria / Branża oferty")
+    industry: str = Query("general", description="Kategoria / Branża oferty"),
+    db: AsyncSession = Depends(get_db)
 ):
     target_url = url.strip()
     if not target_url.startswith(("http://", "https://")):
         target_url = f"https://{target_url}"
     
+    # 1. Generowanie struktury raportu w pamięci
     report_doc = await generate_audit_report(
         listing_text="",
         target_url=target_url,
@@ -68,10 +83,11 @@ async def get_report(
         is_unlocked=admin
     )
     
-    report_id = report_doc["id"]
-    unlocked_param = "?unlocked=true" if admin else ""
+    # 2. Zapis w PostgreSQL przez ReportRepository
+    saved_report = await ReportRepository.create_report(db, report_doc)
     
-    return RedirectResponse(url=f"/report/{report_id}{unlocked_param}", status_code=303)
+    unlocked_param = "?unlocked=true" if admin else ""
+    return RedirectResponse(url=f"/report/{saved_report.report_id}{unlocked_param}", status_code=303)
 
 
 # STRONA GENEROWANIA RAPORTU (POST z formularza głównego)
@@ -79,12 +95,14 @@ async def get_report(
 async def create_report_post(
     request: Request,
     url: str = Form(...),
-    industry: str = Form("general")
+    industry: str = Form("general"),
+    db: AsyncSession = Depends(get_db)
 ):
     target_url = url.strip()
     if not target_url.startswith(("http://", "https://")):
         target_url = f"https://{target_url}"
 
+    # 1. Generowanie struktury raportu w pamięci
     report_doc = await generate_audit_report(
         listing_text="",
         target_url=target_url,
@@ -92,7 +110,10 @@ async def create_report_post(
         is_unlocked=False
     )
 
-    return RedirectResponse(url=f"/report/{report_doc['id']}", status_code=303)
+    # 2. Zapis w PostgreSQL przez ReportRepository
+    saved_report = await ReportRepository.create_report(db, report_doc)
+
+    return RedirectResponse(url=f"/report/{saved_report.report_id}", status_code=303)
 
 
 # PODGLĄD ZAPISANEGO RAPORTU PO ID LUB WIDOK DEMO
@@ -100,7 +121,8 @@ async def create_report_post(
 async def get_report_by_id(
     request: Request, 
     report_id: str, 
-    unlocked: bool = Query(False)
+    unlocked: bool = Query(False),
+    db: AsyncSession = Depends(get_db)
 ):
     doc = None
     
@@ -113,11 +135,34 @@ async def get_report_by_id(
         )
         doc["id"] = report_id
     else:
-        # Miejsce na zapytanie SQLAlchemy do bazy PostgreSQL
-        raise HTTPException(
-            status_code=404, 
-            detail="Raporty z bazy danych będą dostępne po zdefiniowaniu modeli PostgreSQL."
-        )
+        # Pobranie trwałego raportu z bazy danych PostgreSQL
+        db_report = await ReportRepository.get_by_report_id(db, report_id)
+        if not db_report:
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Raport o identyfikatorze '{report_id}' nie został znaleziony."
+            )
+        
+        # Przekształcenie rekordu SQL na słownik dla szablonów Jinja2
+        doc = {
+            "id": str(db_report.id),
+            "report_id": db_report.report_id,
+            "target_url": db_report.target_url,
+            "source_url": db_report.source_url,
+            "title_raw": db_report.title_raw,
+            "category": db_report.category,
+            "industry_name": db_report.industry_name,
+            "is_paid": db_report.is_paid,
+            "is_unlocked": db_report.is_unlocked or unlocked,
+            "risk_score": db_report.risk_score,
+            "risk_level": db_report.risk_level,
+            "freemium_preview": db_report.freemium_preview,
+            "digital_footprint": db_report.digital_footprint,
+            "financial_analysis": db_report.financial_analysis,
+            "expert_checkpoints": db_report.expert_checkpoints,
+            "negotiation_assistant": db_report.negotiation_assistant,
+            "created_at_formatted": db_report.created_at.strftime("%d.%m.%Y") if db_report.created_at else ""
+        }
 
     return templates.TemplateResponse(
         request=request, 

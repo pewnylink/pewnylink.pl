@@ -1,5 +1,5 @@
 # app/models/report.py
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, HttpUrl
 from app.legal.legal_shield import MANDATORY_DISCLAIMER
@@ -50,21 +50,22 @@ class NegotiationAssistant(BaseModel):
     questions_to_seller: List[str] = Field(..., min_length=3, max_length=3, description="3 precyzyjne pytania do ogłoszeniodawcy")
 
 
-# --- GŁÓWNY MODEL RAPORTU SAAS ---
+# --- GŁÓWNY MODEL RAPORTU SAAS (Pydantic DTO) ---
 class PewnyLinkReport(BaseModel):
-    id: Optional[str] = Field(default=None, alias="_id")
+    id: Optional[str] = Field(default=None, description="Identyfikator UUID v4 raportu")
+    report_id: Optional[str] = Field(default=None, description="Format czytelny REP-XXXXX")
     source_url: str
     title_raw: str
-    deep_link: str
     category: str = Field(
         ..., 
         description="heavy_machinery | medical_devices | automotive | real_estate | bicycles | general"
     )
-    generated_at: datetime = Field(default_factory=datetime.utcnow)
+    generated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     algorithm_version: str = "PewnyLink AI v2.0-SevArt"
     
     # Status Płatności i Dostęp
     is_paid: bool = Field(default=False, description="True odblokowuje 30 punktów eksperckich i sekcję negocjacji")
+    is_unlocked: bool = Field(default=False)
     
     # 1. Warstwa Darmowa (Freemium - 5 Punktów)
     freemium_preview: FreemiumPreview
@@ -86,4 +87,4 @@ class PewnyLinkReport(BaseModel):
     disclaimer: str = MANDATORY_DISCLAIMER
 
     class Config:
-        populate_by_name = True
+        from_attributes = True
