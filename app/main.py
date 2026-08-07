@@ -26,10 +26,10 @@ async def lifespan(app: FastAPI):
     yield
 
 
-# 2. Tworzymy instancję aplikacji FastAPI z cyklem życia lifespan
+# 2. Tworzenie instancji aplikacji FastAPI
 app = FastAPI(title="pewnylink.pl API", version="1.0.0", lifespan=lifespan)
 
-# 3. Podłączamy routery (Strony HTML oraz REST API)
+# 3. Podłączanie routerów (Strony HTML oraz REST API)
 app.include_router(pages.router)
 app.include_router(admin.router)
 app.include_router(reports_api_router, prefix="/api/v1")
@@ -77,7 +77,6 @@ async def get_report(
     if not target_url.startswith(("http://", "https://")):
         target_url = f"https://{target_url}"
     
-    # 1. Generowanie struktury raportu w pamięci
     report_doc = await generate_audit_report(
         listing_text="",
         target_url=target_url,
@@ -85,9 +84,7 @@ async def get_report(
         is_unlocked=admin
     )
     
-    # 2. Zapis w PostgreSQL przez ReportRepository
     saved_report = await ReportRepository.create_report(db, report_doc)
-    
     unlocked_param = "?unlocked=true" if admin else ""
     return RedirectResponse(url=f"/report/{saved_report.report_id}{unlocked_param}", status_code=303)
 
@@ -104,7 +101,6 @@ async def create_report_post(
     if not target_url.startswith(("http://", "https://")):
         target_url = f"https://{target_url}"
 
-    # 1. Generowanie struktury raportu w pamięci
     report_doc = await generate_audit_report(
         listing_text="",
         target_url=target_url,
@@ -112,9 +108,7 @@ async def create_report_post(
         is_unlocked=False
     )
 
-    # 2. Zapis w PostgreSQL przez ReportRepository
     saved_report = await ReportRepository.create_report(db, report_doc)
-
     return RedirectResponse(url=f"/report/{saved_report.report_id}", status_code=303)
 
 
@@ -128,7 +122,6 @@ async def get_report_by_id(
 ):
     doc = None
     
-    # OBSŁUGA RAPORTU TESTOWEGO / DEMO
     if report_id.startswith("REP-DEMO") or report_id == "demo":
         doc = await AuditEngine.analyze_url(
             url="https://www.olx.pl/d/oferta/priorytetowy-audyt-testowy-ID999.html",
@@ -137,7 +130,6 @@ async def get_report_by_id(
         )
         doc["id"] = report_id
     else:
-        # Pobranie trwałego raportu z bazy danych PostgreSQL
         db_report = await ReportRepository.get_by_report_id(db, report_id)
         if not db_report:
             raise HTTPException(
@@ -145,7 +137,6 @@ async def get_report_by_id(
                 detail=f"Raport o identyfikatorze '{report_id}' nie został znaleziony."
             )
         
-        # Przekształcenie rekordu SQL na słownik dla szablonów Jinja2
         doc = {
             "id": str(db_report.id),
             "report_id": db_report.report_id,
