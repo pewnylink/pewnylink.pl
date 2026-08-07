@@ -12,6 +12,26 @@
         user-select: none;
         -webkit-user-select: none;
     }
+
+    /* Poprawki do druku i generowania PDF */
+    @media print {
+        .frosted-glass-overlay,
+        button,
+        a[href="/"],
+        a[href^="/checkout"],
+        a[href^="/pricing"] {
+            display: none !important;
+        }
+        .filter.blur-\[4px\] {
+            filter: none !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+        body {
+            background: white !important;
+            color: black !important;
+        }
+    }
 </style>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -46,7 +66,7 @@
                         {{ report.risk_level | default("Brak danych") }}
                     </div>
                 </div>
-                <div class="w-14 h-14 rounded-full flex items-center justify-center font-extrabold text-xl border-2 {% if report.risk_score <= 35 %}border-emerald-500 text-emerald-400 bg-emerald-500/10{% elif report.risk_score <= 65 %}border-amber-500 text-amber-400 bg-amber-500/10{% else %}border-rose-500 text-rose-400 bg-rose-500/10{% endif %}">
+                <div class="w-14 h-14 rounded-full flex items-center justify-center font-extrabold text-xl border-2 {% if (report.risk_score | default(100) | int) <= 35 %}border-emerald-500 text-emerald-400 bg-emerald-500/10{% elif (report.risk_score | default(100) | int) <= 65 %}border-amber-500 text-amber-400 bg-amber-500/10{% else %}border-rose-500 text-rose-400 bg-rose-500/10{% endif %}">
                     {{ report.risk_score | default("?") }}%
                 </div>
             </div>
@@ -58,7 +78,7 @@
         <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex flex-col justify-between">
             <div class="text-slate-400 text-xs">Haczyki w umowie / opisie</div>
             <div class="text-2xl font-bold text-rose-400 my-1">
-                {{ report.digital_footprint.risk_phrases_detected | length if report.digital_footprint is defined and report.digital_footprint.risk_phrases_detected is defined else 0 }}
+                {{ (report.digital_footprint.risk_phrases_detected | default([])) | length if report.digital_footprint is defined else 0 }}
             </div>
             <div class="text-xs text-slate-400">Naruszenia i ryzyka konsumenckie</div>
         </div>
@@ -78,7 +98,7 @@
         <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex flex-col justify-between">
             <div class="text-slate-400 text-xs">Dni na rynku</div>
             <div class="text-2xl font-bold text-indigo-400 my-1">
-                {{ report.digital_footprint.active_days_on_market if report.digital_footprint is defined else 1 }} dn.
+                {{ report.digital_footprint.active_days_on_market if report.digital_footprint is defined and report.digital_footprint.active_days_on_market is defined else 1 }} dn.
             </div>
             <div class="text-xs text-slate-400">Aktywność ogłoszenia</div>
         </div>
@@ -86,7 +106,7 @@
         <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex flex-col justify-between">
             <div class="text-slate-400 text-xs">Profil Sprzedającego</div>
             <div class="text-xl font-bold text-white my-1 truncate">
-                {{ report.financial_analysis.tax_form if report.financial_analysis is defined else "Osoba Prywatna" }}
+                {{ report.financial_analysis.tax_form if report.financial_analysis is defined and report.financial_analysis.tax_form is defined else "Osoba Prywatna" }}
             </div>
             <div class="text-xs text-slate-400">Rękojmia: {{ report.rekojmia_status | default("Obowiązuje") }}</div>
         </div>
@@ -94,7 +114,7 @@
         <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex flex-col justify-between">
             <div class="text-slate-400 text-xs">Odchylenie Cenowe (PDI)</div>
             <div class="text-xl font-bold text-emerald-400 my-1">
-                {{ report.financial_analysis.price_deviation_index_pdi if report.financial_analysis is defined else "0.0" }}%
+                {{ report.financial_analysis.price_deviation_index_pdi if report.financial_analysis is defined and report.financial_analysis.price_deviation_index_pdi is defined else "0.0" }}%
             </div>
             <div class="text-xs text-slate-400">Względem średniej rynkowej</div>
         </div>
@@ -151,7 +171,7 @@
             </div>
 
             <!-- TŁO Z ZADANIAMI EXPERCKIMI -->
-            <div class="{% if not report.is_unlocked %}select-none filter blur-[4px] opacity-45 pointer-events-none{% endif %} space-y-4">
+            <div class="{% if not report.is_unlocked %}select-none filter blur-[4px] opacity-45 pointer-events-none min-h-[300px]{% endif %} space-y-4">
                 {% if report.is_unlocked and report.expert_checkpoints is defined %}
                     {% for item in report.expert_checkpoints %}
                     <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-700/50 flex flex-col justify-between gap-1">
@@ -179,7 +199,7 @@
 
             <!-- OVERLAY MLECZNEGO SZKŁA NA KAFEL II -->
             {% if not report.is_unlocked %}
-            <div class="absolute inset-x-0 bottom-0 top-20 frosted-glass-overlay flex flex-col items-center justify-center p-6 text-center z-10">
+            <div class="absolute inset-x-0 bottom-0 top-[88px] frosted-glass-overlay flex flex-col items-center justify-center p-6 text-center z-10">
                 <div class="w-14 h-14 bg-indigo-600/20 border border-indigo-500/40 rounded-full flex items-center justify-center text-2xl mb-3 text-indigo-400 shadow-inner">
                     🔐
                 </div>
@@ -216,7 +236,7 @@
             </div>
 
             <!-- TŁO DLA KAFELKA III -->
-            <div class="{% if not report.is_unlocked %}select-none filter blur-[4px] opacity-45 pointer-events-none{% endif %} space-y-6">
+            <div class="{% if not report.is_unlocked %}select-none filter blur-[4px] opacity-45 pointer-events-none min-h-[320px]{% endif %} space-y-6">
                 
                 <div>
                     <h3 class="text-md font-bold text-slate-200 mb-3">💬 Sugerowane Pytania do Sprzedającego:</h3>
@@ -247,7 +267,7 @@
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
                             <div class="text-xs text-slate-400">Cena w ogłoszeniu</div>
                             <div class="text-2xl font-bold text-slate-200 mt-1">
-                                {% if report.is_unlocked and report.negotiation_assistant is defined %}
+                                {% if report.is_unlocked and report.negotiation_assistant is defined and report.negotiation_assistant.original_price is defined %}
                                     {{ report.negotiation_assistant.original_price }} PLN
                                 {% else %}
                                     ███ PLN
@@ -257,7 +277,7 @@
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
                             <div class="text-xs text-slate-400">Sugerowana oferta otwarcia</div>
                             <div class="text-2xl font-bold text-emerald-400 mt-1">
-                                {% if report.is_unlocked and report.negotiation_assistant is defined %}
+                                {% if report.is_unlocked and report.negotiation_assistant is defined and report.negotiation_assistant.suggested_opening_price is defined %}
                                     {{ report.negotiation_assistant.suggested_opening_price }} PLN
                                 {% else %}
                                     ███ PLN
@@ -267,8 +287,8 @@
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
                             <div class="text-xs text-slate-400">Potencjał oszczędności</div>
                             <div class="text-2xl font-bold text-indigo-400 mt-1">
-                                {% if report.is_unlocked and report.negotiation_assistant is defined %}
-                                    {{ report.negotiation_assistant.original_price - report.negotiation_assistant.suggested_opening_price }} PLN
+                                {% if report.is_unlocked and report.negotiation_assistant is defined and report.negotiation_assistant.original_price is defined and report.negotiation_assistant.suggested_opening_price is defined %}
+                                    {{ (report.negotiation_assistant.original_price | float) - (report.negotiation_assistant.suggested_opening_price | float) }} PLN
                                 {% else %}
                                     ███ PLN
                                 {% endif %}
@@ -298,7 +318,7 @@
 
             <!-- OVERLAY MLECZNEGO SZKŁA NA KAFEL III -->
             {% if not report.is_unlocked %}
-            <div class="absolute inset-x-0 bottom-0 top-20 frosted-glass-overlay flex flex-col items-center justify-center p-6 text-center z-10">
+            <div class="absolute inset-x-0 bottom-0 top-[88px] frosted-glass-overlay flex flex-col items-center justify-center p-6 text-center z-10">
                 <div class="w-12 h-12 bg-indigo-600/20 border border-indigo-500/40 rounded-full flex items-center justify-center text-xl mb-3 text-indigo-400 shadow-inner">
                     💡
                 </div>
