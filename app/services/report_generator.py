@@ -139,3 +139,56 @@ async def generate_audit_report(
     }
 
     return report_document
+# Dopisz na końcu app/services/report_generator.py
+# app/services/report_generator.py
+from typing import Any, List
+from app.schemas.report_schema import ReportDeepAnalysis, ReportResponse, ReportSummary
+
+
+def _to_list(data: Any, key: str = "questions") -> List[str]:
+    """Pomocnicza funkcja do bezpiecznego wyciągania listy ciągów tekstowych."""
+    if isinstance(data, list):
+        return [str(item) for item in data]
+    if isinstance(data, dict):
+        val = data.get(key, [])
+        if isinstance(val, list):
+            return [str(item) for item in val]
+        if isinstance(val, str):
+            return [val]
+    return []
+
+
+def format_report_response(db_report) -> ReportResponse:
+    """
+    Formatuj rekord z bazy danych do schematu Pydantic.
+    Bezpiecznie przetwarza dane niezależnie od tego, czy są słownikiem, czy listą.
+    """
+    preview = db_report.freemium_preview if isinstance(db_report.freemium_preview, dict) else {}
+    checkpoints = db_report.expert_checkpoints
+    negotiation = db_report.negotiation_assistant
+
+    summary = ReportSummary(
+        score=float(db_report.risk_score) if db_report.risk_score is not None else 5.0,
+        risk_level=str(db_report.risk_level) if db_report.risk_level else "MEDIUM",
+        market_price_diff_percent=preview.get("market_price_diff_percent"),
+        verdict_summary=preview.get(
+            "verdict_summary", "Wstępna analiza została ukończona."
+        ),
+    )
+
+    deep_analysis = None
+    if db_report.is_unlocked:
+        deep_analysis = ReportDeepAnalysis(
+            red_flags=_to_list(preview.get("red_flags", []) if isinstance(preview, dict) else []),
+            checklist=_to_list(checkpoints, key="questions"),
+            negotiation_tips=_to_list(negotiation, key="arguments"),
+        )
+
+    return ReportResponse(
+        report_id=db_report.report_id,
+        target_url=db_report.target_url,
+        is_unlocked=bool(db_report.is_unlocked),
+        created_at=db_report.created_at,
+        summary=summary,
+        deep_analysis=deep_analysis,
+    )

@@ -5,63 +5,65 @@ from app.main import app
 
 
 @pytest.mark.asyncio
-async def test_create_and_get_report_flow():
+async def test_report_freemium_and_mock_checkout_flow():
     """
-    Test integracyjny:
-    1. Wysyła POST /api/v1/reports z prawidłowymi danymi.
-    2. Weryfikuje status HTTP 201 oraz maskowanie sekcji płatnych w odpowiedzi.
-    3. Wysyła GET /api/v1/reports/{report_id} z pobranym id.
-    4. Weryfikuje status HTTP 200 oraz spójność danych z bazą.
+    Testuje kompletny cykl Freemium:
+    1. Utworzenie raportu -> domyślnie is_unlocked == False
+    2. GET /api/v1/reports/{id} -> sprawdzamy, że deep_analysis == None
+    3. POST /api/v1/reports/{id}/mock-checkout -> symulacja odblokowania
+    4. GET /api/v1/reports/{id} -> sprawdzamy, że deep_analysis zawiera pełne dane
     """
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        # 1. TWORZENIE RAPORTU (POST)
-        payload = {
-            "target_url": "https://www.olx.pl/d/oferta/auto-testowe-ID12345.html",
-            "listing_text": "Sprzedam samochód osobowy, stan idealny, bezwypadkowy, serwis w ASO.",
-            "industry": "automotive",
-        }
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
+        test_url = "https://www.olx.pl/d/oferta/testowa-oferta-ID123.html"
 
-        response = await client.post("/api/v1/reports", json=payload)
+        # KROK 1: Utworzenie raportu
+        create_response = await ac.post("/api/v1/reports", json={"url": test_url})
+        assert create_response.status_code == 201
+        
+        created_data = create_response.json()
+        report_id = created_data["report_id"]
+        
+        assert created_data["target_url"] == test_url
+        assert created_data["is_unlocked"] is False
+        assert created_data["summary"] is not None
+        assert created_data["deep_analysis"] is None
 
-        assert response.status_code == 201
-        data = response.json()
+        # KROK 2: Pobranie raportu (wersja zablokowana)
+        get_locked_res = await ac.get(f"/api/v1/reports/{report_id}")
+        assert get_locked_res.status_code == 200
+        
+        locked_data = get_locked_res.json()
+        assert locked_data["is_unlocked"] is False
+        assert locked_data["deep_analysis"] is None
 
-        assert "id" in data
-        assert "report_id" in data
-        assert data["report_id"].startswith("REP-")
-        assert data["is_unlocked"] is False
-        assert data["is_paid"] is False
+        # KROK 3: Symulacja zakupu przez endpoint /mock-checkout
+        checkout_res = await ac.post(f"/api/v1/reports/{report_id}/mock-checkout")
+        assert checkout_res.status_code == 200
+        
+        checkout_data = checkout_res.json()
+        assert checkout_data["is_unlocked"] is True
+        assert checkout_data["deep_analysis"] is not None
+        assert isinstance(checkout_data["deep_analysis"]["red_flags"], list)
 
-        # Weryfikacja maskowania danych płatnych (Freemium)
-        assert data["freemium_preview"] is not None
-        assert data["digital_footprint"] is None
-        assert data["financial_analysis"] is None
-        assert data["expert_checkpoints"] is None
-        assert data["negotiation_assistant"] is None
-
-        report_id = data["report_id"]
-
-        # 2. POBIERANIE RAPORTU PO ID (GET)
-        get_response = await client.get(f"/api/v1/reports/{report_id}")
-
-        assert get_response.status_code == 200
-        get_data = get_response.json()
-
-        assert get_data["report_id"] == report_id
-        assert get_data["target_url"] == payload["target_url"]
-        assert get_data["is_unlocked"] is False
-        assert get_data["digital_footprint"] is None
+        # KROK 4: Weryfikacja ponownym GET (trwałość zmiany w bazie danych)
+        get_unlocked_res = await ac.get(f"/api/v1/reports/{report_id}")
+        assert get_unlocked_res.status_code == 200
+        
+        unlocked_data = get_unlocked_res.json()
+        assert unlocked_data["is_unlocked"] is True
+        assert unlocked_data["deep_analysis"] is not None
+        assert "checklist" in unlocked_data["deep_analysis"]
+        assert "negotiation_tips" in unlocked_data["deep_analysis"]
 
 
 @pytest.mark.asyncio
-async def test_get_nonexistent_report():
-    """
-    Test weryfikujący odpowiedź HTTP 404 dla nieistniejącego raportu.
-    """
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get("/api/v1/reports/REP-NONEXISTENT999")
-
+async def test_get_non_existent_report():
+    """Weryfikacja obsługi błędu 404 dla nieistniejącego raportu."""
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
+        response = await ac.get("/api/v1/reports/REP-NIE-ISTNIEJE-999")
         assert response.status_code == 404
         assert "nie istnieje" in response.json()["detail"]
