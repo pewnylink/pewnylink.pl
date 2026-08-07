@@ -1,6 +1,7 @@
 # app/main.py
 import os
 from contextlib import asynccontextmanager
+from typing import Optional
 from fastapi import FastAPI, Request, Query, Form, HTTPException, Depends, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -13,6 +14,7 @@ from app.api.v1.endpoints.reports import router as reports_api_router
 from app.services.report_generator import generate_audit_report
 from app.services.audit_service import AuditEngine
 from app.services.report_repository import ReportRepository
+from app.models.report import CATEGORY_DISPLAY_NAMES, ReportCategory
 from app.database import engine, Base, get_db
 import app.models.db_models  # Rejestracja modeli w SQLAlchemy przed migracją
 
@@ -29,11 +31,6 @@ async def lifespan(app: FastAPI):
 # 2. Tworzenie instancji aplikacji FastAPI
 app = FastAPI(title="pewnylink.pl API", version="1.0.0", lifespan=lifespan)
 
-# 3. Podłączanie routerów (Strony HTML oraz REST API)
-app.include_router(pages.router)
-app.include_router(admin.router)
-app.include_router(reports_api_router, prefix="/api/v1")
-
 # Ścieżka do katalogu z szablonami i plikami statycznymi
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
@@ -43,6 +40,11 @@ if os.path.exists(STATIC_DIR):
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
+
+# 3. Podłączanie routerów (Strony HTML, Panel Admina oraz REST API)
+app.include_router(pages.router)
+app.include_router(admin.router)
+app.include_router(reports_api_router, prefix="/api/v1")
 
 
 # 4. ENDPOINT MONITORINGU DLA CRON-JOB.ORG
@@ -64,6 +66,40 @@ async def get_landing_page(request: Request):
     return templates.TemplateResponse(request=request, name="index.html")
 
 
+# STRONA CENNIKA (Eliminacja błędu 404)
+@app.get("/pricing", response_class=HTMLResponse)
+async def get_pricing_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="pricing.html" if os.path.exists(os.path.join(TEMPLATES_DIR, "pricing.html")) else "index.html",
+        context={"request": request}
+    )
+
+
+# STRONA ZAMÓWIENIA / CHECKOUT (Eliminacja błędu 404)
+@app.get("/checkout", response_class=HTMLResponse)
+async def get_checkout_page(
+    request: Request,
+    type: Optional[str] = Query("single"),
+    report: Optional[str] = Query(None),
+    db: AsyncSession = Depends(get_db)
+):
+    report_data = None
+    if report:
+        report_data = await ReportRepository.get_by_report_id(db, report)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="checkout.html" if os.path.exists(os.path.join(TEMPLATES_DIR, "checkout.html")) else "index.html",
+        context={
+            "request": request,
+            "checkout_type": type,
+            "report_id": report,
+            "report": report_data
+        }
+    )
+
+
 # STRONA GENEROWANIA RAPORTU AUDYTOWEGO (GET ze skanera/linku)
 @app.get("/report", response_class=HTMLResponse)
 async def get_report(
@@ -83,6 +119,9 @@ async def get_report(
         industry=industry,
         is_unlocked=admin
     )
+    
+    # Przypisanie czytelnej etykiety branży do raportu
+    report_doc.industry_name = CATEGORY_DISPLAY_NAMES.get(industry, "Inne / Ogólne")
     
     saved_report = await ReportRepository.create_report(db, report_doc)
     unlocked_param = "?unlocked=true" if admin else ""
@@ -108,6 +147,7 @@ async def create_report_post(
         is_unlocked=False
     )
 
+    report_doc.industry_name = CATEGORY_DISPLAY_NAMES.get(industry, "Inne / Ogólne")
     saved_report = await ReportRepository.create_report(db, report_doc)
     return RedirectResponse(url=f"/report/{saved_report.report_id}", status_code=303)
 
@@ -129,6 +169,7 @@ async def get_report_by_id(
             report_id=report_id
         )
         doc["id"] = report_id
+        doc["industry_name"] = CATEGORY_DISPLAY_NAMES.get(doc.get("category", "general"), "Inne / Ogólne")
     else:
         db_report = await ReportRepository.get_by_report_id(db, report_id)
         if not db_report:
@@ -144,7 +185,7 @@ async def get_report_by_id(
             "source_url": db_report.source_url,
             "title_raw": db_report.title_raw,
             "category": db_report.category,
-            "industry_name": db_report.industry_name,
+            "industry_name": getattr(db_report, "industry_name", CATEGORY_DISPLAY_NAMES.get(db_report.category, "Inne / Ogólne")),
             "is_paid": db_report.is_paid,
             "is_unlocked": db_report.is_unlocked or unlocked,
             "risk_score": db_report.risk_score,

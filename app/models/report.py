@@ -1,8 +1,29 @@
 # app/models/report.py
+from enum import Enum
 from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, ConfigDict
 from app.legal.legal_shield import MANDATORY_DISCLAIMER
+
+
+class ReportCategory(str, Enum):
+    AUTOMOTIVE = "automotive"          # Motoryzacja
+    REAL_ESTATE = "real_estate"        # Nieruchomości
+    HEAVY_MACHINERY = "heavy_machinery"# Maszyny ciężkie
+    MEDICAL_DEVICES = "medical_devices"# Sprzęt medyczny
+    BICYCLES = "bicycles"              # Rowery
+    GENERAL = "general"                # Ogólne / Inne
+
+
+# Słownik do prezentacji branż w statystykach panelu admina
+CATEGORY_DISPLAY_NAMES: Dict[str, str] = {
+    ReportCategory.AUTOMOTIVE.value: "Motoryzacja",
+    ReportCategory.REAL_ESTATE.value: "Nieruchomości",
+    ReportCategory.HEAVY_MACHINERY.value: "Maszyny ciężkie",
+    ReportCategory.MEDICAL_DEVICES.value: "Sprzęt medyczny",
+    ReportCategory.BICYCLES.value: "Rowery",
+    ReportCategory.GENERAL.value: "Inne / Ogólne",
+}
 
 
 class ChecklistPoint(BaseModel):
@@ -57,8 +78,12 @@ class PewnyLinkReport(BaseModel):
     source_url: str
     title_raw: str
     category: str = Field(
-        ..., 
+        default=ReportCategory.GENERAL.value, 
         description="heavy_machinery | medical_devices | automotive | real_estate | bicycles | general"
+    )
+    industry_name: str = Field(
+        default="Inne / Ogólne",
+        description="Etykieta branży wykorzystywana w statystykach panelu administracyjnego"
     )
     generated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     algorithm_version: str = "PewnyLink AI v2.0-SevArt"
@@ -86,5 +111,4 @@ class PewnyLinkReport(BaseModel):
     # Tarcza Prawna SevArt
     disclaimer: str = MANDATORY_DISCLAIMER
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

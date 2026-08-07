@@ -5,6 +5,17 @@
 {% block content %}
 <div class="space-y-8">
 
+    <!-- BANNER KOMUNIKATÓW SUKCESU -->
+    {% if success_msg or request.query_params.get('success') %}
+    <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 flex items-center justify-between text-emerald-400 text-sm font-semibold shadow-lg">
+        <div class="flex items-center gap-3">
+            <span class="text-xl">✅</span>
+            <span>{{ success_msg or request.query_params.get('success') }}</span>
+        </div>
+        <a href="/admin/dashboard" class="text-xs text-emerald-500 hover:text-emerald-300 underline">Zamknij</a>
+    </div>
+    {% endif %}
+
     <!-- NAGŁÓWEK PANELU -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-6">
         <div>
@@ -25,34 +36,40 @@
         
         <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5">
             <span class="text-slate-400 text-xs font-medium block mb-1">Przychód Łączny</span>
-            <div class="text-2xl font-black text-emerald-400">{{ "%.2f"|format(stats.total_revenue) }} zł</div>
-            <p class="text-[11px] text-slate-500 mt-2">Start: {{ stats.revenue_breakdown.start }} zł | PRO: {{ stats.revenue_breakdown.pro }} zł</p>
+            <div class="text-2xl font-black text-emerald-400">{{ "%.2f"|format(stats.total_revenue|default(0.0)) }} zł</div>
+            <p class="text-[11px] text-slate-500 mt-2">
+                {% if stats.revenue_breakdown %}
+                    Start: {{ stats.revenue_breakdown.start }} zł | PRO: {{ stats.revenue_breakdown.pro }} zł
+                {% else %}
+                    Suma zintegrowana z bramką płatności
+                {% endif %}
+            </p>
         </div>
 
         <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5">
             <span class="text-slate-400 text-xs font-medium block mb-1">Zarejestrowani Użytkownicy</span>
-            <div class="text-2xl font-black text-indigo-400">{{ stats.total_users }}</div>
-            <p class="text-[11px] text-emerald-400 mt-2">⚡ {{ stats.active_users_30d }} aktywnych (ostatnie 30 dni)</p>
+            <div class="text-2xl font-black text-indigo-400">{{ stats.total_users|default(0) }}</div>
+            <p class="text-[11px] text-emerald-400 mt-2">⚡ {{ stats.active_users_30d|default(stats.total_users) }} aktywnych (ostatnie 30 dni)</p>
         </div>
 
         <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5">
             <span class="text-slate-400 text-xs font-medium block mb-1">Wygenerowane Raporty</span>
-            <div class="text-2xl font-black text-white">{{ stats.total_reports }}</div>
-            <p class="text-[11px] text-slate-500 mt-2">Średnio 4.1 raportu / użytkownika</p>
+            <div class="text-2xl font-black text-white">{{ stats.total_reports|default(0) }}</div>
+            <p class="text-[11px] text-slate-500 mt-2">Audyty ogłoszeń i skany rynkowe</p>
         </div>
 
         <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5">
-            <span class="text-slate-400 text-xs font-medium block mb-1">Top Domena</span>
-            <div class="text-2xl font-black text-indigo-300">olx.pl</div>
-            <p class="text-[11px] text-slate-500 mt-2">Następne: otomoto.pl, allegro.pl</p>
+            <span class="text-slate-400 text-xs font-medium block mb-1">Aktywne Dostępne Pakiety</span>
+            <div class="text-2xl font-black text-amber-400">{{ stats.active_grants_count|default(0) }}</div>
+            <p class="text-[11px] text-slate-500 mt-2">Sponsoring / Partnerzy / Promocje</p>
         </div>
 
     </div>
 
-    <!-- SEKCJA DWUKOLUMNOWA: ANALITYKA BRANŻOWA & TOOLKIT NADAWANIA PAKIETÓW -->
+    <!-- ANALITYKA BRANŻOWA & OPERACJE NADAWANIA PAKIETÓW -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-<!-- ANALITYKA BRANŻOWA -->
+        <!-- ANALITYKA BRANŻOWA -->
         <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6">
             <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
                 📊 Najczęściej Audytowane Branże
@@ -65,58 +82,110 @@
                         <span class="text-indigo-400">{{ cat.count }} raportów ({{ cat.percentage }}%)</span>
                     </div>
                     <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800">
-                        <div class="bg-indigo-500 h-2.5 rounded-full w-[{{ cat.percentage }}%]"></div>
+                        <div class="progress-bar bg-indigo-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%;" data-progress="{{ cat.percentage }}"></div>
                     </div>
                 </div>
+                {% else %}
+                <p class="text-xs text-slate-500">Brak danych branżowych do wyświetlenia.</p>
                 {% endfor %}
             </div>
         </div>
 
-        <!-- PRZYDZIELANIE DARMOWYCH PAKIETÓW -->
-        <div class="bg-slate-800/90 border border-indigo-500/40 rounded-2xl p-6 shadow-xl">
-            <h2 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
-                🎁 Dystrybucja Pakietów / Rekompensaty
-            </h2>
-            <p class="text-xs text-slate-400 mb-4">Przyznaj dowolne raporty partnerom, rodzinie lub w ramach rekompensaty.</p>
+        <!-- SEKCJA OPERACYJNA: FORMULARZE -->
+        <div class="space-y-6">
             
-            <form action="/admin/grant-package" method="POST" class="space-y-3">
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">E-mail Użytkownika</label>
-                    <input type="email" name="user_email" required placeholder="klient@domena.pl" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-3 focus:outline-none focus:border-indigo-500">
-                </div>
-
-                <div class="grid grid-cols-3 gap-3">
+            <!-- PRZYDZIELANIE DARMOWYCH PAKIETÓW -->
+            <div class="bg-slate-800/90 border border-indigo-500/40 rounded-2xl p-6 shadow-xl">
+                <h2 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                    🎁 Dystrybucja Dostępu / Rekompensaty
+                </h2>
+                <p class="text-xs text-slate-400 mb-4">Przyznaj dostęp użytkownikowi na podstawie e-maila.</p>
+                
+                <form action="/admin/grant-access" method="POST" class="space-y-3">
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Typ Pakietu</label>
-                        <select name="package_type" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-3 focus:outline-none">
-                            <option value="START">Start</option>
-                            <option value="STANDARD">Standard</option>
-                            <option value="PRO">PRO</option>
-                            <option value="VIP">VIP / Partner</option>
-                        </select>
+                        <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">E-mail Użytkownika</label>
+                        <input type="email" name="user_email" required placeholder="klient@domena.pl" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-3 focus:outline-none focus:border-indigo-500">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Zakres Dostępu</label>
+                            <select name="scope" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-3 focus:outline-none">
+                                <option value="ALL">Wszystkie Branże (Pełny)</option>
+                                <option value="AUTOMOTIVE">Tylko Motoryzacja</option>
+                                <option value="REAL_ESTATE">Tylko Nieruchomości</option>
+                                <option value="HEAVY_MACHINERY">Tylko Maszyny</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Powód Przyznania</label>
+                            <select name="reason" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-3 focus:outline-none">
+                                <option value="FAMILY_FRIENDS">Rodzina / Znajomi</option>
+                                <option value="COMPENSATION">Rekompensata za błąd</option>
+                                <option value="CONTEST_WINNER">Wygrana w konkursie</option>
+                                <option value="ADMIN_TEST">Konto testowe / Admin</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 items-center">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Ważność (Dni)</label>
+                            <input type="number" name="validity_days" value="14" min="1" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-3 focus:outline-none">
+                        </div>
+                        <div class="flex items-center gap-2 mt-4">
+                            <input type="checkbox" id="is_unlimited" name="is_unlimited" class="rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500">
+                            <label for="is_unlimited" class="text-xs text-slate-300 font-semibold">Dostęp Bezterminowy</label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Notatka Wewnętrzna</label>
+                        <input type="text" name="note" placeholder="np. Przyznane podczas ustaleń telefonicznych" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-3 focus:outline-none">
+                    </div>
+
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-md mt-2">
+                        ⚡ Przyznaj Dostęp Użytkownikowi
+                    </button>
+                </form>
+            </div>
+
+            <!-- GENERATOR VOUCHERÓW -->
+            <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6">
+                <h2 class="text-md font-bold text-white mb-1 flex items-center gap-2">
+                    🎟️ Generator Kodów Promocyjnych / Voucherów
+                </h2>
+                <p class="text-xs text-slate-400 mb-4">Stwórz kod do wykorzystania przez klientów podczas rejestracji.</p>
+                
+                <form action="/admin/create-voucher" method="POST" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="sm:col-span-1">
+                        <input type="text" name="code" required placeholder="np. START2026" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-3 focus:outline-none uppercase font-mono">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Liczba Raportów</label>
-                        <input type="number" name="reports_count" value="10" min="1" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-3 focus:outline-none">
+                        <input type="number" name="days_validity" value="14" min="1" placeholder="Dni ważności" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-3 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Ważność (Dni)</label>
-                        <input type="number" name="validity_days" value="30" min="1" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-3 focus:outline-none">
+                        <button type="submit" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs py-3 rounded-xl transition-all">
+                            + Generuj Kod
+                        </button>
                     </div>
-                </div>
+                </form>
+            </div>
 
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Powód Przyznania</label>
-                    <input type="text" name="reason" required placeholder="np. Nagroda w konkursie / Rekompensata" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-3 focus:outline-none">
-                </div>
-
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-md mt-2">
-                    ⚡ Przyznaj Pakiet Dedykowany
-                </button>
-            </form>
         </div>
 
     </div>
 
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.progress-bar').forEach(bar => {
+            const progress = bar.getAttribute('data-progress');
+            if (progress) {
+                bar.style.width = progress + '%';
+            }
+        });
+    });
+</script>
 {% endblock %}
