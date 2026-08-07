@@ -9,6 +9,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.routers import admin, pages
+from app.api.v1.endpoints.reports import router as reports_api_router
 from app.services.report_generator import generate_audit_report
 from app.services.audit_service import AuditEngine
 from app.services.report_repository import ReportRepository
@@ -28,9 +29,10 @@ async def lifespan(app: FastAPI):
 # 2. Tworzymy instancję aplikacji FastAPI z cyklem życia lifespan
 app = FastAPI(title="pewnylink.pl API", version="1.0.0", lifespan=lifespan)
 
-# 3. Podłączamy routery
+# 3. Podłączamy routery (Strony HTML oraz REST API)
 app.include_router(pages.router)
 app.include_router(admin.router)
+app.include_router(reports_api_router, prefix="/api/v1")
 
 # Ścieżka do katalogu z szablonami i plikami statycznymi
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
