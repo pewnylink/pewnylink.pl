@@ -1,7 +1,6 @@
+# app/database.py
 import json
-import os
 from typing import AsyncGenerator
-from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -9,34 +8,34 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import DeclarativeBase
 
-# Wczytanie zmiennych z pliku .env
-load_dotenv()
+from app.config import settings
 
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT", "5432")
-DB_NAME = os.getenv("DB_NAME")
+# Pobranie spójnego URL bazy z modułu konfiguracji
+DATABASE_URL = settings.get_database_url()
 
-# Budowa URL z wymuszonym szyfrowaniem SSL (standard m.in. w Neon.tech i Supabase)
-DATABASE_URL = (
-    f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}"
-    f"@{DB_HOST}:{DB_PORT}/{DB_NAME}?ssl=require"
-)
+is_sqlite = DATABASE_URL.startswith("sqlite")
+connect_args = {"check_same_thread": False} if is_sqlite else {}
 
-# Tworzenie asynchronicznego silnika bazy danych z własnym serializatorem JSON (konwersja datetime -> str)
+# Konfiguracja silnika dopasowana do silnika bazy
+engine_kwargs = {
+    "echo": False,
+    "json_serializer": lambda obj: json.dumps(obj, default=str, ensure_ascii=False),
+}
+
+if not is_sqlite:
+    engine_kwargs.update({
+        "pool_size": 5,
+        "max_overflow": 10,
+        "pool_recycle": 300,
+    })
+
 engine = create_async_engine(
     DATABASE_URL,
-    echo=False,          # Ustaw True, aby widzieć zapytania SQL w konsoli podczas developmentu
-    pool_size=5,         # Liczba stałych połączeń w puli
-    max_overflow=10,     # Maksymalna liczba dodatkowych połączeń przy obciążeniu
-    pool_recycle=300,    # Odświeżanie połączeń co 5 minut (zapobiega zrywaniu przez chmurę)
-    json_serializer=lambda obj: json.dumps(
-        obj, default=str, ensure_ascii=False
-    ),
+    connect_args=connect_args,
+    **engine_kwargs
 )
 
-# Fabryka asynchronicznych sesji
+# Fabryka asynchronicznych sesji SQLAlchemy 2.0
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,
     class_=AsyncSession,
@@ -44,12 +43,14 @@ AsyncSessionLocal = async_sessionmaker(
     autoflush=False,
 )
 
-# Klasa bazowa dla wszystkich modeli tabel (SQLAlchemy 2.0 style)
+
 class Base(DeclarativeBase):
+    """Główna klasa bazowa dla wszystkich modeli tabel ORM."""
     pass
 
-# Generator sesji do użycia w aplikacjach (np. FastAPI lub skryptach)
+
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """Dependency Injection dla FastAPI dostarczający asynchroniczną sesję bazy danych."""
     async with AsyncSessionLocal() as session:
         try:
             yield session
