@@ -1,12 +1,17 @@
 from uuid import UUID
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.schemas.report_schema import ReportResponse
 from app.services.report_generator import build_report_response
 from app.services.report_repository import ReportRepository
+
+
+class VoucherUnlockRequest(BaseModel):
+    voucher_code: str
 
 
 async def get_optional_user(request: Request, db: AsyncSession = Depends(get_db)):
@@ -82,5 +87,28 @@ async def mock_unlock_report(report_id: UUID, db: AsyncSession = Depends(get_db)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Raport nie istnieje"
         )
+
+    return build_report_response(report)
+
+
+@router.post("/{report_id}/unlock-voucher", response_model=ReportResponse)
+async def unlock_report_with_voucher(
+    report_id: UUID,
+    payload: VoucherUnlockRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Odblokowuje raport za pomocą jednorazowego kodu vouchera.
+    """
+    repo = ReportRepository(db)
+    report, error_message = await repo.unlock_with_voucher(report_id, payload.voucher_code)
+
+    if error_message:
+        status_code = (
+            status.HTTP_404_NOT_FOUND
+            if "nie istnieje" in error_message.lower()
+            else status.HTTP_400_BAD_REQUEST
+        )
+        raise HTTPException(status_code=status_code, detail=error_message)
 
     return build_report_response(report)
