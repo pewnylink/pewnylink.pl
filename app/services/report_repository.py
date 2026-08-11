@@ -16,7 +16,7 @@ class ReportRepository:
     async def create_report(
         self, report_data: Dict[str, Any], db: Optional[AsyncSession] = None
     ) -> ReportModel:
-        """Bezpieczny zapis raportu z wykorzystaniem domyślnych wartości .get() zapobiegających błędom KeyError."""
+        """Bezpieczny zapis raportu z wykorzystaniem domyślnych wartości .get()."""
         session = db or self.db
         db_report = ReportModel(
             report_id=report_data["report_id"],
@@ -42,30 +42,30 @@ class ReportRepository:
 
     async def get_by_id(self, report_identifier: Any) -> Optional[ReportModel]:
         """
-        Pobiera raport z bazy bez względu na to, czy przekazano obiekt uuid.UUID,
-        łańcuch znaków z UUID, czy czytelny identyfikator raportu (np. REP-XXXXX).
+        Bezpiecznie pobiera raport z bazy:
+        - Dla liczby int: szuka po kluczu głównym `id` (INTEGER).
+        - Dla stringa / UUID: szuka po biznesowym `report_id` (VARCHAR/TEXT).
         """
-        if isinstance(report_identifier, uuid.UUID):
+        if not report_identifier:
+            return None
+
+        # 1. Jeśli przekazano bezpośrednio liczbę (np. id = 12)
+        if isinstance(report_identifier, int):
+            stmt = select(ReportModel).where(ReportModel.id == report_identifier)
+        
+        # 2. Jeśli przekazano ciąg cyfr w stringu (np. "12")
+        elif isinstance(report_identifier, str) and report_identifier.isdigit():
             stmt = select(ReportModel).where(
                 or_(
-                    ReportModel.id == report_identifier,
-                    ReportModel.report_id == str(report_identifier),
+                    ReportModel.id == int(report_identifier),
+                    ReportModel.report_id == report_identifier
                 )
             )
+
+        # 3. Jeśli przekazano kod tekstowy (np. "REP-TEST-123") lub obiekt UUID
         else:
             identifier_str = str(report_identifier)
-            try:
-                val_uuid = uuid.UUID(identifier_str)
-                stmt = select(ReportModel).where(
-                    or_(
-                        ReportModel.report_id == identifier_str,
-                        ReportModel.id == val_uuid,
-                    )
-                )
-            except ValueError:
-                stmt = select(ReportModel).where(
-                    ReportModel.report_id == identifier_str
-                )
+            stmt = select(ReportModel).where(ReportModel.report_id == identifier_str)
 
         result = await self.db.execute(stmt)
         return result.scalars().first()
@@ -85,7 +85,7 @@ class ReportRepository:
 
         report.is_unlocked = True
         await self.db.commit()
-        await self.db.refresh(report)
+        await session.refresh(report) if (session := self.db) else None
         return report
 
     async def unlock_with_voucher(
@@ -99,7 +99,7 @@ class ReportRepository:
         if not report:
             return None, "Raport nie istnieje"
 
-        if report.is_unlocked:
+        if report.is_unlocked or getattr(report, "is_paid", False):
             return report, None
 
         # Weryfikacja vouchera w bazie
@@ -114,6 +114,9 @@ class ReportRepository:
 
         # Odblokowanie raportu i dezaktywacja jednorazowego vouchera
         report.is_unlocked = True
+        if hasattr(report, "is_paid"):
+            report.is_paid = True
+
         voucher.is_active = False
 
         await self.db.commit()

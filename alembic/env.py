@@ -1,31 +1,35 @@
-# alembic/env.py
 import asyncio
 from logging.config import fileConfig
 
-from sqlalchemy import pool
 from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-# 1. Import konfiguracji aplikacji oraz klas bazowych i modeli ORM
-from app.config import settings
-from app.database import Base
-import app.models  # Rejestracja modeli User, Voucher, Report
+# 1. IMPORTY APLIKACJI - pobranie bazy, silnika oraz modeli ORM
+from app.database import Base, engine
+from app.models.user import User
+from app.models.report import Report
+from app.models.voucher import Voucher
 
+# Obiekt konfiguracji Alembica (.ini)
 config = context.config
 
-# 2. Dynamiczne ustawienie URL bazy z pliku settings (.env)
-config.set_main_option("sqlalchemy.url", settings.get_database_url())
-
+# Konfiguracja logowania
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+# 2. POBRANIE PEŁNEGO URL DLA ALEMBICA (BEZ MASKOWANIA HASŁA ***)
+config.set_main_option(
+    "sqlalchemy.url", 
+    engine.url.render_as_string(hide_password=False)
+)
+
+# 3. REJESTRACJA METADANYCH MODELI
 target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    """Wykonanie migracji w trybie offline (generowanie czystego SQL)."""
+    """Uruchamianie migracji w trybie offline."""
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -46,21 +50,13 @@ def do_run_migrations(connection: Connection) -> None:
 
 
 async def run_async_migrations() -> None:
-    """Inicjalizacja asynchronicznego silnika i wykonanie migracji online."""
-    connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
-
-    async with connectable.connect() as connection:
+    """Uruchamianie migracji asynchronicznych bezpośrednio z użyciem sprawdzanego engine z app.database."""
+    async with engine.connect() as connection:
         await connection.run_sync(do_run_migrations)
-
-    await connectable.dispose()
 
 
 def run_migrations_online() -> None:
-    """Uruchomienie asynchronicznej pętli zdarzeń dla migracji online."""
+    """Uruchamianie migracji w trybie online."""
     asyncio.run(run_async_migrations())
 
 

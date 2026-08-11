@@ -1,25 +1,37 @@
 # app/models/__init__.py
+
+# Modele bazodanowe ORM (SQLAlchemy) z db_models.py
+from app.models.db_models import ReportModel, Voucher, User
+
+# Schematy Pydantic i Enumy z user.py
 from app.models.user import (
-    User, 
     UserRole, 
     UserRegister, 
     UserLogin, 
     UserResponse, 
     TokenResponse, 
     VoucherCreate, 
-    VoucherRedeem
+    VoucherRedeem,
 )
-from app.models.voucher import Voucher
+
+# Schematy Pydantic i Enumy z report.py
 from app.models.report import (
-    Report, 
     ReportCategory, 
     ReportResponse, 
     LegalFlag, 
-    ReportCreateRequest
+    ReportCreateRequest,
 )
 
+# Alias dla wstecznej kompatybilności (zabezpiecza miejsca w kodzie importujące 'Report')
+Report = ReportModel
+
 __all__ = [
+    # Encje ORM
+    "ReportModel",
+    "Report",
+    "Voucher",
     "User",
+    # Schematy i Enumy Użytkowników
     "UserRole",
     "UserRegister",
     "UserLogin",
@@ -27,8 +39,7 @@ __all__ = [
     "TokenResponse",
     "VoucherCreate",
     "VoucherRedeem",
-    "Voucher",
-    "Report",
+    # Schematy i Enumy Raportów
     "ReportCategory",
     "ReportResponse",
     "LegalFlag",

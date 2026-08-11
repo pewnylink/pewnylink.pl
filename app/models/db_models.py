@@ -56,4 +56,47 @@ class ReportModel(Base):
 
     __table_args__ = (
         Index("idx_reports_created_category", "created_at", "category"),
+        {"extend_existing": True},
     )
+
+
+class Voucher(Base):
+    """Tabela 'vouchers' reprezentująca jednorazowe kody dostępowe do raportów."""
+    __tablename__ = "vouchers"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), 
+        primary_key=True, 
+        default=uuid.uuid4
+    )
+    code: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), 
+        default=lambda: datetime.now(timezone.utc), 
+        nullable=False
+    )
+
+    __table_args__ = {"extend_existing": True}
+
+
+class User(Base):
+    """Tabela 'users' reprezentująca użytkowników systemu."""
+    __tablename__ = "users"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), 
+        primary_key=True, 
+        default=uuid.uuid4
+    )
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    role: Mapped[str] = mapped_column(String(32), default="USER", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), 
+        default=lambda: datetime.now(timezone.utc), 
+        nullable=False
+    )
+
+    __table_args__ = {"extend_existing": True}
