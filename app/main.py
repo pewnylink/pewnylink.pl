@@ -14,15 +14,24 @@ from app.api.v1.endpoints.reports import router as reports_api_router
 from app.services.report_generator import generate_audit_report
 from app.services.audit_service import AuditEngine
 from app.services.report_repository import ReportRepository
-from app.models.report import CATEGORY_DISPLAY_NAMES, ReportCategory
 from app.database import engine, Base, get_db
 import app.models.db_models  # Rejestracja modeli w SQLAlchemy przed migracją
+
+# Słownik etykiet branż dla widoków
+CATEGORY_DISPLAY_NAMES = {
+    "automotive": "Motoryzacja",
+    "real_estate": "Nieruchomości",
+    "heavy_machinery": "Maszyny ciężkie",
+    "bicycles": "Rowery",
+    "medical_devices": "Sprzęt medyczny",
+    "general": "Inne / Ogólne",
+}
 
 
 # 1. Zarządzanie cyklem życia aplikacji (Lifespan)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Automatyczne tworzenie tabel w PostgreSQL (Neon.tech) przy starcie serwera
+    # Automatyczne tworzenie tabel w PostgreSQL przy starcie serwera
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
@@ -66,7 +75,7 @@ async def get_landing_page(request: Request):
     return templates.TemplateResponse(request=request, name="index.html")
 
 
-# STRONA CENNIKA (Eliminacja błędu 404)
+# STRONA CENNIKA
 @app.get("/pricing", response_class=HTMLResponse)
 async def get_pricing_page(request: Request):
     return templates.TemplateResponse(
@@ -76,7 +85,7 @@ async def get_pricing_page(request: Request):
     )
 
 
-# STRONA ZAMÓWIENIA / CHECKOUT (Eliminacja błędu 404)
+# STRONA ZAMÓWIENIA / CHECKOUT
 @app.get("/checkout", response_class=HTMLResponse)
 async def get_checkout_page(
     request: Request,
@@ -120,7 +129,6 @@ async def get_report(
         is_unlocked=admin
     )
     
-    # Przypisanie czytelnej etykiety branży do raportu
     report_doc.industry_name = CATEGORY_DISPLAY_NAMES.get(industry, "Inne / Ogólne")
     
     saved_report = await ReportRepository.create_report(db, report_doc)

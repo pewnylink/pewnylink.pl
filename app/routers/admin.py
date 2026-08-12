@@ -1,6 +1,7 @@
 # app/routers/admin.py
 import os
 from datetime import datetime, timedelta, timezone
+from enum import Enum
 from typing import Optional, List, Dict
 from fastapi import APIRouter, Request, Depends, Form, HTTPException, status, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -9,8 +10,46 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
 from app.database import get_db
-from app.models.report import CATEGORY_DISPLAY_NAMES, ReportCategory
-from app.models.user import UserRole, AccessScope, GrantReason
+from app.models.db_models import ReportModel, User, Voucher
+
+
+class ReportCategory(str, Enum):
+    AUTOMOTIVE = "automotive"
+    REAL_ESTATE = "real_estate"
+    HEAVY_MACHINERY = "heavy_machinery"
+    BICYCLES = "bicycles"
+    MEDICAL_DEVICES = "medical_devices"
+    GENERAL = "general"
+
+
+CATEGORY_DISPLAY_NAMES: Dict[str, str] = {
+    "automotive": "Motoryzacja",
+    "real_estate": "Nieruchomości",
+    "heavy_machinery": "Maszyny ciężkie",
+    "bicycles": "Rowery",
+    "medical_devices": "Sprzęt medyczny",
+    "general": "Inne / Ogólne",
+}
+
+
+class UserRole(str, Enum):
+    ADMIN = "ADMIN"
+    USER = "USER"
+
+
+class AccessScope(str, Enum):
+    ALL = "ALL"
+    REPORTS = "REPORTS"
+    SINGLE = "SINGLE"
+
+
+class GrantReason(str, Enum):
+    COMPENSATION = "COMPENSATION"
+    CONTEST_WINNER = "CONTEST_WINNER"
+    PROMOTION = "PROMOTION"
+    TESTING = "TESTING"
+    ADMIN = "ADMIN"
+
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -24,21 +63,19 @@ async def fetch_dashboard_stats(db: AsyncSession) -> Dict:
     Agreguje statystyki biznesowe z bazy danych z naciskiem na podział branżowy.
     """
     try:
-        from app.models.db_models import ReportDB, UserDB, AccessGrantDB
-        
         # 1. Zliczenie wszystkich raportów
-        total_reports_res = await db.execute(select(func.count(ReportDB.id)))
+        total_reports_res = await db.execute(select(func.count(ReportModel.id)))
         total_reports = total_reports_res.scalar() or 0
 
-        # 2. Zliczenie użytkowników i aktywnych darmowych dostępów
-        total_users_res = await db.execute(select(func.count(UserDB.id)))
+        # 2. Zliczenie użytkowników
+        total_users_res = await db.execute(select(func.count(User.id)))
         total_users = total_users_res.scalar() or 0
 
         # 3. Statystyki wg Branż / Kategorii
         industry_query = (
-            select(ReportDB.category, func.count(ReportDB.id).label("count"))
-            .group_by(ReportDB.category)
-            .order_by(func.count(ReportDB.id).desc())
+            select(ReportModel.category, func.count(ReportModel.id).label("count"))
+            .group_by(ReportModel.category)
+            .order_by(func.count(ReportModel.id).desc())
         )
         industry_res = await db.execute(industry_query)
         industry_rows = industry_res.all()
@@ -128,7 +165,6 @@ async def grant_access(
     validity_str = "BEZTERMINOWO" if is_unlimited else f"{validity_days} dni"
     print(f"[ADMIN GRANT] Przydzielono dostęp dla {user_email}: {scope} ({validity_str}). Powód: {reason}. Notatka: {note}")
     
-    # Logic do zapisu w tabeli AccessGrantDB zostanie uruchomiony po zarejestrowaniu tabeli
     return RedirectResponse(
         url="/admin/dashboard?success=Dost%C4%99p%20zosta%C5%82%20pomy%C5%9Blnie%20przydzielony", 
         status_code=status.HTTP_303_SEE_OTHER
@@ -153,7 +189,7 @@ async def create_voucher(
     )
 
 
-# KOmpatybilność wsteczna dla istniejących formularzy
+# Kompatybilność wsteczna dla istniejących formularzy
 @router.post("/grant-package")
 async def grant_package_legacy(
     user_email: str = Form(...),
