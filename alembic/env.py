@@ -5,11 +5,9 @@ from sqlalchemy.engine import Connection
 
 from alembic import context
 
-# 1. IMPORTY APLIKACJI - pobranie bazy, silnika oraz modeli ORM
+# 1. IMPORTY APLIKACJI - pobranie bazy, silnika oraz modeli ORM ze skonsolidowanego pliku db_models
 from app.database import Base, engine
-from app.models.user import User
-from app.models.report import Report
-from app.models.voucher import Voucher
+from app.models.db_models import ReportModel, User, Voucher
 
 # Obiekt konfiguracji Alembica (.ini)
 config = context.config

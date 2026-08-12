@@ -1,11 +1,11 @@
 # app/models/db_models.py
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
-from sqlalchemy import String, Boolean, DateTime, Integer, Index
+from sqlalchemy import String, Boolean, DateTime, Integer, Index, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID, JSONB
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
@@ -24,6 +24,13 @@ class ReportModel(Base):
     # Czytelny Identyfikator raportu np. REP-8A1F3C90
     report_id: Mapped[str] = mapped_column(String(32), unique=True, index=True, nullable=False)
     
+    # Klucz obcy powiązany z użytkownikiem (opcjonalny - dla raportów niezalogowanych użytkowników może być NULL)
+    user_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True), 
+        ForeignKey("users.id", ondelete="SET NULL"), 
+        nullable=True
+    )
+
     # Dane podstawowe ogłoszenia
     target_url: Mapped[str] = mapped_column(String(2048), nullable=False)
     source_url: Mapped[str] = mapped_column(String(2048), nullable=False)
@@ -52,6 +59,12 @@ class ReportModel(Base):
         default=lambda: datetime.now(timezone.utc), 
         nullable=False,
         index=True
+    )
+
+    # Relacja ORM do modelu User
+    user: Mapped[Optional["User"]] = relationship(
+        "User", 
+        back_populates="reports"
     )
 
     __table_args__ = (
@@ -97,6 +110,13 @@ class User(Base):
         DateTime(timezone=True), 
         default=lambda: datetime.now(timezone.utc), 
         nullable=False
+    )
+
+    # Relacja ORM do raportów powiązanych z użytkownikiem
+    reports: Mapped[List["ReportModel"]] = relationship(
+        "ReportModel", 
+        back_populates="user", 
+        cascade="all, delete-orphan"
     )
 
     __table_args__ = {"extend_existing": True}
