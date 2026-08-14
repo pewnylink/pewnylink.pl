@@ -27,5 +27,11 @@ class Settings(BaseSettings):
         env_file_encoding = "utf-8"
         extra = "ignore"
 
+    # Lista e-maili administratorów (wpisz Wasze adresy e-mail):
+    ADMIN_EMAILS: list[str] = [
+        "sebo3010@gmail.com",
+        "Adrian.u9277@gmail.com"
+    ]
+
 
 settings = Settings()

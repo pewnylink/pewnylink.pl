@@ -41,17 +41,22 @@ DATABASE_URL = sanitize_asyncpg_url(RAW_DATABASE_URL)
 is_sqlite = DATABASE_URL.startswith("sqlite")
 connect_args = {"check_same_thread": False} if is_sqlite else {}
 
-# Konfiguracja silnika dopasowana do silnika bazy
+# Konfiguracja silnika dopasowana do produkcyjnych wymogów
 engine_kwargs = {
     "echo": False,
-    "json_serializer": lambda obj: json.dumps(obj, default=str, ensure_ascii=False),
+    "pool_pre_ping": True,  # Odporność na zerwania połączeń z PostgreSQL
 }
 
-if not is_sqlite:
+if is_sqlite:
+    # Tylko dla SQLite stosujemy customowy serializer JSON
+    engine_kwargs["json_serializer"] = lambda obj: json.dumps(obj, default=str, ensure_ascii=False)
+else:
+    # Parametry puli połączeń dla produkcyjnej bazy PostgreSQL
     engine_kwargs.update({
-        "pool_size": 5,
-        "max_overflow": 10,
-        "pool_recycle": 300,
+        "pool_size": 10,         # Domyślny rozmiar puli gniazd
+        "max_overflow": 20,      # Dopuszczalny skok natężenia ruchu
+        "pool_recycle": 1800,    # Odświeżanie gniazd co 30 minut (zgodne z większością firewalli/proxy)
+        "pool_timeout": 30,      # Czas oczekiwania na wolne gniazdo
     })
 
 engine = create_async_engine(
@@ -77,7 +82,4 @@ class Base(DeclarativeBase):
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Dependency Injection dla FastAPI dostarczający asynchroniczną sesję bazy danych."""
     async with AsyncSessionLocal() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
+        yield session

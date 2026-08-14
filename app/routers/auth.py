@@ -22,6 +22,7 @@ from app.models.user import (
 from app.core.security import hash_password, verify_password, create_access_token
 from app.dependencies import get_current_user_required
 
+# Prefiks API dla modułu autoryzacji
 router = APIRouter(prefix="/api/v1/auth", tags=["Auth & Access"])
 
 
@@ -44,16 +45,15 @@ async def register(
             detail="Konto z tym adresem e-mail już istnieje."
         )
 
-    # 2. Tworzenie obiektu użytkownika w PostgreSQL
-    role = UserRole.USER
+    # 2. Tworzenie obiektu użytkownika w PostgreSQL (tylko z polami obecnymi w db_models.py)
+    role_val = UserRole.USER.value if hasattr(UserRole.USER, 'value') else str(UserRole.USER)
     now_utc = datetime.now(timezone.utc)
 
     new_user = User(
         email=email_clean,
-        password_hash=hash_password(payload.password),
-        full_name=payload.full_name,
-        role=role,
-        access_until=None,
+        hashed_password=hash_password(payload.password),
+        role=role_val,
+        is_admin=False,
         created_at=now_utc
     )
 
@@ -65,12 +65,12 @@ async def register(
     token = create_access_token(user_id=new_user.id, role=role_str)
 
     # Zapis w ciasteczku pod kątem widoków www / Jinja2
-    response.set_cookie(key="access_token", value=token, httponly=True)
+    response.set_cookie(key="access_token", value=token, httponly=True, path="/", samesit="lax")
 
     user_resp = UserResponse(
         id=str(new_user.id),
         email=new_user.email,
-        full_name=new_user.full_name,
+        full_name=payload.full_name,
         role=new_user.role,
         access_until=None,
         created_at=new_user.created_at
@@ -91,7 +91,7 @@ async def login(
     result = await db.execute(stmt)
     user = result.scalar_one_or_none()
 
-    if not user or not verify_password(payload.password, user.password_hash):
+    if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Błędny e-mail lub hasło."
@@ -101,14 +101,14 @@ async def login(
     token = create_access_token(user_id=user.id, role=role_str)
 
     # Zapis w ciasteczku pod kątem widoków www / Jinja2
-    response.set_cookie(key="access_token", value=token, httponly=True)
+    response.set_cookie(key="access_token", value=token, httponly=True, path="/", samesite="lax")
 
     user_resp = UserResponse(
         id=str(user.id),
         email=user.email,
-        full_name=user.full_name,
+        full_name=getattr(user, "full_name", None),
         role=user.role,
-        access_until=user.access_until,
+        access_until=getattr(user, "access_until", None),
         created_at=user.created_at
     )
 
@@ -120,9 +120,9 @@ async def get_my_profile(current_user: User = Depends(get_current_user_required)
     return UserResponse(
         id=str(current_user.id),
         email=current_user.email,
-        full_name=current_user.full_name,
+        full_name=getattr(current_user, "full_name", None),
         role=current_user.role,
-        access_until=current_user.access_until,
+        access_until=getattr(current_user, "access_until", None),
         created_at=current_user.created_at
     )
 
@@ -135,9 +135,11 @@ async def create_voucher(
     current_user: User = Depends(get_current_user_required),
     db: AsyncSession = Depends(get_db)
 ):
-    """Tworzenie kodów promocyjnych (Dostępne tylko dla ról SUPER_ADMIN)."""
+    """Tworzenie kodów promocyjnych (Dostępne tylko dla administratorów)."""
     role_val = current_user.role.value if hasattr(current_user.role, 'value') else str(current_user.role)
-    if role_val != "SUPER_ADMIN" and current_user.role != UserRole.SUPER_ADMIN:
+    is_admin_flag = getattr(current_user, "is_admin", False)
+
+    if not is_admin_flag and role_val != "SUPER_ADMIN" and current_user.role != UserRole.SUPER_ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, 
             detail="Brak uprawnień administratora."
@@ -194,7 +196,7 @@ async def redeem_voucher(
 
     # 2. Wyliczanie nowej daty ważności konta
     now = datetime.now(timezone.utc)
-    current_access = current_user.access_until
+    current_access = getattr(current_user, "access_until", None)
     
     if current_access and current_access.tzinfo is None:
         current_access = current_access.replace(tzinfo=timezone.utc)
@@ -203,14 +205,17 @@ async def redeem_voucher(
     new_access_until = base_date + timedelta(days=voucher.days_validity)
 
     # 3. Aktualizacja danych użytkownika i wykorzystania kodu
-    current_user.access_until = new_access_until
-    current_user.role = UserRole.VIP_GUEST
+    if hasattr(current_user, "access_until"):
+        current_user.access_until = new_access_until
+    
+    vip_role = UserRole.VIP_GUEST.value if hasattr(UserRole.VIP_GUEST, 'value') else str(UserRole.VIP_GUEST)
+    current_user.role = vip_role
     voucher.uses_count += 1
 
     await db.commit()
 
     return {
         "status": "ok",
-        "message": f"Kod aktywowany! Dostęp do raportów został przyznany do: {new_access_until.strftime('%Y-%m-%d %H:%M')}",
+        "message": f"Kod aktywowany! Dostęp został przyznany do: {new_access_until.strftime('%Y-%m-%d %H:%M')}",
         "access_until": new_access_until
     }

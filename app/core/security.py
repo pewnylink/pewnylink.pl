@@ -2,12 +2,13 @@
 import hashlib
 import os
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Optional, Any
 import jwt
 from fastapi import Request, HTTPException, status
 
 from app.core.config import settings
-from app.db.models import User, UserRole
+# Poprawiony import modelu z db_models.py
+from app.models.db_models import User
 
 
 def hash_password(password: str) -> str:
@@ -29,7 +30,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         return False
 
 
-def create_access_token(user_id: int, role: str) -> str:
+def create_access_token(user_id: Any, role: str) -> str:
     """Generuje szyfrowany token JWT dla użytkownika."""
     expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = {
@@ -59,14 +60,31 @@ def get_token_from_request(request: Request) -> Optional[str]:
 
 def verify_active_access(user: User) -> bool:
     """Weryfikacja praw dostępu (ADMIN vs zwykły użytkownik)."""
-    role_val = user.role.value if hasattr(user.role, "value") else str(user.role)
-    if role_val in ["SUPER_ADMIN", "ADMIN"]:
+    role_val = str(getattr(user, "role", "")).upper()
+    is_admin_flag = getattr(user, "is_admin", False)
+
+    # 1. Administratorzy i właściciele mają zawsze pełny dostęp
+    if is_admin_flag or role_val in ["SUPER_ADMIN", "ADMIN"]:
         return True
 
+    # 2. Bezpieczna weryfikacja dostępu dla zwykłych użytkowników
+    access_until = getattr(user, "access_until", None)
     now_utc = datetime.now(timezone.utc)
-    if not user.access_until or user.access_until.replace(tzinfo=timezone.utc) < now_utc:
+
+    if access_until is None:
+        # Jeśli użytkownik nie jest adminem i nie ma ustawionej daty dostępu
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Brak aktywnego dostępu do generowania raportów. Odnów pakiet subskrypcyjny."
         )
+
+    if access_until.tzinfo is None:
+        access_until = access_until.replace(tzinfo=timezone.utc)
+
+    if access_until < now_utc:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Brak aktywnego dostępu do generowania raportów. Odnów pakiet subskrypcyjny."
+        )
+
     return True

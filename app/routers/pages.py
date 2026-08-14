@@ -126,3 +126,17 @@ async def login_page(
         name="login.html",
         context={"request": request, "user": current_user}
     )
+@router.get("/register", response_class=HTMLResponse)
+async def register_page(
+    request: Request, 
+    current_user: Optional[DBUser] = Depends(get_optional_user)
+):
+    """Wyświetla stronę rejestracji. Jeśli użytkownik jest już zalogowany, przekierowuje do moich raportów."""
+    if current_user:
+        return RedirectResponse(url="/my-reports", status_code=status.HTTP_303_SEE_OTHER)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="register.html",
+        context={"request": request, "user": current_user}
+    )
