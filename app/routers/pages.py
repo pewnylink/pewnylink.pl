@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.services.audit_service import AuditEngine
-from app.models.db_models import User as DBUser, Report as DBReport
+from app.models.db_models import User as DBUser, ReportModel as DBReport
 
 router = APIRouter(tags=["pages"])
 
@@ -112,4 +112,17 @@ async def my_reports(
             "user": current_user,
             "reports": user_reports
         }
+    )
+@router.get("/login", response_class=HTMLResponse)
+async def login_page(
+    request: Request, 
+    current_user: Optional[DBUser] = Depends(get_optional_user)
+):
+    if current_user:
+        return RedirectResponse(url="/my-reports", status_code=status.HTTP_303_SEE_OTHER)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="login.html",
+        context={"request": request, "user": current_user}
     )

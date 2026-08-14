@@ -6,15 +6,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.db.session import get_db
-from app.db.models import User, UserRole
+# Modele bazy danych (SQLAlchemy)
+from app.models.db_models import User, Voucher
+
+# Schematy walidacji danych API (Pydantic)
 from app.models.user import (
-    UserRegister, 
-    UserLogin, 
-    TokenResponse, 
-    UserResponse, 
-    VoucherCreate, 
-    VoucherRedeem,
-    Voucher
+    UserRegister,
+    UserLogin,
+    UserResponse,
+    TokenResponse,
+    UserRole,
+    VoucherCreate,
+    VoucherRedeem
 )
 from app.core.security import hash_password, verify_password, create_access_token
 from app.dependencies import get_current_user_required
