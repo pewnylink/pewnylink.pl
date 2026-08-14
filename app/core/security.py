@@ -1,17 +1,13 @@
+# app/core/security.py
 import hashlib
 import os
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 import jwt
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from sqlalchemy.future import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Request, HTTPException, status
 
 from app.core.config import settings
-from app.db.session import get_db
 from app.db.models import User, UserRole
-
-security = HTTPBearer()
 
 
 def hash_password(password: str) -> str:
@@ -38,49 +34,33 @@ def create_access_token(user_id: int, role: str) -> str:
     expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = {
         "sub": str(user_id),
-        "role": role,
+        "role": str(role),
         "exp": expire
     }
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    db: AsyncSession = Depends(get_db)
-) -> User:
-    """Pobiera i weryfikuje użytkownika z tokena Bearer JWT w bazie SQLAlchemy."""
-    token = credentials.credentials
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        user_id_str: str = payload.get("sub")
-        if user_id_str is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Nieprawidłowy token autoryzacji."
-            )
-        user_id = int(user_id_str)
-    except (jwt.PyJWTError, ValueError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Błąd dekodowania tokena lub token wygasł."
-        )
-
-    stmt = select(User).where(User.id == user_id)
-    result = await db.execute(stmt)
-    user = result.scalars().first()
-
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Konto użytkownika nie istnieje."
-        )
-
-    return user
+def get_token_from_request(request: Request) -> Optional[str]:
+    """
+    Uniwersalne pobieranie tokena:
+    1. Najpierw szuka w ciasteczkach (klucz 'access_token') - dla przeglądarki/Jinja2.
+    2. Jeśli brak, szuka w nagłówku 'Authorization: Bearer <token>' - dla klientów REST API.
+    """
+    token = request.cookies.get("access_token")
+    if token:
+        return token
+    
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        return auth_header.split(" ")[1]
+        
+    return None
 
 
 def verify_active_access(user: User) -> bool:
     """Weryfikacja praw dostępu (ADMIN vs zwykły użytkownik)."""
-    if user.role in [UserRole.SUPER_ADMIN, UserRole.ADMIN]:
+    role_val = user.role.value if hasattr(user.role, "value") else str(user.role)
+    if role_val in ["SUPER_ADMIN", "ADMIN"]:
         return True
 
     now_utc = datetime.now(timezone.utc)

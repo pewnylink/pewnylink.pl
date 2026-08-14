@@ -1,29 +1,33 @@
 # app/routers/auth.py
 from datetime import datetime, timezone, timedelta
 from typing import Dict, Any
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update
+from sqlalchemy import select
 
-from app.database import get_db
+from app.db.session import get_db
+from app.db.models import User, UserRole
 from app.models.user import (
     UserRegister, 
     UserLogin, 
     TokenResponse, 
     UserResponse, 
-    UserRole, 
     VoucherCreate, 
     VoucherRedeem,
-    User,
     Voucher
 )
-from app.core.security import hash_password, verify_password, create_access_token, get_current_user
+from app.core.security import hash_password, verify_password, create_access_token
+from app.dependencies import get_current_user_required
 
 router = APIRouter(prefix="/api/v1/auth", tags=["Auth & Access"])
 
 
 @router.post("/register", response_model=TokenResponse)
-async def register(payload: UserRegister, db: AsyncSession = Depends(get_db)):
+async def register(
+    payload: UserRegister, 
+    response: Response,
+    db: AsyncSession = Depends(get_db)
+):
     email_clean = payload.email.lower().strip()
 
     # 1. Sprawdzenie unikalności adresu e-mail
@@ -54,11 +58,14 @@ async def register(payload: UserRegister, db: AsyncSession = Depends(get_db)):
     await db.commit()
     await db.refresh(new_user)
 
-    user_id_str = str(new_user.id)
-    token = create_access_token(user_id=user_id_str, role=role)
+    role_str = new_user.role.value if hasattr(new_user.role, 'value') else str(new_user.role)
+    token = create_access_token(user_id=new_user.id, role=role_str)
+
+    # Zapis w ciasteczku pod kątem widoków www / Jinja2
+    response.set_cookie(key="access_token", value=token, httponly=True)
 
     user_resp = UserResponse(
-        id=user_id_str,
+        id=str(new_user.id),
         email=new_user.email,
         full_name=new_user.full_name,
         role=new_user.role,
@@ -70,7 +77,11 @@ async def register(payload: UserRegister, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):
+async def login(
+    payload: UserLogin, 
+    response: Response,
+    db: AsyncSession = Depends(get_db)
+):
     email_clean = payload.email.lower().strip()
     
     stmt = select(User).where(User.email == email_clean)
@@ -83,11 +94,14 @@ async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):
             detail="Błędny e-mail lub hasło."
         )
 
-    user_id_str = str(user.id)
-    token = create_access_token(user_id=user_id_str, role=user.role)
+    role_str = user.role.value if hasattr(user.role, 'value') else str(user.role)
+    token = create_access_token(user_id=user.id, role=role_str)
+
+    # Zapis w ciasteczku pod kątem widoków www / Jinja2
+    response.set_cookie(key="access_token", value=token, httponly=True)
 
     user_resp = UserResponse(
-        id=user_id_str,
+        id=str(user.id),
         email=user.email,
         full_name=user.full_name,
         role=user.role,
@@ -99,14 +113,14 @@ async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/me", response_model=UserResponse)
-async def get_my_profile(current_user: dict = Depends(get_current_user)):
+async def get_my_profile(current_user: User = Depends(get_current_user_required)):
     return UserResponse(
-        id=str(current_user["id"]),
-        email=current_user["email"],
-        full_name=current_user["full_name"],
-        role=current_user["role"],
-        access_until=current_user.get("access_until"),
-        created_at=current_user["created_at"]
+        id=str(current_user.id),
+        email=current_user.email,
+        full_name=current_user.full_name,
+        role=current_user.role,
+        access_until=current_user.access_until,
+        created_at=current_user.created_at
     )
 
 
@@ -115,11 +129,12 @@ async def get_my_profile(current_user: dict = Depends(get_current_user)):
 @router.post("/vouchers/create", tags=["Admin Vouchers"])
 async def create_voucher(
     payload: VoucherCreate, 
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user_required),
     db: AsyncSession = Depends(get_db)
 ):
     """Tworzenie kodów promocyjnych (Dostępne tylko dla ról SUPER_ADMIN)."""
-    if current_user["role"] != UserRole.SUPER_ADMIN:
+    role_val = current_user.role.value if hasattr(current_user.role, 'value') else str(current_user.role)
+    if role_val != "SUPER_ADMIN" and current_user.role != UserRole.SUPER_ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, 
             detail="Brak uprawnień administratora."
@@ -127,7 +142,6 @@ async def create_voucher(
 
     code_clean = payload.code.upper().strip()
     
-    # Sprawdzamy czy voucher istnieje w bazie
     stmt = select(Voucher).where(Voucher.code == code_clean)
     result = await db.execute(stmt)
     voucher = result.scalar_one_or_none()
@@ -152,7 +166,7 @@ async def create_voucher(
 @router.post("/vouchers/redeem")
 async def redeem_voucher(
     payload: VoucherRedeem, 
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user_required),
     db: AsyncSession = Depends(get_db)
 ):
     """Realizacja vouchera przez użytkownika."""
@@ -177,29 +191,17 @@ async def redeem_voucher(
 
     # 2. Wyliczanie nowej daty ważności konta
     now = datetime.now(timezone.utc)
-    current_access = current_user.get("access_until")
+    current_access = current_user.access_until
     
-    # Obsługa stref czasowych / naiwnych obiektów datetime
     if current_access and current_access.tzinfo is None:
         current_access = current_access.replace(tzinfo=timezone.utc)
 
     base_date = current_access if (current_access and current_access > now) else now
     new_access_until = base_date + timedelta(days=voucher.days_validity)
 
-    # 3. Pobranie i aktualizacja użytkownika (wypchnięcie ObjectId na rzecz id PostgreSQL)
-    user_id = int(current_user["id"]) if str(current_user["id"]).isdigit() else current_user["id"]
-    stmt_u = select(User).where(User.id == user_id)
-    res_u = await db.execute(stmt_u)
-    user = res_u.scalar_one_or_none()
-
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
-            detail="Użytkownik nie został znaleziony."
-        )
-
-    user.access_until = new_access_until
-    user.role = UserRole.VIP_GUEST
+    # 3. Aktualizacja danych użytkownika i wykorzystania kodu
+    current_user.access_until = new_access_until
+    current_user.role = UserRole.VIP_GUEST
     voucher.uses_count += 1
 
     await db.commit()

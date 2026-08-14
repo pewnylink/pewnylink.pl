@@ -9,12 +9,14 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.routers import admin, pages
+from app.routers import admin, pages, auth  # <--- Podłączono auth
 from app.api.v1.endpoints.reports import router as reports_api_router
 from app.services.report_generator import generate_audit_report
 from app.services.audit_service import AuditEngine
 from app.services.report_repository import ReportRepository
 from app.database import engine, Base, get_db
+from app.dependencies import get_current_user_optional  # <--- Zależność pobierająca użytkownika
+from app.models.db_models import User
 import app.models.db_models  # Rejestracja modeli w SQLAlchemy przed migracją
 
 # Słownik etykiet branż dla widoków
@@ -50,9 +52,10 @@ if os.path.exists(STATIC_DIR):
 
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-# 3. Podłączanie routerów (Strony HTML, Panel Admina oraz REST API)
+# 3. Podłączanie routerów (Strony HTML, Panel Admina, Autentykacja oraz REST API)
 app.include_router(pages.router)
 app.include_router(admin.router)
+app.include_router(auth.router)  # <--- Dodano router auth
 app.include_router(reports_api_router, prefix="/api/v1")
 
 
@@ -116,6 +119,7 @@ async def get_report(
     url: str = Query(..., description="Adres URL oferty"), 
     admin: bool = Query(False, description="Flaga dostępu administratora"),
     industry: str = Query("general", description="Kategoria / Branża oferty"),
+    current_user: Optional[User] = Depends(get_current_user_optional),  # <--- Pobranie sesji
     db: AsyncSession = Depends(get_db)
 ):
     target_url = url.strip()
@@ -131,6 +135,10 @@ async def get_report(
     
     report_doc.industry_name = CATEGORY_DISPLAY_NAMES.get(industry, "Inne / Ogólne")
     
+    # Przypisanie id zalogowanego użytkownika (jeśli występuje)
+    if current_user:
+        report_doc.user_id = current_user.id
+    
     saved_report = await ReportRepository.create_report(db, report_doc)
     unlocked_param = "?unlocked=true" if admin else ""
     return RedirectResponse(url=f"/report/{saved_report.report_id}{unlocked_param}", status_code=303)
@@ -142,6 +150,7 @@ async def create_report_post(
     request: Request,
     url: str = Form(...),
     industry: str = Form("general"),
+    current_user: Optional[User] = Depends(get_current_user_optional),  # <--- Pobranie sesji
     db: AsyncSession = Depends(get_db)
 ):
     target_url = url.strip()
@@ -156,6 +165,11 @@ async def create_report_post(
     )
 
     report_doc.industry_name = CATEGORY_DISPLAY_NAMES.get(industry, "Inne / Ogólne")
+    
+    # Przypisanie id zalogowanego użytkownika (jeśli występuje)
+    if current_user:
+        report_doc.user_id = current_user.id
+
     saved_report = await ReportRepository.create_report(db, report_doc)
     return RedirectResponse(url=f"/report/{saved_report.report_id}", status_code=303)
 
