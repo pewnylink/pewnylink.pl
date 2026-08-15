@@ -14,7 +14,7 @@ from app.api.v1.endpoints.reports import router as reports_api_router
 from app.services.report_generator import generate_audit_report
 from app.services.audit_service import AuditEngine
 from app.services.report_repository import ReportRepository
-from app.database import engine, Base, get_db
+from app.db.session import engine, Base, get_db
 from app.dependencies import get_current_user_optional  # <--- Zależność pobierająca użytkownika
 from app.models.db_models import User
 import app.models.db_models  # Rejestracja modeli w SQLAlchemy przed migracją

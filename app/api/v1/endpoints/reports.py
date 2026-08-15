@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import get_db
+from app.db.session import get_db
 from app.schemas.report_schema import ReportCreate, ReportResponse
 from app.services.report_generator import generate_audit_report, format_report_response
 from app.services.report_repository import ReportRepository

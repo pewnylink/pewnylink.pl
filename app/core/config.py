@@ -1,3 +1,4 @@
+# app/core/config.py
 from typing import List
 from pydantic_settings import BaseSettings
 
@@ -22,16 +23,16 @@ class Settings(BaseSettings):
     # Nagłówki CORS
     ALLOWED_ORIGINS: List[str] = ["http://localhost:8000", "http://127.0.0.1:8000"]
 
+    # Lista e-maili administratorów
+    ADMIN_EMAILS: List[str] = [
+        "sebo3010@gmail.com",
+        "Adrian.u9277@gmail.com"
+    ]
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
         extra = "ignore"
-
-    # Lista e-maili administratorów (wpisz Wasze adresy e-mail):
-    ADMIN_EMAILS: list[str] = [
-        "sebo3010@gmail.com",
-        "Adrian.u9277@gmail.com"
-    ]
 
 
 settings = Settings()

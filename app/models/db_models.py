@@ -7,7 +7,7 @@ from sqlalchemy import String, Boolean, DateTime, Integer, Index, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database import Base
+from app.db.session import Base
 
 
 class ReportModel(Base):

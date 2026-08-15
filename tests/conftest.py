@@ -6,10 +6,10 @@ import pytest_asyncio
 # Dodanie katalogu głównego projektu do ścieżki Pythona
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-# Dostosuj import poniżej do rzeczywistej ścieżki pliku database.py w Twoim projekcie:
-# - Jeśli plik to app/database.py -> from app.database import engine
+# Dostosuj import poniżej do rzeczywistej ścieżki pliku db.session.py w Twoim projekcie:
+# - Jeśli plik to app/db.session.py -> from app.db.session import engine
 # - Jeśli plik to app/core/database.py -> from app.core.database import engine
-from app.database import engine
+from app.db.session import engine
 
 
 @pytest_asyncio.fixture(autouse=True)

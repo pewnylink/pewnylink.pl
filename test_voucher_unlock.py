@@ -3,7 +3,7 @@ import asyncio
 import uuid
 from datetime import datetime, timezone
 
-from app.database import Base, engine, AsyncSessionLocal
+from app.db.session import Base, engine, AsyncSessionLocal
 from app.models.db_models import ReportModel, Voucher
 from app.services.report_repository import ReportRepository
 

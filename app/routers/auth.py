@@ -65,7 +65,7 @@ async def register(
     token = create_access_token(user_id=new_user.id, role=role_str)
 
     # Zapis w ciasteczku pod kątem widoków www / Jinja2
-    response.set_cookie(key="access_token", value=token, httponly=True, path="/", samesit="lax")
+    response.set_cookie(key="access_token", value=token, httponly=True, path="/", samesite="lax")
 
     user_resp = UserResponse(
         id=str(new_user.id),

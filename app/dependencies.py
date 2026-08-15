@@ -9,7 +9,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.security import get_token_from_request, verify_active_access
 from app.db.session import get_db
-# Poprawiony ścieżka importu modelu User
 from app.models.db_models import User
 
 
@@ -19,10 +18,8 @@ async def get_current_user_optional(
 ) -> Optional[User]:
     """
     Pobiera zalogowanego użytkownika z ciasteczka lub nagłówka Bearer.
-    
-    - Zwraca obiekt User, jeśli token jest prawidłowy.
-    - Zwraca None, jeśli brak tokena lub jest nieprawidłowy (obsługa gości).
-    Nie rzuca wyjątku HTTP 401.
+    Jesli e-mail znajduje się na liście ADMIN_EMAILS, dynamicznie przyznaje
+    uprawnienia administratora w obiekcie sesji.
     """
     token = get_token_from_request(request)
     if not token:
@@ -46,6 +43,14 @@ async def get_current_user_optional(
     stmt = select(User).where(User.id == user_id)
     result = await db.execute(stmt)
     user = result.scalars().first()
+
+    # Dynamiczne nadawanie uprawnień administratora na podstawie config.py
+    if user and user.email:
+        admin_emails = [email.strip().lower() for email in getattr(settings, "ADMIN_EMAILS", [])]
+        if user.email.strip().lower() in admin_emails:
+            user.is_admin = True
+            if hasattr(user, "role"):
+                user.role = "ADMIN"
 
     return user
 

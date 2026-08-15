@@ -6,7 +6,7 @@ from sqlalchemy.engine import Connection
 from alembic import context
 
 # 1. IMPORTY APLIKACJI - pobranie bazy, silnika oraz modeli ORM ze skonsolidowanego pliku db_models
-from app.database import Base, engine
+from app.db.session import Base, engine
 from app.models.db_models import ReportModel, User, Voucher
 
 # Obiekt konfiguracji Alembica (.ini)
@@ -48,7 +48,7 @@ def do_run_migrations(connection: Connection) -> None:
 
 
 async def run_async_migrations() -> None:
-    """Uruchamianie migracji asynchronicznych bezpośrednio z użyciem sprawdzanego engine z app.database."""
+    """Uruchamianie migracji asynchronicznych bezpośrednio z użyciem sprawdzanego engine z app.db.session."""
     async with engine.connect() as connection:
         await connection.run_sync(do_run_migrations)
 
