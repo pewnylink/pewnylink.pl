@@ -3,9 +3,10 @@ import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any, Dict, List, Optional
 
 from app.config import settings
+from app.schemas.report_schema import ReportDeepAnalysis, ReportResponse, ReportSummary
 from app.services.audit_service import AuditEngine
 
 
@@ -41,6 +42,19 @@ def _build_checkpoints_list(raw_points: List[str]) -> List[dict]:
     return checkpoints
 
 
+def _to_list(data: Any, key: str = "questions") -> List[str]:
+    """Pomocnicza funkcja do bezpiecznego wyciągania listy ciągów tekstowych."""
+    if isinstance(data, list):
+        return [str(item) for item in data]
+    if isinstance(data, dict):
+        val = data.get(key, [])
+        if isinstance(val, list):
+            return [str(item) for item in val]
+        if isinstance(val, str):
+            return [val]
+    return []
+
+
 async def generate_audit_report(
     listing_text: str, 
     target_url: str, 
@@ -56,10 +70,8 @@ async def generate_audit_report(
     industry_name = industry_info.get("name", "Analiza Ogólna (Asysta Zakupowa)")
     raw_expert_points = industry_info.get("checkpoints", [])
     
-    # Budowanie 30 punktów eksperckich dla danej branży
     expert_checkpoints = _build_checkpoints_list(raw_expert_points)
 
-    # Budowanie 5 punktów darmowych z sekcji freemium_checkpoints
     raw_freemium_points = config.get("freemium_checkpoints", [])[:5]
     freemium_checkpoints = _build_checkpoints_list(raw_freemium_points)
 
@@ -80,7 +92,7 @@ async def generate_audit_report(
     if len(questions_to_seller) < 3:
         questions_to_seller = default_questions
 
-    # 4. Generowanie unikalnego identyfikatora UUID v4 (PostgreSQL STANDARD)
+    # 4. Generowanie unikalnego identyfikatora UUID v4
     report_uuid = str(uuid.uuid4())
     short_code = report_uuid.replace("-", "")[:8].upper()
 
@@ -100,14 +112,12 @@ async def generate_audit_report(
         "is_paid": is_unlocked,
         "is_unlocked": is_unlocked,
         
-        # Warstwa Freemium (5 Punktów)
         "freemium_preview": {
             "checkpoints": freemium_checkpoints,
             "overall_score": audit_results.get("risk_score", 30),
             "risk_summary": audit_results.get("risk_summary", "Wymaga weryfikacji dokumentacji przed zakupem.")
         },
         
-        # Metryki i Dane Finansowe
         "digital_footprint": {
             "listing_id": audit_results.get("listing_id", "N/A"),
             "first_seen_timestamp": datetime.now(timezone.utc),
@@ -121,10 +131,8 @@ async def generate_audit_report(
             "estimated_additional_costs": audit_results.get("total_tco_extra", 0.0)
         },
         
-        # Warstwa Płatna (30 Punktów Eksperckich)
         "expert_checkpoints": expert_checkpoints,
         
-        # Warstwa Płatna (Asystent Negocjacji)
         "negotiation_assistant": {
             "suggested_opening_price": suggested_opening_price,
             "original_price": original_price,
@@ -132,37 +140,21 @@ async def generate_audit_report(
             "questions_to_seller": questions_to_seller[:3]
         },
         
-        # Statusy pomocnicze
         "risk_score": audit_results.get("risk_score", 30),
         "risk_level": audit_results.get("risk_level", "NISKIE"),
         "rekojmia_status": audit_results.get("rekojmia_status", "Obowiązuje")
     }
 
     return report_document
-# Dopisz na końcu app/services/report_generator.py
-# app/services/report_generator.py
-from typing import Any, List
-from app.schemas.report_schema import ReportDeepAnalysis, ReportResponse, ReportSummary
 
 
-def _to_list(data: Any, key: str = "questions") -> List[str]:
-    """Pomocnicza funkcja do bezpiecznego wyciągania listy ciągów tekstowych."""
-    if isinstance(data, list):
-        return [str(item) for item in data]
-    if isinstance(data, dict):
-        val = data.get(key, [])
-        if isinstance(val, list):
-            return [str(item) for item in val]
-        if isinstance(val, str):
-            return [val]
-    return []
-
-
-def format_report_response(db_report) -> ReportResponse:
+def format_report_response(db_report: Any, force_unlocked: bool = False) -> ReportResponse:
     """
-    Formatuj rekord z bazy danych do schematu Pydantic.
-    Bezpiecznie przetwarza dane niezależnie od tego, czy są słownikiem, czy listą.
+    Formatuj rekord z bazy danych do schematu Pydantic ReportResponse.
+    Obsługuje opcjonalną flagę force_unlocked (np. dla Widoku Administratora).
     """
+    is_unlocked = bool(getattr(db_report, "is_unlocked", False)) or force_unlocked
+
     preview = db_report.freemium_preview if isinstance(db_report.freemium_preview, dict) else {}
     checkpoints = db_report.expert_checkpoints
     negotiation = db_report.negotiation_assistant
@@ -177,7 +169,7 @@ def format_report_response(db_report) -> ReportResponse:
     )
 
     deep_analysis = None
-    if db_report.is_unlocked:
+    if is_unlocked:
         deep_analysis = ReportDeepAnalysis(
             red_flags=_to_list(preview.get("red_flags", []) if isinstance(preview, dict) else []),
             checklist=_to_list(checkpoints, key="questions"),
@@ -187,8 +179,12 @@ def format_report_response(db_report) -> ReportResponse:
     return ReportResponse(
         report_id=db_report.report_id,
         target_url=db_report.target_url,
-        is_unlocked=bool(db_report.is_unlocked),
+        is_unlocked=is_unlocked,
         created_at=db_report.created_at,
         summary=summary,
         deep_analysis=deep_analysis,
     )
+
+
+# Alias zapewniający kompatybilność z importami w routerach
+build_report_response = format_report_response

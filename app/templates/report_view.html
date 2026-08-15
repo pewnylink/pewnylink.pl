@@ -347,4 +347,25 @@
     </div>
 
 </div>
+<!-- OVERLAY MLECZNEGO SZKŁA NA KAFEL III -->
+            {% if not report.is_unlocked %}
+            <div class="absolute inset-x-0 bottom-0 top-[88px] frosted-glass-overlay flex flex-col items-center justify-center p-6 text-center z-10">
+                <div class="w-12 h-12 bg-indigo-600/20 border border-indigo-500/40 rounded-full flex items-center justify-center text-xl mb-3 text-indigo-400 shadow-inner">
+                    💡
+                </div>
+                <h3 class="text-lg font-bold text-white mb-1">Odblokuj Asystenta Negocjacji & Pytania AI</h3>
+                <p class="text-slate-300 max-w-md mb-4 text-xs leading-relaxed">
+                    Otrzymaj gotowe argumenty do rozmowy ze sprzedawcą oraz precyzyjne kwoty obniżki wyliczone przez naszą sztuczną inteligencję.
+                </p>
+                <a href="/checkout?type=single&report={{ report.report_id }}" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg transition text-sm">
+                    Odblokuj Dostęp do Raportu
+                </a>
+            </div>
+            {% endif %}
+
+        </div> <!-- /Kafel III -->
+
+    </div> <!-- /Sekcja szczegółowa -->
+
+</div> <!-- /Główny kontener -->
 {% endblock %}
