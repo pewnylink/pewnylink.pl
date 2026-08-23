@@ -1,5 +1,6 @@
 # app/core/config.py
 from typing import List
+from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
 
 
@@ -29,10 +30,11 @@ class Settings(BaseSettings):
         "Adrian.u9277@gmail.com"
     ]
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        extra = "ignore"
+    model_config = ConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
 
 
 settings = Settings()
