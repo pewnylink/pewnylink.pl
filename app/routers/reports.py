@@ -74,9 +74,11 @@ async def create_report(
     if current_user and hasattr(current_user, "id"):
         report_doc["user_id"] = current_user.id
 
-    saved_report = await ReportRepository.create_report(db, report_doc)
+    # Tworzymy instancję repozytorium z przekazaną sesją bazy danych
+    repo = ReportRepository(db)
+    saved_report = await repo.create_report(report_doc)
+    
     return build_report_response(saved_report)
-
 
 @router.get("/{report_id}", response_model=ReportResponse)
 async def get_report(

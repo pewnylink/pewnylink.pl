@@ -1,10 +1,22 @@
 # app/services/report_repository.py
 import uuid
+from datetime import datetime
 from typing import Optional, Dict, Any, Tuple
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.db_models import ReportModel, Voucher
+
+
+def _sanitize_for_json(obj: Any) -> Any:
+    """Rekurencyjnie konwertuje obiekty datetime na string w formacie ISO dla bezpiecznego zapisu w kolumnach JSONB."""
+    if isinstance(obj, dict):
+        return {k: _sanitize_for_json(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [_sanitize_for_json(i) for i in obj]
+    elif isinstance(obj, datetime):
+        return obj.isoformat()
+    return obj
 
 
 class ReportRepository:
@@ -16,8 +28,9 @@ class ReportRepository:
     async def create_report(
         self, report_data: Dict[str, Any], db: Optional[AsyncSession] = None
     ) -> ReportModel:
-        """Bezpieczny zapis raportu z wykorzystaniem domyślnych wartości .get()."""
+        """Bezpieczny zapis raportu z wykorzystaniem domyślnych wartości .get() oraz automatyczną sanitaryzacją typów JSONB."""
         session = db or self.db
+        
         db_report = ReportModel(
             report_id=report_data["report_id"],
             target_url=report_data["target_url"],
@@ -29,12 +42,20 @@ class ReportRepository:
             is_unlocked=report_data.get("is_unlocked", False),
             risk_score=report_data.get("risk_score", 30),
             risk_level=report_data.get("risk_level", "NISKIE"),
-            freemium_preview=report_data["freemium_preview"],
-            digital_footprint=report_data["digital_footprint"],
-            financial_analysis=report_data["financial_analysis"],
-            expert_checkpoints=report_data["expert_checkpoints"],
-            negotiation_assistant=report_data["negotiation_assistant"],
+            freemium_preview=_sanitize_for_json(report_data.get("freemium_preview")),
+            digital_footprint=_sanitize_for_json(report_data.get("digital_footprint")),
+            financial_analysis=_sanitize_for_json(report_data.get("financial_analysis")),
+            expert_checkpoints=_sanitize_for_json(report_data.get("expert_checkpoints")),
+            negotiation_assistant=_sanitize_for_json(report_data.get("negotiation_assistant")),
         )
+
+        if report_data.get("id"):
+            db_report.id = report_data["id"]
+        if report_data.get("user_id"):
+            db_report.user_id = report_data["user_id"]
+        if report_data.get("created_at"):
+            db_report.created_at = report_data["created_at"]
+
         session.add(db_report)
         await session.commit()
         await session.refresh(db_report)
@@ -85,7 +106,7 @@ class ReportRepository:
 
         report.is_unlocked = True
         await self.db.commit()
-        await session.refresh(report) if (session := self.db) else None
+        await self.db.refresh(report)
         return report
 
     async def unlock_with_voucher(
