@@ -3,15 +3,14 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import String, Boolean, DateTime, Integer, Index, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy import String, Boolean, DateTime, Integer, Index, ForeignKey, JSON, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
 
 
 class ReportModel(Base):
-    """Tabela 'reports' w bazie PostgreSQL reprezentująca trwałe dane raportów SaaS."""
+    """Tabela 'reports' w bazie reprezentująca trwałe dane raportów SaaS."""
     __tablename__ = "reports"
 
     # Unikalny klucz główny UUID4
@@ -46,12 +45,12 @@ class ReportModel(Base):
     risk_score: Mapped[int] = mapped_column(Integer, default=30, nullable=False)
     risk_level: Mapped[str] = mapped_column(String(32), default="NISKIE", nullable=False)
     
-    # Złożone struktury z Pydantic przechowywane natywnie jako PostgreSQL JSONB
-    freemium_preview: Mapped[Dict[str, Any]] = mapped_column(JSONB, nullable=False)
-    digital_footprint: Mapped[Dict[str, Any]] = mapped_column(JSONB, nullable=False)
-    financial_analysis: Mapped[Dict[str, Any]] = mapped_column(JSONB, nullable=False)
-    expert_checkpoints: Mapped[Dict[str, Any]] = mapped_column(JSONB, nullable=False)
-    negotiation_assistant: Mapped[Dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    # Złożone struktury z Pydantic przechowywane jako uniwersalny JSON (JSONB w PostgreSQL, JSON w SQLite)
+    freemium_preview: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False)
+    digital_footprint: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False)
+    financial_analysis: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False)
+    expert_checkpoints: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False)
+    negotiation_assistant: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False)
     
     # Znaczniki czasu z obsługą stref czasowych
     created_at: Mapped[datetime] = mapped_column(

@@ -1,6 +1,6 @@
 # app/core/config.py
 from typing import List
-from pydantic import ConfigDict
+from pydantic import ConfigDict, model_validator
 from pydantic_settings import BaseSettings
 
 
@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     # Zewnętrzne API (LLM + Scraper)
     OPENAI_API_KEY: str = ""
     SCRAPERAPI_KEY: str = ""
+    SCRAPER_API_KEY: str = ""  # Alias wymagany przez ScraperEngine
 
     # Nagłówki CORS
     ALLOWED_ORIGINS: List[str] = ["http://localhost:8000", "http://127.0.0.1:8000"]
@@ -35,6 +36,22 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore"
     )
+
+    @model_validator(mode="after")
+    def sync_scraper_keys(self) -> "Settings":
+        """Synchronizuje wartości między SCRAPERAPI_KEY i SCRAPER_API_KEY."""
+        key = self.SCRAPERAPI_KEY or self.SCRAPER_API_KEY
+        if key:
+            self.SCRAPERAPI_KEY = key
+            self.SCRAPER_API_KEY = key
+        return self
+
+    def __getattr__(self, item: str):
+        """Dynamiczny fallback zapobiegający AttributeError przy zapytaniach o warianty klucza scrapera."""
+        item_upper = item.upper()
+        if item_upper in ("SCRAPERAPI_KEY", "SCRAPER_API_KEY", "SCRAPER_KEY"):
+            return self.SCRAPERAPI_KEY or self.SCRAPER_API_KEY or ""
+        raise AttributeError(f"'Settings' object has no attribute '{item}'")
 
 
 settings = Settings()
