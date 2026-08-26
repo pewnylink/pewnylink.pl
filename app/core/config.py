@@ -1,16 +1,28 @@
 # app/core/config.py
-from typing import List
+from pathlib import Path
+from typing import List, Optional
 from pydantic import ConfigDict, model_validator
 from pydantic_settings import BaseSettings
+
+# Ścieżka do katalogu głównego projektu pewnylink.pl
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 class Settings(BaseSettings):
     # Podstawowe informacje o projekcie
     PROJECT_NAME: str = "PewnyLink.pl API"
     ENVIRONMENT: str = "development"
-    
-    # Baza danych SQL
-    DATABASE_URL: str = "sqlite+aiosqlite:///./sql_app.db"
+
+    # Ścieżki do zasobów
+    CHECKLISTS_PATH: Path = BASE_DIR / "config" / "checklists.json"
+
+    # Baza danych SQL (Domyślnie lokalny SQLite z roota, z możliwością nadpisania przez PostgreSQL w .env)
+    DATABASE_URL: Optional[str] = "sqlite+aiosqlite:///./sql_app.db"
+    DB_USER: Optional[str] = None
+    DB_PASSWORD: Optional[str] = None
+    DB_HOST: Optional[str] = None
+    DB_PORT: str = "5432"
+    DB_NAME: Optional[str] = None
 
     # Bezpieczeństwo i JWT
     SECRET_KEY: str = "DEV_ONLY_INSECURE_SECRET_KEY_CHANGE_THIS_IN_ENV_123456789"
@@ -45,6 +57,22 @@ class Settings(BaseSettings):
             self.SCRAPERAPI_KEY = key
             self.SCRAPER_API_KEY = key
         return self
+
+    def get_database_url(self) -> str:
+        """
+        Zwraca właściwy URL połączenia z bazą danych.
+        Automatycznie prioryteryzuje PostgreSQL z .env, a w razie braku – SQLite.
+        """
+        if self.DATABASE_URL and self.DATABASE_URL.startswith("postgresql"):
+            return self.DATABASE_URL
+
+        if self.DB_USER and self.DB_PASSWORD and self.DB_HOST and self.DB_NAME:
+            return (
+                f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}"
+                f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}?ssl=require"
+            )
+
+        return self.DATABASE_URL or f"sqlite+aiosqlite:///{BASE_DIR}/sql_app.db"
 
     def __getattr__(self, item: str):
         """Dynamiczny fallback zapobiegający AttributeError przy zapytaniach o warianty klucza scrapera."""
