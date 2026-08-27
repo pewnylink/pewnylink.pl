@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from typing import Optional
 
 from fastapi import Depends, FastAPI, Form, HTTPException, Query, Request, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -11,12 +12,12 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.models.db_models  # Rejestracja modeli w SQLAlchemy przed migracją
+from app.api.v1.endpoints.payments import router as payments_api_router
+from app.api.v1.endpoints.reports import router as reports_api_router
 from app.db.session import Base, engine, get_db
 from app.dependencies import get_current_user_optional
 from app.models.db_models import User
 from app.routers import admin, auth, pages
-from app.api.v1.endpoints.reports import router as reports_api_router
-from app.api.v1.endpoints.payments import router as payments_api_router
 from app.services.audit_service import AuditEngine
 from app.services.report_generator import generate_audit_report
 from app.services.report_repository import ReportRepository
@@ -43,6 +44,21 @@ async def lifespan(app: FastAPI):
 
 # 2. Tworzenie instancji aplikacji FastAPI
 app = FastAPI(title="pewnylink.pl API", version="1.0.0", lifespan=lifespan)
+
+# 2a. Konfiguracja CORS (Cross-Origin Resource Sharing)
+raw_origins = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:3000,http://localhost:8000,https://pewnylink.pl,https://www.pewnylink.pl"
+)
+allowed_origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept"],
+)
 
 # Ścieżka do katalogu z szablonami i plikami statycznymi
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
