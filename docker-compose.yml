@@ -1,18 +1,38 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
     container_name: pewnylink_postgres
     restart: always
     environment:
-      POSTGRES_USER: pewnylink_user
-      POSTGRES_PASSWORD: your_db_password
-      POSTGRES_DB: pewnylink_db
+      POSTGRES_USER: ${POSTGRES_USER:-pewnylink_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-your_db_password}
+      POSTGRES_DB: ${POSTGRES_DB:-pewnylink_db}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pewnylink_user} -d ${POSTGRES_DB:-pewnylink_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    container_name: pewnylink_web
+    restart: always
+    # Automatyczne uruchomienie migracji Alembic, a następnie serwera FastAPI
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-pewnylink_user}:${POSTGRES_PASSWORD:-your_db_password}@postgres:5432/${POSTGRES_DB:-pewnylink_db}
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:
