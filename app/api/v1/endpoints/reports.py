@@ -1,7 +1,7 @@
 # app/api/v1/endpoints/reports.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from sqlalchemy import select, or_
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
@@ -82,7 +82,7 @@ async def unlock_with_voucher_api(
 
     stmt = select(Voucher).where(
         Voucher.code == clean_voucher_code,
-        or_(Voucher.is_active == True, Voucher.is_active == 1)
+        Voucher.is_active.is_(True),
     )
     result = await db.execute(stmt)
     voucher = result.scalar_one_or_none()

@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from app.config import settings
+from app.core.config import settings
 from app.schemas.report_schema import ReportDeepAnalysis, ReportResponse, ReportSummary
 from app.services.audit_service import AuditEngine
 

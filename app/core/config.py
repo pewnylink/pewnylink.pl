@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     # Podstawowe informacje o projekcie
     PROJECT_NAME: str = "PewnyLink.pl API"
     ENVIRONMENT: str = "development"
+    FRONTEND_URL: str = "http://localhost:8000"
 
     # Ścieżki do zasobów
     CHECKLISTS_PATH: Path = BASE_DIR / "config" / "checklists.json"
@@ -28,6 +29,10 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "DEV_ONLY_INSECURE_SECRET_KEY_CHANGE_THIS_IN_ENV_123456789"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 godziny
+
+    # Integracja ze Stripe (Płatności Online)
+    STRIPE_SECRET_KEY: str = ""
+    STRIPE_WEBHOOK_SECRET: str = ""
 
     # Zewnętrzne API (LLM + Scraper)
     OPENAI_API_KEY: str = ""

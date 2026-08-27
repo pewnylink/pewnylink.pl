@@ -1,11 +1,10 @@
-# app/scrapers/scraper_engine.py
 import re
 import httpx
 from bs4 import BeautifulSoup
 from typing import Dict, Any, Optional
 from urllib.parse import urlparse
 
-from app.config import settings
+from app.core.config import settings
 
 
 class ScraperEngine:

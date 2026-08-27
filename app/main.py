@@ -15,7 +15,8 @@ from app.db.session import Base, engine, get_db
 from app.dependencies import get_current_user_optional
 from app.models.db_models import User
 from app.routers import admin, auth, pages
-from app.routers.reports import router as reports_api_router  # Poprawiona ścieżka importu
+from app.api.v1.endpoints.reports import router as reports_api_router
+from app.api.v1.endpoints.payments import router as payments_api_router
 from app.services.audit_service import AuditEngine
 from app.services.report_generator import generate_audit_report
 from app.services.report_repository import ReportRepository
@@ -58,6 +59,7 @@ app.include_router(pages.router)
 app.include_router(admin.router)
 app.include_router(auth.router)
 app.include_router(reports_api_router, prefix="/api/v1")
+app.include_router(payments_api_router, prefix="/api/v1")
 
 
 # 4. ENDPOINT MONITORINGU DLA CRON-JOB.ORG
@@ -228,4 +230,3 @@ async def get_report_by_id(
             "is_admin": doc.get("is_unlocked", False)
         }
     )
-    

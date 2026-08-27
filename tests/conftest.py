@@ -6,17 +6,18 @@ import pytest_asyncio
 # Dodanie katalogu głównego projektu do ścieżki Pythona
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-# Dostosuj import poniżej do rzeczywistej ścieżki pliku db.session.py w Twoim projekcie:
-# - Jeśli plik to app/db.session.py -> from app.db.session import engine
-# - Jeśli plik to app/core/database.py -> from app.core.database import engine
-from app.db.session import engine
+from app.db.session import engine, Base
 
 
 @pytest_asyncio.fixture(autouse=True)
-async def cleanup_db_engine():
+async def setup_and_cleanup_db():
     """
-    Automatycznie zwalnia pulę połączeń asyncpg po każdym teście.
-    Dzięki temu każdy kolejny test nawiązuje czyste połączenie w swojej pętli asyncio.
+    Automatycznie tworzy strukturę tabel przed każdym testem
+    oraz zwalnia pętlę połączeń po jego zakończeniu.
     """
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    
     yield
+    
     await engine.dispose()

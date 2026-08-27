@@ -10,10 +10,7 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import DeclarativeBase
 
-try:
-    from app.core.config import settings
-except ImportError:
-    from app.config import settings
+from app.core.config import settings
 
 
 def sanitize_asyncpg_url(url: str) -> str:
@@ -24,6 +21,7 @@ def sanitize_asyncpg_url(url: str) -> str:
     parsed = urlparse(url)
     query_params = parse_qs(parsed.query)
 
+    # Bezpieczne usunięcie niekompatybilnych parametrów cloudowych
     query_params.pop("channel_binding", None)
 
     if "sslmode" in query_params:
@@ -34,7 +32,7 @@ def sanitize_asyncpg_url(url: str) -> str:
     return urlunparse(parsed._replace(query=new_query))
 
 
-# Pobranie URL bazy danych w zależności od struktury settings
+# Pobranie URL bazy danych
 if hasattr(settings, "get_database_url"):
     RAW_DATABASE_URL = settings.get_database_url()
 else:
@@ -43,7 +41,14 @@ else:
 DATABASE_URL = sanitize_asyncpg_url(RAW_DATABASE_URL)
 
 is_sqlite = DATABASE_URL.startswith("sqlite")
-connect_args = {"check_same_thread": False} if is_sqlite else {}
+
+# Konfiguracja connect_args w zależności od silnika bazy danych
+connect_args = {}
+if is_sqlite:
+    connect_args["check_same_thread"] = False
+else:
+    # Wyłączenie cache przygotowanych zapytań (rozwiązuje InvalidCachedStatementError w testach oraz PgBouncerze)
+    connect_args["prepared_statement_cache_size"] = 0
 
 # Konfiguracja silnika pod produkcyjne wymogi SaaS
 engine_kwargs = {
@@ -73,6 +78,9 @@ AsyncSessionLocal = async_sessionmaker(
     expire_on_commit=False,
     autoflush=False,
 )
+
+# Alias zapewniający kompatybilność ze wszystkimi modułami i testami
+async_session_maker = AsyncSessionLocal
 
 
 class Base(DeclarativeBase):
