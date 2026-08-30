@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Kontakt i Reklamacje - pewnylink.pl{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6 sm:p-10 space-y-6 text-slate-300">
+    <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight border-b border-slate-700 pb-4">
+        Kontakt i Procedura Reklamacyjna
+    </h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-700/60 space-y-3">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">🏢 Dane Operatora</h2>
+            <p class="text-sm text-slate-300 font-semibold">SevArt sp. z o.o.</p>
+            <p class="text-xs text-slate-400">ul. Przykładowa 12/4<br>64-100 Leszno, Polska</p>
+            <p class="text-xs text-slate-400">KRS: 0000000000 | NIP: 0000000000</p>
+        </div>
+
+        <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-700/60 space-y-3">
+            <h2 class="text-lg font-bold text-indigo-400 flex items-center gap-2">✉️ Wsparcie i Reklamacje</h2>
+            <p class="text-xs text-slate-400">Kontakt ogólny:</p>
+            <p class="text-sm text-white font-mono bg-slate-800 px-3 py-1.5 rounded border border-slate-700 inline-block">kontakt@pewnylink.pl</p>
+            <p class="text-xs text-slate-400 mt-2">Zgłoszenia reklamacyjne:</p>
+            <p class="text-sm text-white font-mono bg-slate-800 px-3 py-1.5 rounded border border-slate-700 inline-block">reklamacje@pewnylink.pl</p>
+        </div>
+    </div>
+
+    <section class="space-y-3 pt-4 border-t border-slate-700/50">
+        <h2 class="text-lg font-bold text-indigo-400">Procedura Rozpatrywania Reklamacji</h2>
+        <p class="text-sm leading-relaxed">1. Reklamacje dotyczące działania Serwisu lub wygenerowanych Raportów należy przesyłać na adres e-mail: <strong class="text-white">reklamacje@pewnylink.pl</strong>.</p>
+        <p class="text-sm leading-relaxed">2. Zgłoszenie powinno zawierać adres e-mail konta, identyfikator płatności/raportu oraz opis problemu.</p>
+        <p class="text-sm leading-relaxed">3. Operator rozpatruje reklamacje w terminie <strong class="text-white">14 dni</strong> od dnia ich otrzymania.</p>
+    </section>
+</div>
+{% endblock %}

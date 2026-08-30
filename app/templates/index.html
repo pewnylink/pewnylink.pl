@@ -5,24 +5,24 @@
 
     <!-- HERO SECTION -->
     <div class="text-center max-w-3xl mx-auto mb-8 sm:mb-12 space-y-4">
-    <div class="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold px-3 py-1.5 rounded-full">
-        <span>🛡️ pewnylink.pl &bull; Inteligentna Asysta Zakupowa</span>
+        <div class="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold px-3 py-1.5 rounded-full">
+            <span>🛡️ pewnylink.pl &bull; Inteligentna Asysta Zakupowa</span>
+        </div>
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight">
+            Prześlij dowolną ofertę<br>
+            <span class="text-indigo-400">i zminimalizuj ryzyko</span><br>
+            z naszym raportem bezpieczeństwa
+        </h1>
+        <div class="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl mx-auto space-y-2 font-normal">
+            <p>Wklej odnośnik do dowolnej aukcji, oferty sklepu lub ogłoszenia.</p>
+            <p class="text-slate-400">
+                Nasz algorytm natychmiast wykryje kruczki prawne, haczyki nieuczciwych sprzedawców, niezgodności w rejestrach państwowych oraz ukryte koszty TCO.
+            </p>
+            <p class="text-slate-400">
+                Na podstawie dogłębnej analizy wygeneruje również 3 precyzyjne pytania do sprzedającego.
+            </p>
+        </div>
     </div>
-    <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight">
-    Prześlij dowolną ofertę<br>
-    <span class="text-indigo-400">i zminimalizuj ryzyko</span><br>
-    z naszym raportem bezpieczeństwa
-</h1>
-    <div class="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl mx-auto space-y-2 font-normal">
-        <p>Wklej odnośnik do&nbsp;dowolnej aukcji, oferty sklepu lub&nbsp;ogłoszenia.</p>
-        <p class="text-slate-400">
-            Nasz algorytm natychmiast wykryje kruczki prawne, haczyki nieuczciwych sprzedawców, niezgodności w&nbsp;rejestrach państwowych oraz&nbsp;ukryte koszty TCO.
-        </p>
-        <p class="text-slate-400">
-            Na&nbsp;podstawie dogłębnej analizy wygeneruje również 3&nbsp;precyzyjne pytania do&nbsp;sprzedającego.
-        </p>
-    </div>
-</div>
 
     <!-- FORMULARZ SKANOWANIA -->
     <div class="max-w-2xl mx-auto w-full bg-slate-800/80 border border-slate-700/60 p-4 sm:p-8 rounded-2xl shadow-2xl backdrop-blur-xl mb-12 sm:mb-16">
@@ -63,10 +63,13 @@
                     <div class="text-3xl font-black text-indigo-400 mb-1">9,99 zł</div>
                     <p class="text-xs text-slate-400 mb-4">Opłata za pojedynczy raport</p>
                 </div>
-                <div class="space-y-2">
+                <div class="space-y-4">
                     <div class="text-xs text-slate-200 font-semibold bg-slate-900/80 py-2.5 rounded-lg border border-slate-700">
                         1 Raport Audytowy
                     </div>
+                    <a href="/checkout?type=single" class="block w-full bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs py-3 rounded-xl transition-all">
+                        Kup 1 Raport
+                    </a>
                     <p class="text-[11px] text-slate-500">Bez rejestracji konta</p>
                 </div>
             </div>
@@ -82,10 +85,13 @@
                     <div class="text-3xl font-black text-indigo-400 mb-1">79,99 zł</div>
                     <p class="text-xs text-slate-400 mb-4">Ważność pakietu: 30 dni</p>
                 </div>
-                <div class="space-y-2">
+                <div class="space-y-4">
                     <div class="text-xs text-indigo-300 font-semibold bg-indigo-950/80 py-2.5 rounded-lg border border-indigo-800">
                         10 Raportów Audytowych
                     </div>
+                    <a href="/checkout?type=standard" class="block w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/30">
+                        Wybierz Pakiet Standard
+                    </a>
                     <p class="text-[11px] text-indigo-400/80">Zakup jednorazowy (brak autoodnawiania)</p>
                 </div>
             </div>
@@ -98,10 +104,13 @@
                     <div class="text-3xl font-black text-indigo-400 mb-1">229,99 zł</div>
                     <p class="text-xs text-slate-400 mb-4">Ważność pakietu: 30 dni</p>
                 </div>
-                <div class="space-y-2">
+                <div class="space-y-4">
                     <div class="text-xs text-slate-200 font-semibold bg-slate-900/80 py-2.5 rounded-lg border border-slate-700">
                         30 Raportów Audytowych
                     </div>
+                    <a href="/checkout?type=pro" class="block w-full bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs py-3 rounded-xl transition-all">
+                        Wybierz Pakiet PRO
+                    </a>
                     <p class="text-[11px] text-slate-500">Zakup jednorazowy (brak autoodnawiania)</p>
                 </div>
             </div>

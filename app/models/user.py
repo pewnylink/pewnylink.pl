@@ -11,6 +11,7 @@ class UserRole(str, Enum):
     """Uprawnienia użytkowników w systemie pewnylink.pl"""
     USER = "USER"                 # Zwykły zarejestrowany użytkownik
     VIP_GUEST = "VIP_GUEST"       # Użytkownik z aktywnym kodem/subskrypcją
+    ADMIN = "ADMIN"
     SUPER_ADMIN = "SUPER_ADMIN"   # Administrator pełny
 
 
