@@ -11,8 +11,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import app.models.db_models  # Rejestracja modeli w SQLAlchemy przed migracją
 from app.api.v1.endpoints.payments import router as payments_api_router
 from app.api.v1.endpoints.reports import router as reports_api_router
+from app.routers.affiliates import router as affiliates_router
+from app.core.affiliates import get_affiliate_widgets
 from app.db.session import Base, engine, get_db
 from app.routers import admin, auth, pages
+from app.routers.pages import templates  # Rejestracja funkcji globalnych Jinja2
 
 
 # 1. Zarządzanie cyklem życia aplikacji (Lifespan)
@@ -31,7 +34,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# 2a. Konfiguracja CORS (Cross-Origin Resource Sharing)
+# 2a. Rejestracja funkcji afiliacyjnej w szablonach Jinja2
+templates.env.globals["get_affiliates"] = get_affiliate_widgets
+
+# 2b. Konfiguracja CORS (Cross-Origin Resource Sharing)
 raw_origins = os.getenv(
     "CORS_ORIGINS",
     "http://localhost:3000,http://localhost:8000,https://pewnylink.pl,https://www.pewnylink.pl"
@@ -46,7 +52,7 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type", "Accept"],
 )
 
-# 2b. Podłączenie plików statycznych
+# 2c. Podłączenie plików statycznych
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 
@@ -58,8 +64,10 @@ if os.path.exists(STATIC_DIR):
 app.include_router(pages.router)
 app.include_router(admin.router)
 app.include_router(auth.router)  # Usunięto prefix="/auth" – router ma już prefiks w auth.py
+app.include_router(affiliates_router)
 app.include_router(reports_api_router, prefix="/api/v1")
 app.include_router(payments_api_router, prefix="/api/v1")
+
 
 # 4. ENDPOINT MONITORINGU DLA CRON-JOB.ORG / HEALTH CHECK
 @app.get("/health", tags=["Monitoring"])

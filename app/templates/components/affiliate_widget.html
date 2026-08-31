@@ -1,0 +1,20 @@
+<!-- templates/components/affiliate_widget.html -->
+{% macro render_affiliate(widget) %}
+<div class="bg-slate-900/90 border border-slate-700/80 hover:border-{{ widget.color }}-500/50 rounded-xl p-4 transition-all duration-200 my-3">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div class="space-y-1">
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-{{ widget.color }}-500/10 text-{{ widget.color }}-400 border border-{{ widget.color }}-500/20 px-2 py-0.5 rounded-md">
+                    {{ widget.badge }}
+                </span>
+                <h4 class="text-xs sm:text-sm font-bold text-white">{{ widget.title }}</h4>
+            </div>
+            <p class="text-xs text-slate-400">{{ widget.desc }}</p>
+        </div>
+        <a href="{{ widget.url }}" target="_blank" rel="nofollow noopener" 
+           class="bg-{{ widget.color }}-600 hover:bg-{{ widget.color }}-500 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-all shrink-0 whitespace-nowrap shadow-md">
+            {{ widget.cta }} &rarr;
+        </a>
+    </div>
+</div>
+{% endmacro %}

@@ -1,0 +1,129 @@
+{# app/templates/macros/affiliates.html #}
+{% from "components/affiliate_widget.html" import render_affiliate %}
+
+{% macro get_affiliates(section, category="general", report=None) %}
+
+{# Normalizacja nazwy kategorii #}
+{% set cat = (category | default("general") | lower) %}
+
+{# --- BAZA OFERT AFILIACYJNYCH --- #}
+
+{# Sekcja: Analiza Finansowa (Leasingi, Kredyty, Ubezpieczenia) #}
+{% set financial_widgets_auto = [
+    {
+        "badge": "Leasing / Finansowanie",
+        "title": "Kalkulator Leasingu Operacyjnego & Kredytu Auto",
+        "desc": "Porównaj raty w 12 bankach i uzyskaj wstępną decyzję online w 15 minut.",
+        "url": "https://affiliate-link.example.com/auto-leasing?ref=pewnylink",
+        "cta": "Oblicz ratę leasingu",
+        "color": "indigo"
+    },
+    {
+        "badge": "Ubezpieczenie OC/AC",
+        "title": "Tanie Ubezpieczenie Auto – Zniżki do -20%",
+        "desc": "Sprawdź stawki OC/AC dla tego pojazdu w kalkulatorze porównawczym 15 towarzystw.",
+        "url": "https://affiliate-link.example.com/auto-insurance?ref=pewnylink",
+        "cta": "Wylicz składkę OC/AC",
+        "color": "emerald"
+    }
+] %}
+
+{% set financial_widgets_property = [
+    {
+        "badge": "Kredyt Hipoteczny",
+        "title": "Porównywarka Kredytów Hipotecznych & Gotówkowych",
+        "desc": "Sprawdź swoją zdolność kredytową i porównaj marże w bankach przed złożeniem oferty.",
+        "url": "https://affiliate-link.example.com/hipoteka?ref=pewnylink",
+        "cta": "Sprawdź zdolność",
+        "color": "indigo"
+    },
+    {
+        "badge": "Ubezpieczenie Nieruchomości",
+        "title": "Polisa Mieszkaniowa od 15 zł/mies.",
+        "desc": "Pełna ochrona murów, wyposażenia i OC w życiu prywatnym z szybką wypłatą odszkodowania.",
+        "url": "https://affiliate-link.example.com/property-insurance?ref=pewnylink",
+        "cta": "Ubezpiecz nieruchomość",
+        "color": "emerald"
+    }
+] %}
+
+{% set financial_widgets_general = [
+    {
+        "badge": "Pożyczka / Kredyt",
+        "title": "Szybkie Finansowanie Zakupu",
+        "desc": "Decyzja kredytowa online w 5 minut. Kwoty od 1 000 do 50 000 PLN na elastycznych warunkach.",
+        "url": "https://affiliate-link.example.com/kredyt-gotowkowy?ref=pewnylink",
+        "cta": "Sprawdź ofertę",
+        "color": "indigo"
+    }
+] %}
+
+{# Sekcja: Zielone Światło / Rekomendacje (Rzeczoznawcy, Inspektorzy, Transport, Umowy) #}
+{% set green_light_widgets_auto = [
+    {
+        "badge": "Inspekcja Pojazdu",
+        "title": "Zamów Rzeczoznawcę do Oględzin na Miejscu",
+        "desc": "Niezależny ekspert sprawdzi grubość lakieru, stan mechaniczny i podepnie komputer diagnostyczny.",
+        "url": "https://affiliate-link.example.com/inspekcja-auta?ref=pewnylink",
+        "cta": "Zamów rzeczoznawcę",
+        "color": "emerald"
+    },
+    {
+        "badge": "Transport / Laweta",
+        "title": "Bezpieczny Transport Pojazdu na Terenie PL/UE",
+        "desc": "Zleć bezpieczny przewóz zakupionego auta z pełnym ubezpieczeniem ładunku.",
+        "url": "https://affiliate-link.example.com/transport-auto?ref=pewnylink",
+        "cta": "Wyceń transport",
+        "color": "blue"
+    }
+] %}
+
+{% set green_light_widgets_property = [
+    {
+        "badge": "Audyt Techniczny",
+        "title": "Odbiór Techniczny Mieszkania / Domu",
+        "desc": "Inżynier sprawdzi tynki, instalacje elektryczne/wod-kan, piony oraz wykona badanie termowizyjne.",
+        "url": "https://affiliate-link.example.com/odbior-mieszkania?ref=pewnylink",
+        "cta": "Zamów inżyniera",
+        "color": "emerald"
+    }
+] %}
+
+{% set green_light_widgets_general = [
+    {
+        "badge": "Bezpieczna Transakcja",
+        "title": "Umowa Kupna-Sprzedaży z Ochroną Prawną",
+        "desc": "Pobierz sprawdzony wzór umowy z klauzulami chroniącymi kupującego przed wadami ukżytymi.",
+        "url": "https://affiliate-link.example.com/wzor-umowy?ref=pewnylink",
+        "cta": "Pobierz wzór umowy",
+        "color": "emerald"
+    }
+] %}
+
+{# --- LOGIKA SELEKCJI WIDGETÓW --- #}
+{% set selected_widgets = [] %}
+
+{% if section == "financial_analysis" %}
+    {% if "auto" in cat or "motoryzacja" in cat or "pojazdy" in cat or "samochód" in cat %}
+        {% set selected_widgets = financial_widgets_auto %}
+    {% elif "nieruchomosc" in cat or "mieszkanie" in cat or "dom" in cat or "działka" in cat %}
+        {% set selected_widgets = financial_widgets_property %}
+    {% else %}
+        {% set selected_widgets = financial_widgets_general %}
+    {% endif %}
+{% elif section == "green_light" %}
+    {% if "auto" in cat or "motoryzacja" in cat or "pojazdy" in cat or "samochód" in cat %}
+        {% set selected_widgets = green_light_widgets_auto %}
+    {% elif "nieruchomosc" in cat or "mieszkanie" in cat or "dom" in cat or "działka" in cat %}
+        {% set selected_widgets = green_light_widgets_property %}
+    {% else %}
+        {% set selected_widgets = green_light_widgets_general %}
+    {% endif %}
+{% endif %}
+
+{# --- RENDEROWANIE WIDGETÓW --- #}
+{% for widget in selected_widgets %}
+    {{ render_affiliate(widget) }}
+{% endfor %}
+
+{% endmacro %}
