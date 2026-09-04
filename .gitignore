@@ -36,3 +36,7 @@ sql_app.db
 .coverage
 htmlcov/
 .mypy_cache/
+
+# Node.js / Tailwind CSS
+node_modules/
+npm-debug.log*

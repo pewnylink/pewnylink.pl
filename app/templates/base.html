@@ -6,21 +6,7 @@
     <meta name="robots" content="index, follow">
     <title>{% block title %}pewnylink.pl - Inteligentna Tarcza Prawna & Audyt Ofert{% endblock %}</title>
     
-    <!-- Tailwind CSS CDN + Safelist Konfiguracji Dynamicznych Kolorów -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {},
-            },
-            safelist: [
-                {
-                    pattern: /(bg|text|border|hover:bg|hover:border)-(indigo|emerald|amber|rose|blue)-(400|500|600)/,
-                    variants: ['hover'],
-                },
-            ]
-        }
-    </script>
+    <link href="{{ url_for('static', path='/css/output.css') }}" rel="stylesheet">
 
     <script>
         function purgeSession() {
