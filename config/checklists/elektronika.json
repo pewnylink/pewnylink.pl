@@ -1,0 +1,298 @@
+{
+  "industry_id": "elektronika_i_it",
+  "industry_name": "ELEKTRONIKA UŻYTKOWA I SPRZĘT IT",
+  "version": "1.0.0",
+  "public_free_summary": {
+    "access_level": "free_registered",
+    "total_points": 5,
+    "points": [
+      {
+        "id": "FREE_1",
+        "title": "Weryfikacja metadanych ogłoszenia",
+        "description": "Analiza wieku ogłoszenia, stażu ogłoszeniodawcy na portalu, historii zmian ceny, stabilności lokalizacji oraz autentyczności zdjęć (detekcja grafik ze stron producenta lub kradzionych z innych serwisów)."
+      },
+      {
+        "id": "FREE_2",
+        "title": "Analiza zwięzłości i detekcja zwrotów wymijających",
+        "description": "Wykrywanie fraz ryzyka w opisie (np. 'stan jak na zdjęciach', 'do poprawek', 'nie mam jak sprawdzić')."
+      },
+      {
+        "id": "FREE_3",
+        "title": "Podstawowa deklaracja typu dokumentu sprzedaży",
+        "description": "Weryfikacja oferowanego dowodu zakupu (Faktura VAT 23%, VAT-marża, Umowa K-S, Paragon)."
+      },
+      {
+        "id": "FREE_4",
+        "title": "Indeks kompletności dokumentacji technicznej/serwisowej w opisie",
+        "description": "Ocena poziomu szczegółowości opisu parametrów technicznych, historii wymian i posiadanych papierów serwisowych."
+      },
+      {
+        "id": "FREE_5",
+        "title": "Ogólny wskaźnik oceny ryzyka zakupu (Score 0-100)",
+        "description": "Zagregowany scoring wyliczany przez AI oceniający ogólne bezpieczeństwo transakcji."
+      }
+    ]
+  },
+  "paid_detailed_analysis": {
+    "access_level": "paid_unlocked",
+    "display_mode": "blur_until_payment",
+    "total_points": 40,
+    "categories": [
+      {
+        "category_id": "CAT_1",
+        "category_title": "📋 KATEGORIA 1: Status Prawny, Blokady i Autentyczność",
+        "category_description": "Te punkty eliminują ryzyko zakupu zablokowanego 'cegłofonu', sprzętu obciążonego ratami lub podróbek.",
+        "points": [
+          {
+            "id": 1,
+            "title": "Weryfikacja blokad ratalnych operatorów komórkowych",
+            "description": "Czy smartfon nie pochodzi z zakupu ratalnego w sieciach Plus, T-Mobile czy Orange, które zdalnie blokują numer IMEI za niepłacenie rachunków przez pierwszego właściciela."
+          },
+          {
+            "id": 2,
+            "title": "Status kont antykradzieżowych (iCloud / Google FRP / Mi Account)",
+            "description": "Czy sprzedawca wprost deklaruje, że urządzenie zostało całkowicie wylogowane i usunięte z konta poprzedniego właściciela."
+          },
+          {
+            "id": 3,
+            "title": "Dostępność i zgodność numeru IMEI / Seryjnego",
+            "description": "Czy na zdjęciach obudowy, szufladki SIM lub pudełka widoczne są numery identyfikacyjne pozwalające na sprawdzenie statusu urządzenia w bazach policyjnych."
+          },
+          {
+            "id": 4,
+            "title": "Autentyczność i detekcja replik (Superclones)",
+            "description": "Analiza detali graficznych opakowania, czcionek, ułożenia aparatów w celu eliminacji doskonałych podróbek (np. iPhone, słuchawki AirPods, odkurzacze Dyson)."
+          },
+          {
+            "id": 5,
+            "title": "Rynek przeznaczenia i dystrybucja (Wersje China vs Global)",
+            "description": "Czy sprzęt pochodzi z oficjalnej dystrybucji europejskiej, czy z importu z Azji (ryzyko braku obsługi pasma B20 LTE, inne wtyczki zasilania, brak gwarancji w PL)."
+          },
+          {
+            "id": 6,
+            "title": "Legalność oprogramowania i blokady MDM",
+            "description": "Weryfikacja, czy laptopy (np. MacBooki) nie posiadają korporacyjnej blokady MDM (Mobile Device Management), która pozwala firmie zdalnie zablokować komputer."
+          },
+          {
+            "id": 7,
+            "title": "Dowód zakupu jako podstawa gwarancji producenta",
+            "description": "Obecność faktury imiennej lub paragonu z polskiego elektromarketu – faktury VAT-marża z komisów często nie są honorowane przez oficjalne serwisy (np. Apple, Samsung)."
+          },
+          {
+            "id": 8,
+            "title": "Status blokady SIM-Lock",
+            "description": "Czy urządzenie współpracuje z każdą kartą SIM, co przy starszych modelach z importu wciąż bywa problemem."
+          }
+        ]
+      },
+      {
+        "category_id": "CAT_2",
+        "category_title": "⚙️ KATEGORIA 2: Cykl Życia Ogniwa i Podzespołów",
+        "category_description": "Komputerowa ocena stopnia wyeksploatowania technicznego sprzętu.",
+        "points": [
+          {
+            "id": 9,
+            "title": "Kondycja baterii (SOH – State of Health)",
+            "description": "Procentowa sprawność ogniwa (np. w iPhone/MacBook) – AI flaguje jako oszustwo deklaracje typu 'telefon ma 2 lata i 100% kondycji baterii' bez wymiany w ASO."
+          },
+          {
+            "id": 10,
+            "title": "Liczba cykli ładowania baterii",
+            "description": "Wykrywanie konkretnych wartości liczbowych cykli ładowania w opisie (dla laptopów i smartfonów), określających faktyczny stopień zużycia chemicznego."
+          },
+          {
+            "id": 11,
+            "title": "Kondycja dysków twardych (SSD Health / TBW)",
+            "description": "Weryfikacja zużycia dysku SSD (współczynnik parametrów SMART i TBW) na podstawie zrzutów ekranu, kluczowa przy zakupie stacji roboczych i laptopów."
+          },
+          {
+            "id": 12,
+            "title": "Przeszłość w kopalniach kryptowalut (Mining Check)",
+            "description": "Analiza modeli kart graficznych (np. seria RTX) i procesorów pod kątem pracy w trybie 24/7 pod stałym, ekstremalnym obciążeniem termicznym."
+          },
+          {
+            "id": 13,
+            "title": "Wersja procesora i architektura (Intel/AMD vs Apple Silicon)",
+            "description": "Identyfikacja generacji podzespołów – starsze procesory (np. Intel w MacBookach sprzed 2020 r.) drastycznie tracą na wartości użytkowej."
+          },
+          {
+            "id": 14,
+            "title": "Oryginalność zamontowanych części (Komunikaty systemowe)",
+            "description": "Czy w opisie są informacje o wymianie ekranu lub baterii (w nowych modelach brak oryginalnego chipu generuje wieczne komunikaty o 'nieznanej części')."
+          },
+          {
+            "id": 15,
+            "title": "Sprawność wbudowanych systemów biometrycznych",
+            "description": "Czy systemy Face ID, Touch ID lub czytniki linii papilarnych pod ekranem są w 100% sprawne (ich naprawa po zalaniu lub upadku bywa niemożliwa)."
+          },
+          {
+            "id": 16,
+            "title": "Kultura pracy układu chłodzenia (Thermal Throttling)",
+            "description": "Czy sprzedawca wspomina o głośnej pracy wentylatorów lub nagrzewaniu się obudowy, co oznacza konieczność kosztownej wymiany past termoprzewodzących."
+          }
+        ]
+      },
+      {
+        "category_id": "CAT_3",
+        "category_title": "🏗️ KATEGORIA 3: Ekran, Obudowa i Uszkodzenia Mechaniczne",
+        "category_description": "Wizualna i tekstowa ocena uszkodzeń wpływających na bezpieczeństwo i estetykę.",
+        "points": [
+          {
+            "id": 17,
+            "title": "Detekcja martwych pikseli (Dead Pixels) i przejaśnień",
+            "description": "Szukanie na zdjęciach plam, linii lub punktów na matrycy ekranu LCD/OLED, które dyskwalifikują sprzęt z profesjonalnego użytku."
+          },
+          {
+            "id": 18,
+            "title": "Wypalenia matryc OLED (Burn-in)",
+            "description": "Analiza ekranu pod kątem utrwalonych powidoków (np. paska nawigacji, logo aplikacji), co jest nieodwracalną wadą starszych paneli OLED."
+          },
+          {
+            "id": 19,
+            "title": "Ślady naprężeń i wygięcia obudowy (Bend Test)",
+            "description": "Dotyczy tabletów (np. iPad) oraz cienkich smartfonów – detekcja nienaturalnych krzywizn ramy urządzenia na zdjęciach z profilu."
+          },
+          {
+            "id": 20,
+            "title": "Stan powłoki oleofobowej i antyrefleksyjnej",
+            "description": "Czy ekran nie posiada plam powstałych przez przetarcie warstwy ochronnej (częsta wada matryc typu Staingate w MacBookach)."
+          },
+          {
+            "id": 21,
+            "title": "Mikropęknięcia wokół portów ładowania",
+            "description": "Analiza zdjęć makro gniazd USB-C / Lightning – pęknięcia sugerują szarpanie przewodem i ryzyko uszkodzenia płyty głównej."
+          },
+          {
+            "id": 22,
+            "title": "Luzy na zawiasach ekranu",
+            "description": "W laptopach – szukanie zwrotów sugerujących opadanie klapy lub brak stabilności ekranu pod wybranym kątem."
+          },
+          {
+            "id": 23,
+            "title": "Stan techniczny klawiatury (Mechanizm motylkowy/nożycowy)",
+            "description": "Wykrywanie informacji o zacinających się, niedziałających lub brakujących klawiszach (szczególnie w wadliwych seriach klawiatur motylkowych Apple)."
+          },
+          {
+            "id": 24,
+            "title": "Stan gumowych nóżek i śrub montażowych",
+            "description": "Brak śrubek lub zarysowane łby świadczą o niefachowych, domowych naprawach urządzenia."
+          }
+        ]
+      },
+      {
+        "category_id": "CAT_4",
+        "category_title": "🛠️ KATEGORIA 4: Interfejsy, Łączność i Zestaw",
+        "category_description": "Co klient otrzymuje w pudełku i z jakimi standardami połączy urządzenie.",
+        "points": [
+          {
+            "id": 25,
+            "title": "Obecność i oryginalność ładowarki fabrycznej",
+            "description": "Brak oryginalnej kostki o dużej mocy (np. 65W/120W) wymusza zakup drogiego zamiennika i spowalnia proces ładowania."
+          },
+          {
+            "id": 26,
+            "title": "Kompletność zestawu pudełkowego (SerialNumber Match)",
+            "description": "Czy numer seryjny na urządzeniu zgadza się z numerem na pudełku (niezgodność sugeruje sprzęt składany z kilku sztuk)."
+          },
+          {
+            "id": 27,
+            "title": "Sprawność modułów łączności bezprzewodowej (Wi-Fi/Bluetooth/NFC)",
+            "description": "Czy w opisie nie ma wzmianek o problemach z rozłączaniem słuchawek lub brakiem płatności zbliżeniowych."
+          },
+          {
+            "id": 28,
+            "title": "Stan złącz audio i minijack (jeśli występują)",
+            "description": "Weryfikacja czystości i sprawności przesyłu dźwięku."
+          },
+          {
+            "id": 29,
+            "title": "Akcesoria dodatkowe o wysokiej wartości",
+            "description": "Czy drogie rysiki (np. Apple Pencil) lub stacje dokujące widoczne na zdjęciach faktycznie wchodzą w skład oferty."
+          },
+          {
+            "id": 30,
+            "title": "Aktualność systemu operacyjnego (Brak wsparcia dla aplikacji)",
+            "description": "Czy urządzenie nie utknęło na starej wersji systemu (np. Android 8 lub iOS 12), na której nowo pobrane aplikacje (np. bankowe) nie dadzą się uruchomić."
+          },
+          {
+            "id": 31,
+            "title": "Sprawność wbudowanych głośników i mikrofonów",
+            "description": "Wykrywanie fraz typu 'głośnik lekko trzeszczy', 'słabo mnie słychać podczas rozmów'."
+          },
+          {
+            "id": 32,
+            "title": "Stan techniczny napędów optycznych (w konsolach)",
+            "description": "W konsolach PS4/PS5 lub Xbox – czy napęd płynnie przyjmuje, czyta i wysuwa płyty z grami."
+          }
+        ]
+      },
+      {
+        "category_id": "CAT_5",
+        "category_title": "👤 KATEGORIA 5: Psychologia Ogłoszenia i Profil Sprzedawcy",
+        "category_description": "Handlowe mechanizmy obronne przed wyłudzeniami zaliczek w branży IT.",
+        "points": [
+          {
+            "id": 33,
+            "title": "Sprzedaż wysyłkowa poza systemem portalu",
+            "description": "Flagsowanie zwrotów typu 'nie wysyłam przez OLX, proszę o przelew na konto' lub podsyłanie linków do fałszywych paneli płatności."
+          },
+          {
+            "id": 34,
+            "title": "Ceny rażąco zaniżone ('Okazje życia')",
+            "description": "Wystawianie najnowszych modeli smartfonów za 50% ceny rynkowej jako mechanizm wabienia ofiar."
+          },
+          {
+            "id": 35,
+            "title": "Wykrywanie zdjęć z innych ogłoszeń (Kradzież tożsamości oferty)",
+            "description": "Analiza, czy zdjęcia nie zostały pobrane z archiwalnych aukcji Allegro lub zagranicznych portali."
+          },
+          {
+            "id": 36,
+            "title": "Sformułowanie 'Stan idealny, oprócz...'",
+            "description": "Wykrywanie handlowych paradoksów językowych (np. 'Stan idealny, oprócz pękniętej szybki i niedziałającego dotyku')."
+          },
+          {
+            "id": 37,
+            "title": "Wymuszona sprzedaż w pośpiechu ('Sprzedam do dzisiaj')",
+            "description": "Próba wywarcia presji czasu, aby kupujący zrezygnował ze sprawdzenia numeru IMEI lub odbioru osobistego."
+          },
+          {
+            "id": 38,
+            "title": "Profil wyspecjalizowanego lombardu / serwisu",
+            "description": "Czy sprzęt sprzedaje osoba prywatna, czy komis, który masowo skupuje urządzenia powystawowe i odnawiane niewiadomego pochodzenia."
+          },
+          {
+            "id": 39,
+            "title": "Ukrywanie danych identyfikacyjnych w opisie",
+            "description": "Celowe unikanie podania pełnej specyfikacji (np. podanie tylko 'Laptop ASUS', bez modelu procesora i ilości RAM)."
+          },
+          {
+            "id": 40,
+            "title": "Blokada kontaktu telefonicznego",
+            "description": "Sprzedawca ucina próby rozmowy telefonicznej, nalegając wyłącznie na kontakt przez zewnętrzne aplikacje (np. WhatsApp)."
+          }
+        ]
+      }
+    ]
+  },
+  "ai_generated_action_plan": {
+    "section_title": "💡 Wnioski i Sugestie AI po Analizie Oferty",
+    "modules": [
+      {
+        "module_id": "SELLER_QUESTIONS",
+        "title": "1. Proponowane Pytania Do Sprzedawcy",
+        "prompt_instruction": "Na podstawie przeprowadzonych 45 punktów analizy wygeneruj od 3 do 6 precyzyjnych i wysoce technicznych pytań do sprzedawcy. Pytania powinny dotyczyć brakujących danych, np. proszenia o numer IMEI/seryjny, zrzut ekranu z parametrami baterii/SMART dysku, potwierdzenie braku blokad ratalnych lub wyjaśnienie rozbieżności opisu."
+      },
+      {
+        "module_id": "COST_ESTIMATION",
+        "title": "2. Wyliczenie Przewidywanych Kosztów Początkowych i Serwisowych",
+        "prompt_instruction": "Przeanalizuj wykryte wady i braki. Wylicz szacowane koszty dodatkowe, w tym: koszty wysyłki ubezpieczonej / bezpiecznej przesyłki z możliwością sprawdzenia zawartości, zakup brakującej ładowarki OEM, koszty wymiany baterii (jeśli SOH jest niskie), czyszczenie układu chłodzenia lub wymiana pasty termoprzewodzącej."
+      },
+      {
+        "module_id": "NEGOTIATION_STRATEGY",
+        "title": "3. Strategia i Propozycja Negocjacji Cenowej",
+        "prompt_instruction": "Przygotuj gotowy szablon wiadomości negocjacyjnej do sprzedawcy. Wykorzystaj wykryte mankamenty (brak ładowarki, zużycie baterii, brak pełnej gwarancji lub ślady użytkowania) jako twarde argumenty uzasadniające propozycję obniżenia ceny o określoną kwotę."
+      }
+    ]
+  }
+}

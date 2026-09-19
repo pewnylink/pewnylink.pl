@@ -1,0 +1,128 @@
+{
+  "motoryzacja": {
+    "category_name": "Motoryzacja",
+    "category_slug": "motoryzacja",
+    "description": "Analiza ogłoszeń samochodów osobowych, dostawczych i motocykli pod kątem przeszłości powypadkowej, legalności i wkładu finansowego.",
+    "free_checkpoints": [
+      {
+        "id": "free_1",
+        "title": "Weryfikacja metadanych ogłoszenia",
+        "description": "Ocena wieku ogłoszenia, stażu sprzedawcy, historii zmian ceny, stabilności lokalizacji oraz autentyczności zdjęć."
+      },
+      {
+        "id": "free_2",
+        "title": "Analiza zwięzłości i detekcja zwrotów wymijających",
+        "description": "Wykrywanie fraz maskujących usterki (np. 'stan jak na zdjęciach', 'klima do nabicia', 'do poprawek')."
+      },
+      {
+        "id": "free_3",
+        "title": "Podstawowa deklaracja typu dokumentu sprzedaży",
+        "description": "Identyfikacja formy sprzedaży (Faktura VAT 23%, VAT-marża, Umowa K-S) pod kątem podatku PCC i odliczeń."
+      },
+      {
+        "id": "free_4",
+        "title": "Indeks kompletności dokumentacji technicznej/serwisowej w opisie",
+        "description": "Sprawdzenie dostępności numeru VIN, wpisów serwisowych i badania technicznego."
+      },
+      {
+        "id": "free_5",
+        "title": "Ogólny wskaźnik oceny ryzyka zakupu",
+        "description": "Zagregowany wskaźnik punktowy (Score 0-100) oceniający poziom ryzyka transakcji."
+      }
+    ],
+    "paid_categories": [
+      {
+        "category_id": 1,
+        "category_name": "Status Prawny i Finanse",
+        "checkpoints": [
+          {"id": 1, "title": "Zgodność formy własności", "prompt": "Weryfikacja czy sprzedawca jest jedynym właścicielem i czy brak umów in blanco."},
+          {"id": 2, "title": "Status podatkowy (VAT 23% vs VAT-marża)", "prompt": "Sprawdzenie formy faktury pod kątem ukrywania historii podatkowej z importu."},
+          {"id": 3, "title": "Zastawy i zajęcia komornicze", "prompt": "Wykrywanie informacji o kredytach, banku w dowodzie i ryzyku komorniczym."},
+          {"id": 4, "title": "Ważność badań technicznych i OC", "prompt": "Ocena terminu przeglądu pod kątem ukrytych wad uniemożliwiających zaliczenie badania."},
+          {"id": 5, "title": "Kraj pochodzenia i liczba właścicieli", "prompt": "Weryfikacja pochodzenia (salon PL vs import) i liczby poprzednich właścicieli."},
+          {"id": 6, "title": "Przeszłość jako Taxi / Carsharing / Nauka Jazdy", "prompt": "Detekcja słów kluczy sugerujących intensywną eksploatację miejską."},
+          {"id": 7, "title": "Historia szkodowości w ubezpieczeniu", "prompt": "Zestawienie deklaracji bezwypadkowości ze wzmiankami o naprawach lakierniczych."},
+          {"id": 8, "title": "Kompletność kluczyków i dokumentów", "prompt": "Sprawdzenie obecności min. 2 oryginalnych kluczyków i dokumentów."}
+        ]
+      },
+      {
+        "category_id": 2,
+        "category_name": "Stan Mechaniczny i Napęd",
+        "checkpoints": [
+          {"id": 9, "title": "Realność przebiegu do rocznika", "prompt": "Analiza średniego rocznego przebiegu pod kątem anomalii licznikowych."},
+          {"id": 10, "title": "Zużycie wnętrza a licznik", "prompt": "Korelacja stopnia zużycia fali, kierownicy i pedałów ze stanem licznika."},
+          {"id": 11, "title": "Kondycja układu oczyszczania spalin (DPF/GPF/AdBlue)", "prompt": "Detekcja fraz o usuwaniu ekologii lub błędach czujników spalin."},
+          {"id": 12, "title": "Historia wymiany rozrządu i olejów", "prompt": "Ocena konkretnych interwałów i dat wymiany rozrządu i płynów."},
+          {"id": 13, "title": "Typ i stan skrzyni biegów (Automat vs Manual)", "prompt": "Ocena ryzyka awarii skrzyni automatycznej przy wysokim przebiegu."},
+          {"id": 14, "title": "Świeżo umyty silnik", "prompt": "Wykrywanie sterylnie czystej komory silnika pod kątem zmywania wycieków."},
+          {"id": 15, "title": "Stan układu chłodzenia i uszczelki pod głowicą", "prompt": "Sprawdzenie wzmianek o ubytkach płynu i przegrzewaniu silnika."},
+          {"id": 16, "title": "Odgłosy z zawieszenia i koła dwumasowego", "prompt": "Detekcja opisów stuków w zawieszeniu lub hałasu dwumasy."}
+        ]
+      },
+      {
+        "category_id": 3,
+        "category_name": "Nadwozie, Powłoka i Wypadkowość",
+        "checkpoints": [
+          {"id": 17, "title": "Spójność szczelin nadwozia", "prompt": "Analiza równomierności odstępów między elementami karoserii na zdjęciach."},
+          {"id": 18, "title": "Odcienie lakieru na poszczególnych elementach", "prompt": "Detekcja różnic odcieni lakieru na sąsiednich elementach nadwozia."},
+          {"id": 19, "title": "Oryginalność i roczniki szyb", "prompt": "Weryfikacja spójności roczników szyb z rocznikiem pojazdu."},
+          {"id": 20, "title": "Korozja elementów konstrukcyjnych", "prompt": "Szukanie śladów rdzawych nalotów na progach, nadkolach i podwoziu."},
+          {"id": 21, "title": "Stan opon i felg (Zużycie bieżnika)", "prompt": "Ocena wieku opon (DOT) i nierównomierności zużycia bieżnika."},
+          {"id": 22, "title": "Ślady po demontażu elementów", "prompt": "Detekcja obrobionych śrub na zawiasach maski i błotników."},
+          {"id": 23, "title": "Kondycja reflektorów (Zmatowienie)", "prompt": "Ocena zmatowienia reflektorów jako wskaźnika przebiegu."},
+          {"id": 24, "title": "Stan podłużnic i pasa przedniego", "prompt": "Analiza spoin, szpachli i prostowania w komorze silnika."}
+        ]
+      },
+      {
+        "category_id": 4,
+        "category_name": "Elektronika i Wyposażenie",
+        "checkpoints": [
+          {"id": 25, "title": "Sprawność klimatyzacji", "prompt": "Weryfikacja zwrotu 'klima do nabicia' pod kątem nieszczelności i sprężarki."},
+          {"id": 26, "title": "Komunikaty błędów na desce rozdzielczej", "prompt": "Analiza palących się kontrolek na zdjęciach zegarów przy pracy silnika."},
+          {"id": 27, "title": "Działanie systemów bezpieczeństwa (ADAS)", "prompt": "Sprawdzenie sprawności radarów i kamer po kolizjach przodu."},
+          {"id": 28, "title": "Stan fabrycznych multimediów i nawigacji", "prompt": "Ocena wyświetlaczy pod kątem wypaleń i uszkodzeń dotyku."},
+          {"id": 29, "title": "Zużycie systemów komfortu", "prompt": "Sprawdzenie działania podgrzewania foteli, szyb i elektryki."},
+          {"id": 30, "title": "Stan instalacji gazowej LPG", "prompt": "Weryfikacja homologacji zbiornika LPG i marki komponentów."},
+          {"id": 31, "title": "Pneumatyczne lub adaptacyjne zawieszenie", "prompt": "Ocena ryzyka kosztów serwisu zawieszenia adaptacyjnego/pneumatycznego."},
+          {"id": 32, "title": "Oryginalność wyposażenia fabrycznego z VIN", "prompt": "Porównanie wyposażenia ze zdjęć ze specyfikacją fabryczną VIN."}
+        ]
+      },
+      {
+        "category_id": 5,
+        "category_name": "Psychologia Ogłoszenia i Sprzedawca",
+        "checkpoints": [
+          {"id": 33, "title": "Typ sprzedawcy (Prywatny vs Handlarz/Komis)", "prompt": "Wykrywanie ukrytych handlarzy podszywających się pod prywatnych właścicieli."},
+          {"id": 34, "title": "Słowa klucze agresywnego marketingu", "prompt": "Detekcja fraz typu 'perełka', 'igła' maskujących brak faktów technicznych."},
+          {"id": 35, "title": "Powód sprzedaży pojazdu", "prompt": "Analiza spójności i logiki podanego powodu sprzedaży."},
+          {"id": 36, "title": "Zgoda na sprawdzenie w ASO / stacji diagnostycznej", "prompt": "Sprawdzenie deklaracji otwartości na weryfikację techniczną."},
+          {"id": 37, "title": "Historia serwisowa (Książka vs Faktury)", "prompt": "Ocena obecności fizycznych rachunków potwierdzających wpisy."},
+          {"id": 38, "title": "Analiza lokalizacji (Miejscowości podwyższonego ryzyka)", "prompt": "Identyfikacja ogłoszeń z rejonów znanych z handlu autami popowodziowymi/powypadkowymi."},
+          {"id": 39, "title": "Ciągłość wpisów w CEPiK", "prompt": "Sprawdzenie kompletności danych (VIN, nr rejestracyjny, data 1. rejestracji)."},
+          {"id": 40, "title": "Presja czasu w opisie", "prompt": "Detekcja presji czasowej skłaniającej do zakupu bez oględzin."}
+        ]
+      }
+    ],
+    "ai_post_analysis_config": {
+      "seller_questions_keys": [
+        "zgoda_aso_skp",
+        "dane_cepik_vin",
+        "rozrzad_olej_skrzynia",
+        "dpf_adblue_stan",
+        "klimatyzacja_sprawnosc"
+      ],
+      "cost_estimation_categories": [
+        {"key": "pakiet_startowy", "label": "Pakiet startowy (oleje, filtry)", "min": 600, "max": 1800},
+        {"key": "rozrzad_pompa", "label": "Wymiana rozrządu z pompą wody", "min": 1000, "max": 3500},
+        {"key": "przeglad_przedzakupowy", "label": "Przegląd przedzakupowy (SKP / ASO)", "min": 200, "max": 800},
+        {"key": "rejestracja_pcc", "label": "Rejestracja i podatek PCC-3 (2%)", "min": 160, "max": 3000},
+        {"key": "opony_klimatyzacja", "label": "Serwis opon / serwis klimatyzacji", "min": 300, "max": 1500}
+      ],
+      "negotiation_triggers": {
+        "no_service_history_deduction_pct": 8,
+        "timing_belt_due_deduction_pct": 5,
+        "repaired_paint_deduction_pct": 10,
+        "default_opening_discount_pct": 15
+      }
+    }
+  }
+}

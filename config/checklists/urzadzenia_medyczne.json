@@ -1,0 +1,288 @@
+{
+  "sprzet_i_urzadzenia_medyczne": {
+    "category_name": "Sprzęt i urządzenia medyczne",
+    "category_slug": "sprzet-medyczny",
+    "description": "Analiza ogłoszeń aparatury medycznej (USG, RTG, aparaty do znieczulania, lasery frakcyjne, autoklawy, kardiomonitory).",
+    "free_checkpoints": [
+      {
+        "id": "free_1",
+        "title": "Weryfikacja metadanych ogłoszenia",
+        "description": "Ocena wieku ogłoszenia, stażu sprzedawcy, historii zmian ceny, stabilności lokalizacji oraz autentyczności zdjęć (detekcja grafik ze stron producentów/katalogów)."
+      },
+      {
+        "id": "free_2",
+        "title": "Analiza zwięzłości i detekcja zwrotów wymijających",
+        "description": "Wykrywanie fraz maskujących usterki techniczne lub brak dokumentacji (np. 'stan jak na zdjęciach', 'do poprawek', 'stan nieznany')."
+      },
+      {
+        "id": "free_3",
+        "title": "Podstawowa deklaracja typu dokumentu sprzedaży",
+        "description": "Identyfikacja formy sprzedaży (Faktura VAT 23%, Faktura VAT-marża, Umowa Kupna-Sprzedaży) pod kątem rozliczenia w placówce medycznej i odliczeń podatkowych."
+      },
+      {
+        "id": "free_4",
+        "title": "Indeks kompletności dokumentacji technicznej/serwisowej w opisie",
+        "description": "Ocena obecności wzmianek o Paszporcie Technicznym, wpisach serwisowych, DTR oraz certyfikatach CE/MDR."
+      },
+      {
+        "id": "free_5",
+        "title": "Ogólny wskaźnik oceny ryzyka zakupu",
+        "description": "Zagregowany wskaźnik punktowy (Score 0-100) określający poziom ryzyka transakcji na podstawie wykrytych anomalii."
+      }
+    ],
+    "paid_categories": [
+      {
+        "category_id": 1,
+        "category_name": "Status Prawny, Klasyfikacja i Certyfikacja",
+        "checkpoints": [
+          {
+            "id": 1,
+            "title": "Zgodność z dyrektywą MDR (Medical Device Regulation)",
+            "prompt": "Weryfikacja, czy urządzenie posiada aktualny certyfikat CE zgodny z MDR do celów klinicznych w UE."
+          },
+          {
+            "id": 2,
+            "title": "Klasa wyrobu medycznego",
+            "prompt": "Identyfikacja klasy ryzyka (I, IIa, IIb, III) i weryfikacja rygorów sanitarno-prawnych w opisie."
+          },
+          {
+            "id": 3,
+            "title": "Zgłoszenie do URPL",
+            "prompt": "Sprawdzenie deklaracji o zgłoszeniu do Urzędu Rejestracji Produktów Leczniczych, Wyrobów Medycznych i Produktów Biobójczych."
+          },
+          {
+            "id": 4,
+            "title": "Identyfikowalność kodu UDI (Unique Device Identification)",
+            "prompt": "Weryfikacja widoczności kodu UDI z tabliczki znamionowej na zdjęciach do oceny legalności i historii wyrobu."
+          },
+          {
+            "id": 5,
+            "title": "Pochodzenie rynkowe (Krajowe vs. Sprowadzane)",
+            "prompt": "Analiza pochodzenia sprzętu (polska sieć dystrybucji vs. prywatny import bez wsparcia serwisowego w PL)."
+          },
+          {
+            "id": 6,
+            "title": "Status podatkowy (Stawka VAT 8% vs. 23%)",
+            "prompt": "Weryfikacja stawki VAT na fakturze – oznaczenie anomalii, jeśli wykracza poza preferencyjne 8% VAT."
+          },
+          {
+            "id": 7,
+            "title": "Historia wycofań z rynku (Recall Alerts)",
+            "prompt": "Zestawienie modelu z bazami fabrycznych ostrzeżeń bezpieczeństwa (FDA, EUDAMED)."
+          },
+          {
+            "id": 8,
+            "title": "Wolność od obciążeń finansowych (Leasing/Zastaw)",
+            "prompt": "Weryfikacja ryzyka obciążeń leasingowych, cesji i zastawów rejestrowych."
+          }
+        ]
+      },
+      {
+        "category_id": 2,
+        "category_name": "Cykl Życia, Zużycie i Eksploatacja",
+        "checkpoints": [
+          {
+            "id": 9,
+            "title": "Aktualny Paszport Techniczny",
+            "prompt": "Ocena obecności paszportu z ważnym dopuszczeniem do pracy i wpisami przeglądów."
+          },
+          {
+            "id": 10,
+            "title": "Licznik roboczogodzin (lub liczba strzałów/skanów)",
+            "prompt": "Analiza zużycia elementów kluczowych: impulsów w laserach, godzin lamp RTG/TK."
+          },
+          {
+            "id": 11,
+            "title": "Wiek technologii (End of Life - EOL)",
+            "prompt": "Sprawdzenie, czy producent ogłosił status EOL odcinający dostęp do oficjalnych części."
+          },
+          {
+            "id": 12,
+            "title": "Stan obudowy i odporność na dezynfekcję",
+            "prompt": "Detekcja pęknięć i odbarwień obudowy sugerujących uszkodzenia chemiczne lub ryzyko bio-filmu."
+          },
+          {
+            "id": 13,
+            "title": "Kondycja baterii i akumulatorów podtrzymujących",
+            "prompt": "Ocena wzmianek o wymianie baterii podtrzymujących w zasilaniu awaryjnym i modułach mobilnych."
+          },
+          {
+            "id": 14,
+            "title": "Stabilność oprogramowania i wersja firmware",
+            "prompt": "Weryfikacja wersji oprogramowania sterującego pod kątem kompatybilności systemowej."
+          },
+          {
+            "id": 15,
+            "title": "Historia napraw i wymiany podzespołów kluczowych",
+            "prompt": "Detekcja fraz o regeneracji i naprawach generatorów, lamp czy zasilaczy."
+          },
+          {
+            "id": 16,
+            "title": "Warunki dotychczasowego przechowywania",
+            "prompt": "Wykrywanie sygnałów przestoju w niekontrolowanych warunkach (ryzyko korozji i rozkalibrowania)."
+          }
+        ]
+      },
+      {
+        "category_id": 3,
+        "category_name": "Akcesoria, Głowice, Sensory i Kompletność",
+        "checkpoints": [
+          {
+            "id": 17,
+            "title": "Stan i oryginalność głowic (w USG)",
+            "prompt": "Weryfikacja obecności, typów i oryginalności głowic USG."
+          },
+          {
+            "id": 18,
+            "title": "Ciągłość matrycy i kryształów głowic",
+            "prompt": "Ocena obrazu diagnostycznego pod kątem uszkodzonych kryształów i czarnych linii."
+          },
+          {
+            "id": 19,
+            "title": "Kompletność okablowania pacjenta",
+            "prompt": "Sprawdzenie obecności przewodów EKG, czujników SpO2, mankietów NIBP z certyfikacją medyczną."
+          },
+          {
+            "id": 20,
+            "title": "Stan światłowodów i przewodów optycznych",
+            "prompt": "Analiza światłowodów w laserach i endoskopach pod kątem zmatowień i uszkodzeń."
+          },
+          {
+            "id": 21,
+            "title": "Dostępność i stan czujników jednorazowych/wielorazowych",
+            "prompt": "Weryfikacja uzależnienia od ultra-drogich, zamkniętych materiałów eksploatacyjnych jednego producenta."
+          },
+          {
+            "id": 22,
+            "title": "Stan elementów mechanicznych i ramion nośnych",
+            "prompt": "Ocena zużycia pantografów, przegubów i blokad w lampach oraz aparatach RTG."
+          },
+          {
+            "id": 23,
+            "title": "Obecność dedykowanego wózka / stacji dokującej",
+            "prompt": "Sprawdzenie obecności i stanu oryginalnej bazy mobilnej."
+          },
+          {
+            "id": 24,
+            "title": "Zgodność złączy i wtyków standardów medycznych",
+            "prompt": "Weryfikacja obecności standardowych portów vs. wycofanych złączy autorskich."
+          }
+        ]
+      },
+      {
+        "category_id": 4,
+        "category_name": "Interfejs, Integracja IT i Kalibracja",
+        "checkpoints": [
+          {
+            "id": 25,
+            "title": "Wsparcie dla standardu DICOM",
+            "prompt": "Ocena aktywnych licencji DICOM (Send, Print, Worklist)."
+          },
+          {
+            "id": 26,
+            "title": "Kompatybilność z systemami HIS/RIS",
+            "prompt": "Sprawdzenie możliwości dwukierunkowej integracji z systemem zarządczym kliniki."
+          },
+          {
+            "id": 27,
+            "title": "Aktualność kalibracji i testów akceptacyjnych",
+            "prompt": "Weryfikacja ważności specjalistycznych testów pomiarowych dla RTG i mammografów."
+          },
+          {
+            "id": 28,
+            "title": "Stan ekranów i matryc dotykowych",
+            "prompt": "Analiza monitorów diagnostycznych pod kątem wypaleń i martwych pikseli."
+          },
+          {
+            "id": 29,
+            "title": "Rodzaj portów eksportu danych",
+            "prompt": "Ocena obecności nowoczesnych portów LAN/USB vs. przestarzałych nośników (dyskietki, MO)."
+          },
+          {
+            "id": 30,
+            "title": "Wbudowane systemy autodiagnostyczne (Self-test)",
+            "prompt": "Detekcja wzmianek o statusie 'Error-free' oraz raportach błędów wbudowanych."
+          },
+          {
+            "id": 31,
+            "title": "Licencje oprogramowania (Permanentne vs. Subskrypcyjne)",
+            "prompt": "Weryfikacja trwałości licencji diagnostycznych (np. 3D/4D, elastografia) przy zmianie właściciela."
+          },
+          {
+            "id": 32,
+            "title": "Język interfejsu i komunikatów",
+            "prompt": "Sprawdzenie obecności języka polskiego lub angielskiego w oprogramowaniu aparatu."
+          }
+        ]
+      },
+      {
+        "category_id": 5,
+        "category_name": "Serwis, Wiarygodność i Psychologia Sprzedaży",
+        "checkpoints": [
+          {
+            "id": 33,
+            "title": "Autoryzacja serwisu wykonującego przeglądy",
+            "prompt": "Weryfikacja czy paszport podpisywał autoryzowany serwis producenta, czy firma zewnętrzna."
+          },
+          {
+            "id": 34,
+            "title": "Powód wycofania sprzętu z placówki",
+            "prompt": "Analiza przyczyn sprzedaży (wymiana z dotacji UE vs. likwidacja gabinetu / komornik)."
+          },
+          {
+            "id": 35,
+            "title": "Profil wystawiającego (Autoryzowany Broker vs. Prywatny Gabinet)",
+            "prompt": "Ocena podmiotu sprzedającego – profesjonalny refurbisher z gwarancją vs. sprzedaż 'as-is'."
+          },
+          {
+            "id": 36,
+            "title": "Dostępność pełnej dokumentacji techniczno-ruchowej (DTR)",
+            "prompt": "Sprawdzenie obecności instrukcji obsługi w języku polskim (wymóg PIP i Sanepidu)."
+          },
+          {
+            "id": 37,
+            "title": "Historia sterylizacji i procedur czyszczenia",
+            "prompt": "Ocena obecności wydruków z ostatnich cykli autoklawów / myjni-dezynfektorów."
+          },
+          {
+            "id": 38,
+            "title": "Koszt pojedynczego przeglądu okresowego",
+            "prompt": "Szacunek rocznych kosztów utrzymania wpisów w paszporcie technicznym."
+          },
+          {
+            "id": 39,
+            "title": "Gotowość sprzedawcy na testy bezpieczeństwa elektrycznego",
+            "prompt": "Deklaracja udostępnienia urządzenia do pomiarów prądów upływu (PN-EN 62353)."
+          },
+          {
+            "id": 40,
+            "title": "Agresywny marketing medyczny ('Stan idealny', 'Okazja')",
+            "prompt": "Wykrywanie zwrotów handlowych obniżających rating wiarygodności ogłoszenia."
+          }
+        ]
+      }
+    ],
+    "ai_post_analysis_config": {
+      "seller_questions_keys": [
+        "paszport_techniczny_wpis",
+        "licencje_dicom_trwalosc",
+        "eol_wsparcie_czesci",
+        "dtr_ce_urpl_dokumentacja",
+        "testy_przedzakupowe_zgoda"
+      ],
+      "cost_estimation_categories": [
+        {"key": "przeglad_zerowy", "label": "Przegląd zerowy i nowy Paszport Techniczny", "min": 800, "max": 2500},
+        {"key": "pomiary_pnen62353", "label": "Pomiary bezpieczeństwa elektrycznego (PN-EN 62353)", "min": 300, "max": 600},
+        {"key": "testy_specjalistyczne", "label": "Testy specjalistyczne (RTG/USG/Sanepid)", "min": 1200, "max": 4500},
+        {"key": "transport_medyczny", "label": "Specjalistyczny transport medyczny i instalacja", "min": 1000, "max": 3500},
+        {"key": "akcesoria_startowe", "label": "Wymiana zużytych czujników/kabli/akumulatorów", "min": 1500, "max": 8000}
+      ],
+      "negotiation_triggers": {
+        "missing_passport_deduction_pct": 10,
+        "eol_status_deduction_pct": 15,
+        "vat_margin_deduction_pct": 8,
+        "default_opening_discount_pct": 20
+      }
+    }
+  }
+}

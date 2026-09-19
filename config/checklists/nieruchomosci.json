@@ -1,0 +1,128 @@
+{
+"nieruchomosci": {
+    "category_name": "Nieruchomości",
+    "category_slug": "nieruchomosci",
+    "description": "Analiza ogłoszeń mieszkań, domów i działek pod kątem obciążeń w KW, stanu technicznego oraz kosztów ukrytych.",
+    "free_checkpoints": [
+      {
+        "id": "free_1",
+        "title": "Weryfikacja metadanych ogłoszenia",
+        "description": "Ocena wieku ogłoszenia, stażu sprzedawcy/agencji, historii zmian ceny i stabilności lokalizacji."
+      },
+      {
+        "id": "free_2",
+        "title": "Analiza zwięzłości i detekcja zwrotów wymijających",
+        "description": "Wykrywanie słów maskujących wady (np. 'do własnej aranżacji', 'przytulne', 'rozwijająca się okolica')."
+      },
+      {
+        "id": "free_3",
+        "title": "Podstawowa deklaracja typu dokumentu sprzedaży",
+        "description": "Identyfikacja formy sprzedaży (Własność, Spółdzielcze własnościowe, Udział) pod kątem VAT i PCC."
+      },
+      {
+        "id": "free_4",
+        "title": "Indeks kompletności dokumentacji w opisie",
+        "description": "Sprawdzenie obecności numeru KW, świadectwa energetycznego i wysokości opłat."
+      },
+      {
+        "id": "free_5",
+        "title": "Ogólny wskaźnik oceny ryzyka zakupu",
+        "description": "Zagregowany wskaźnik punktowy (Score 0-100) oceniający ryzyko prawne i budowlane."
+      }
+    ],
+    "paid_categories": [
+      {
+        "category_id": 1,
+        "category_name": "Status Prawny i Księga Wieczysta",
+        "checkpoints": [
+          {"id": 1, "title": "Forma własności", "prompt": "Weryfikacja typu własności (hipoteczna, spółdzielcze własnościowe, udział)."},
+          {"id": 2, "title": "Obciążenia w Dziale III i IV KW", "prompt": "Detekcja hipoteki, służebności, prawa dożywocia i komornika."},
+          {"id": 3, "title": "Status gruntów pod budynkiem", "prompt": "Sprawdzenie własności gruntu vs użytkowanie wieczyste."},
+          {"id": 4, "title": "Meldunki i lokatorzy", "prompt": "Weryfikacja deklaracji braku osób zameldowanych i dożywotników."},
+          {"id": 5, "title": "Samowole budowlane i przeróbki", "prompt": "Sprawdzenie samowolnych wyburzeń ścian i dobudówek bez odbioru."},
+          {"id": 6, "title": "Przeznaczenie lokalu (Mieszkalny vs Użytkowy)", "prompt": "Weryfikacja statusu prawnego lokalu (mieszkalny 8% VAT vs użytkowy 23% VAT)."},
+          {"id": 7, "title": "Certyfikat Energetyczny", "prompt": "Sprawdzenie obecności wymaganego świadectwa charakterystyki energetycznej."},
+          {"id": 8, "title": "Czystość transakcji (Pośrednik vs Bezpośrednio)", "prompt": "Ocena dodatkowych kosztów prowizji agencji nieruchomości."}
+        ]
+      },
+      {
+        "category_id": 2,
+        "category_name": "Stan Techniczny i Budowlany",
+        "checkpoints": [
+          {"id": 9, "title": "Materiał i technologia budowy", "prompt": "Ocena rygorów technologicznych (wielka płyta, cegła, żelbet)."},
+          {"id": 10, "title": "Stan instalacji elektrycznej", "prompt": "Identyfikacja instalacji miedzianej vs aluminiowej w opisie/zdjęciach."},
+          {"id": 11, "title": "Stan pionów wodno-kanalizacyjnych", "prompt": "Sprawdzenie informacji o wymianie pionów w budynku."},
+          {"id": 12, "title": "Wilgoć i zagrzybienie (Pleśń)", "prompt": "Detekcja zacieków, zamalowanej pleśni i zawilgocenia na zdjęciach."},
+          {"id": 13, "title": "Stan stolarki okiennej", "prompt": "Ocena materiału okien (PCV vs stare drewniane)."},
+          {"id": 14, "title": "Krzywizna ścian i podłóg", "prompt": "Detekcja nierówności na zdjęciach wykończeń."},
+          {"id": 15, "title": "Efektywność i rodzaj ogrzewania", "prompt": "Weryfikacja źródła ogrzewania (miejskie, gazowe, piec węglowy)."},
+          {"id": 16, "title": "Kondycja dachu i elewacji", "prompt": "Analiza stanu ocieplenia budynku i pokrycia dachowego."}
+        ]
+      },
+      {
+        "category_id": 3,
+        "category_name": "Lokalizacja i Otoczenie",
+        "checkpoints": [
+          {"id": 17, "title": "Plan Zagospodarowania Przestrzennego (MPZP)", "prompt": "Analiza ustaleń MPZP dla sąsiednich działek."},
+          {"id": 18, "title": "Ekspozycja na strony świata", "prompt": "Ocena doświetlenia mieszkania na podstawie rzutu/zdjęć."},
+          {"id": 19, "title": "Odległość od uciążliwej infrastruktury", "prompt": "Weryfikacja odległości od torów, dróg szybkiego ruchu i zakładów."},
+          {"id": 20, "title": "Dostępność komunikacji miejskiej", "prompt": "Ocena odległości do przystanków ZTM/autobus/metro."},
+          {"id": 21, "title": "Infrastruktura społeczna", "prompt": "Sprawdzenie bliskości szkół, przedszkoli i sklepów."},
+          {"id": 22, "title": "Piętro i obecność windy", "prompt": "Ocena braku windy na wysokim piętrze lub wad parteru."},
+          {"id": 23, "title": "Strefy zalewowe i geodezyjne", "prompt": "Analiza zagrożeń hydrologicznych w danej lokalizacji."},
+          {"id": 24, "title": "Bezpieczeństwo dzielnicy/osiedla", "prompt": "Ocena poziomu bezpieczeństwa i ogrodzenia osiedla."}
+        ]
+      },
+      {
+        "category_id": 4,
+        "category_name": "Finanse Eksploatacyjne i Wspólnota",
+        "checkpoints": [
+          {"id": 25, "title": "Wysokość czynszu administracyjnego", "prompt": "Sprawdzenie wysokości zaliczki na czynsz w opisie."},
+          {"id": 26, "title": "Stan funduszu remontowego", "prompt": "Ocena planowanych remontów i kredytów wspólnoty."},
+          {"id": 27, "title": "Forma zarządzania nieruchomością", "prompt": "Sprawdzenie typu zarządcy (prywatny vs ZGM)."},
+          {"id": 28, "title": "Przynależności (Piwnica, komórka, garaż)", "prompt": "Sprawdzenie czy piwnica i garaż są w cenie lokalu."},
+          {"id": 29, "title": "Podział kosztów ogrzewania (Podzielniki)", "prompt": "Detekcja podzielników ciepła na grzejnikach."},
+          {"id": 30, "title": "Dostęp do mediów cyfrowych", "prompt": "Weryfikacja obecności dostawców internetu światłowodowego."},
+          {"id": 31, "title": "Liczba lokali na wynajem krótkoterminowy", "prompt": "Ocena uciążliwości sąsiedztwa (najem krótkoterminowy)."},
+          {"id": 32, "title": "Klasa energetyczna budynku", "prompt": "Sprawdzenie klasy energetycznej i poziomu emisji."}
+        ]
+      },
+      {
+        "category_id": 5,
+        "category_name": "Analiza Marketingowa i Sprzedażowa",
+        "checkpoints": [
+          {"id": 33, "title": "Weryfikacja ceny za m² do średniej rynkowej", "prompt": "Porównanie ceny m² ze średnią dla danej okolicy."},
+          {"id": 34, "title": "Home Staging i triki fotograficzne", "prompt": "Wykrywanie obiektywów szerokokątnych i retuszu słabego światła."},
+          {"id": 35, "title": "Sformułowania-wytrychy agencji", "prompt": "Tłumaczenie zwrotów agencji na faktyczny stan nieruchomości."},
+          {"id": 36, "title": "Czas widoczności ogłoszenia na rynku", "prompt": "Ocena czasu widoczności oferty na portalu."},
+          {"id": 37, "title": "Pilność sprzedaży", "prompt": "Detekcja informacji o szybkiej sprzedaży jako podstawy do negocjacji."},
+          {"id": 38, "title": "Historia zmian ceny", "prompt": "Analiza zmian ceny w czasie w celu oceny pozycji negocjacyjnej."},
+          {"id": 39, "title": "Dostępność nieruchomości od zaraz", "prompt": "Weryfikacja terminu wydania lokalu kupującemu."},
+          {"id": 40, "title": "Stan prawny balkonu/tarasu", "prompt": "Sprawdzenie statusu prawnego balkonu/loggii."}
+        ]
+      }
+    ],
+    "ai_post_analysis_config": {
+      "seller_questions_keys": [
+        "numer_kw_dane",
+        "zaswiadczenie_brak_zaleglosci",
+        "swiadectwo_energetyczne_status",
+        "piony_instalacje_rok",
+        "garaz_komorka_cena"
+      ],
+      "cost_estimation_categories": [
+        {"key": "taksa_notarialna", "label": "Taksa notarialna i opłaty sądowe", "min": 1500, "max": 4500},
+        {"key": "podatek_pcc", "label": "Podatek PCC (2% - rynek wtórny)", "min": 0, "max": 12000},
+        {"key": "prowizja_agencji", "label": "Prowizja biura nieruchomości", "min": 0, "max": 15000},
+        {"key": "audyt_techniczny", "label": "Inżynieryjny audyt techniczny przed zakupem", "min": 500, "max": 1500},
+        {"key": "odswiezenie_startowe", "label": "Odświeżenie / pakiet naprawczy", "min": 3000, "max": 20000}
+      ],
+      "negotiation_triggers": {
+        "aluminum_wiring_deduction_pct": 5,
+        "high_rent_deduction_pct": 4,
+        "long_listing_days_deduction_pct": 7,
+        "default_opening_discount_pct": 8
+      }
+    }
+  }
+}  

@@ -1,0 +1,264 @@
+{
+  "freemium_checkpoints": [
+    "Weryfikacja metadanych ogłoszenia (wiek ogłoszenia, staż ogłoszeniodawcy na portalu ogłoszeniowym, historia zmian ceny, stabilność lokalizacji, czy zdjęcia w ogłoszeniu budzą wątpliwości tzn. czy przedstawiają sprzedawany produkt czy są ściągnięte z innych stron np. producenta)",
+    "Analiza zwięzłości i detekcja zwrotów wymijających (np. 'stan jak na zdjęciach', 'do poprawek')",
+    "Podstawowa deklaracja typu dokumentu sprzedaży (Faktura VAT 23%, VAT-marża, Umowa K-S)",
+    "Indeks kompletności dokumentacji technicznej/serwisowej w opisie",
+    "Ogólny wskaźnik oceny ryzyka zakupu (Score 0-100)"
+  ],
+  "heavy_machinery": {
+    "id": "heavy_machinery",
+    "name": "Sprzęt i maszyny rolnicze oraz budowlane",
+    "categories": [
+      {
+        "id": 1,
+        "name": "📋 KATEGORIA 1: Identyfikacja Maszyny i Legalność (1-8)",
+        "description": "Te punkty eliminują ryzyko zakupu maszyn kradzionych, zajętych przez komornika lub posiadających wady prawne.",
+        "checkpoints": [
+          {
+            "id": 1,
+            "title": "Widoczność i czytelność numeru VIN/ramy",
+            "details": "Czy na zdjęciach tabliczki znamionowej widoczne są ślady szlifowania, przebijania lub czy celowo została ona pominięta w opisie."
+          },
+          {
+            "id": 2,
+            "title": "Rok produkcji vs. Generacja modelu",
+            "details": "Weryfikacja, czy deklarowany w ogłoszeniu rok produkcji pokrywa się z latami, w których dany producent (np. John Deere, Caterpillar) faktycznie wypuszczał tę serię maszyn na rynek."
+          },
+          {
+            "id": 3,
+            "title": "Zgodność specyfikacji fabrycznej",
+            "details": "Porównanie podanej w ogłoszeniu mocy silnika (KM/kW) i masy własnej z oficjalnymi danymi katalogowymi producenta dla tego modelu."
+          },
+          {
+            "id": 4,
+            "title": "Kraj pochodzenia i pierwsza rejestracja",
+            "details": "Analiza, czy maszyna pochodzi z rynku krajowego, czy została sprowadzona (np. z Francji, Niemiec) – co drastically zmienia historię serwisową i podatkową."
+          },
+          {
+            "id": 5,
+            "title": "Status podatkowy (Faktura VAT vs. VAT-marża)",
+            "details": "Handlowy punkt krytyczny – określenie, czy cena jest kwotą netto, brutto, czy sprzedawca wystawia fakturę VAT 23%, czy VAT-marżę (co w maszynach budowlanych często sugeruje handel z drugiej/trzeciej ręki bez pełnej historii kosztowej)."
+          },
+          {
+            "id": 6,
+            "title": "Przeszłość w wypożyczalniach (Rental Check)",
+            "details": "Detekcja słów kluczowych lub oznak wizualnych (np. ślady po naklejkach firmowych) sugerujących, że maszyna pracowała w korporacji wynajmu maszyn, co oznacza skrajne wyeksploatowanie."
+          },
+          {
+            "id": 7,
+            "title": "Ważność badań UDT (Urząd Dozoru Technicznego)",
+            "details": "Dotyczy maszyn budowlanych (koparki, ładowarki, dźwigi). Czy sprzedawca deklaruje aktualny dozór, co jest warunkiem dopuszczenia do pracy na budowie."
+          },
+          {
+            "id": 8,
+            "title": "Status zastawu rejestrowego",
+            "details": "Weryfikacja (na podstawie profilu sprzedawcy i opisu), czy maszyna nie jest wciąż przedmiotem niespłaconego leasingu lub zabezpieczeniem kredytowym banku."
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "name": "⚙️ KATEGORIA 2: Analiza Układu Napędowego i Silnika (9-16)",
+        "description": "Handlowa ocena ryzyka najdroższych komponentów w maszynie ciężkiej.",
+        "checkpoints": [
+          {
+            "id": 9,
+            "title": "Realność motogodzin (Mth)",
+            "details": "Analiza korelacji między deklarowanym przebiegiem a wiekiem maszyny. Przykładowo: 10-letni ciągnik rolniczy z przebiegiem 3000 Mth to handlowa czerwona flaga (średnia to ok. 600-800 Mth rocznie)."
+          },
+          {
+            "id": 10,
+            "title": "Stan zużycia wnętrza kabiny a Mth",
+            "details": "Porównanie wytarcia kierownicy, fotela operatora i gum na pedałach ze stanem licznika – AI szuka rażących niespójności."
+          },
+          {
+            "id": 11,
+            "title": "Norma emisji spalin (Tier / Stage)",
+            "details": "Sprawdzenie, jaką normę spełnia silnik (np. Stage V, Tier 4). To kluczowe przy wjeździe maszyn budowlanych na nowoczesne, ekologiczne place budowy w miastach."
+          },
+          {
+            "id": 12,
+            "title": "Obecność i status systemu AdBlue/DPF",
+            "details": "Czy w opisie są wzmianki o „usuniętym ekologicznym problemie” lub „emulatorze”, co czyni maszynę nielegalną w świetle prawa i generuje ryzyko kar."
+          },
+          {
+            "id": 13,
+            "title": "Rodzaj i stan skrzyni biegów",
+            "details": "Identyfikacja typu przekładni (np. manualna, Powershift, bezstopniowa Vario/CVT). Skrzynie bezstopniowe w starszych maszynach rolniczych to ogromne ryzyko kosztów regeneracji."
+          },
+          {
+            "id": 14,
+            "title": "Wycieki i mycie silnika",
+            "details": "Analiza zdjęć pod kątem „sterylnie czystego” silnika, co u handlowców oznacza próbę ukrycia świeżych wycieków oleju tuż przed sesją zdjęciową."
+          },
+          {
+            "id": 15,
+            "title": "Układ chłodzenia i kondycja chłodnic",
+            "details": "Ocena czystości i braku zagięć na siatkach chłodnic (kluczowe w kombajnach i traktorach pracujących w dużym zapyleniu)."
+          },
+          {
+            "id": 16,
+            "title": "Układ paliwowy (Common Rail / Pompowtryski)",
+            "details": "Ocena ryzyka na podstawie czułości silnika na jakość paliwa – starsze systemy są tańsze w naprawie, nowoczesne Common Rail wymagają drogiej diagnostyki komputerowej."
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "name": "🏗️ KATEGORIA 3: Hydraulika, Konstrukcja i Podwozie (17-24)",
+        "description": "Punkty sprawdzające sprawność operacyjną maszyny.",
+        "checkpoints": [
+          {
+            "id": 17,
+            "title": "Stan pompy hydraulicznej głównej",
+            "details": "Analiza wzmianek o szybkości pracy ramienia/podnośnika pod obciążeniem lub generowanym hałasie (słowa kluczowe: „pompa po regeneracji”, „słaba na ciepłym silniku”)."
+          },
+          {
+            "id": 18,
+            "title": "Luz na sworzniach i tulejach",
+            "details": "Weryfikacja opisów i zdjęć połączeń ruchomych (ramiona koparek, tury rolnicze) pod kątem widocznych luzów i braku regularnego smarowania."
+          },
+          {
+            "id": 19,
+            "title": "Stan siłowników hydraulicznych",
+            "details": "Detekcja rys na tłoczyskach lub wycieków z uszczelniaczy widocznych na zdjęciach makro."
+          },
+          {
+            "id": 20,
+            "title": "Zużycie ogumienia (Tread Wear)",
+            "details": "Szacowanie procentowego zużycia opon rolniczych/budowlanych na podstawie zdjęć bieżnika. Komplet nowych opon do dużego traktora to koszt rzędu kilkunastu tysięcy złotych – to kluczowy argument cenowy."
+          },
+          {
+            "id": 21,
+            "title": "Stan podwozia gąsienicowego (w maszynach budowlanych)",
+            "details": "Ocena stopnia zużycia łańcuchów, rolek, gwiazd napędowych i samych gąsienic (stalowych lub gumowych)."
+          },
+          {
+            "id": 22,
+            "title": "Pęknięcia i spawy na konstrukcji",
+            "details": "Detekcja na zdjęciach niefabrycznych spawów, wzmocnień ramy, podmalowań ramion – świadczą o przeciążeniach lub wypadkowej przeszłości."
+          },
+          {
+            "id": 23,
+            "title": "Kompletność układu zawieszenia (TUZ / WOM)",
+            "details": "Dla maszyn rolniczych – czy tylny/przedni podnośnik i wałek odbioru mocy są kompletne, sprawne i posiadają zaczepy (dolny, górny, hitch)."
+          },
+          {
+            "id": 24,
+            "title": "Stan szyb i oświetlenia roboczego",
+            "details": "Oryginalność szyb kabiny (oznaczenia roczników) jako dowód bezwypadkowości maszyny oraz kompletność drogiego oświetlenia LED/ksenon."
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "name": "🛠️ KATEGORIA 4: Osprzęt, Elektronika i Wyposażenie dodatkowe (25-32)",
+        "description": "Co klient dostaje w cenie i jak nowoczesna jest maszyna.",
+        "checkpoints": [
+          {
+            "id": 25,
+            "title": "Instalacja do systemów GPS / Rolnictwa Precyzyjnego",
+            "details": "Czy maszyna posiada fabryczne przygotowanie pod nawigację satelitarną (AutoTrac, GPS-ready), co drastycznie podnosi jej wartość rynkową."
+          },
+          {
+            "id": 26,
+            "title": "Rodzaj i stan sterowania (Joysticki vs. Wajchy)",
+            "details": "Czy maszyna budowlana posiada nowoczesne sterowanie elektrohydrauliczne (joysticki), czy klasyczne, mechaniczne dźwignie (wpływ na ergonomię i cenę)."
+          },
+          {
+            "id": 27,
+            "title": "Klimatyzacja i ogrzewanie kabiny",
+            "details": "Sprawdzenie deklaracji o sprawności klimatyzacji (częsty zwrot handlarzy: „klimatyzacja sprawna, tylko do nabicia” zazwyczaj oznacza nieszczelny układ lub uszkodzoną sprężarkę)."
+          },
+          {
+            "id": 28,
+            "title": "Kompletność linii hydraulicznych dodatkowych",
+            "details": "Czy koparka posiada linie do młota, wiertnicy lub skarpówki wychylnej (zwiększa to uniwersalność i wartość sprzętu)."
+          },
+          {
+            "id": 29,
+            "title": "Szybkozłącze osprzętu (rodzaj i stan)",
+            "details": "Czy maszyna ma szybkozłącze hydrauliczne czy mechaniczne (np. Verachtert, Lehnhoff) i czy w zestaw są łyżki/widły."
+          },
+          {
+            "id": 30,
+            "title": "Stan układu hamulcowego przyczep",
+            "details": "Dla traktorów – obecność i sprawność instalacji hamulcowej pneumatycznej (jedno- i dwuobwodowej) lub hydraulicznej dla przyczep."
+          },
+          {
+            "id": 31,
+            "title": "Obecność systemów wagowych",
+            "details": "W ładowarkach kołowych – czy maszyna posiada wagę dynamiczną w ramieniu, niezbędną na żwirowniach i składach węgla."
+          },
+          {
+            "id": 32,
+            "title": "Rewers hydrauliczny (Powershuttle)",
+            "details": "Obecność bezsprzęgłowej zmiany kierunku jazdy przód-tył, kluczowej w pracy z ładowaczem czołowym."
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "name": "👤 KATEGORIA 5: Wiarygodność Sprzedawcy i Psychologia Ogłoszenia (33-40)",
+        "description": "Handlowa analiza intencji i zachowań wystawiającego.",
+        "checkpoints": [
+          {
+            "id": 33,
+            "title": "Profil sprzedawcy (Dealer vs. Rolnik/Firma budowlana)",
+            "details": "Czy ogłoszenie wystawia wyspecjalizowany handlarz (często myjący i malujący maszyny pod sprzedaż), czy pierwszy właściciel, który pracował nią w swoim gospodarstwie/firmie."
+          },
+          {
+            "id": 34,
+            "title": "Historia rotacji ogłoszeń dewelopera",
+            "details": "Czy dany numer telefonu lub konto wystawia setki maszyn rocznie, co sugeruje komis i doliczanie marży pośrednika."
+          },
+          {
+            "id": 35,
+            "title": "„Pilność” sprzedaży w tekście",
+            "details": "Wykrywanie fraz typu „sprzedam z powodu wymiany na nową (dotacja unijna)” vs „pilnie sprzedam z powodu wyjazdu” – doskonała baza pod negocjacje cenowe."
+          },
+          {
+            "id": 36,
+            "title": "Dostępność dokumentacji i instrukcji",
+            "details": "Czy do maszyny dołączona jest oryginalna książka serwisowa, instrukcja obsługi w języku polskim oraz katalog części."
+          },
+          {
+            "id": 37,
+            "title": "Historia serwisowania w ASO",
+            "details": "Czy w opisie pojawiają się nazwy oficjalnych dealerów (np. Korbanek, Zeppelin, Bergerat Monnoyeur), u których można zweryfikować historię po VIN."
+          },
+          {
+            "id": 38,
+            "title": "Analiza lokalizacji (Zagłębia handlarskie)",
+            "details": "Czy maszyna fizycznie znajduje się w rejonach Polski znanych z masowego sprowadzania i „odświeżania” maszyn (tzw. zagłębia komisowe) – co podnosi współczynnik ryzyka."
+          },
+          {
+            "id": 39,
+            "title": "Gotowość na inspekcję zewnętrzną",
+            "details": "Czy sprzedawca zgadza się w opisie na testy komputerowe, przyjazd mechanika lub badanie maszyny pod pełnym obciążeniem na jego placu."
+          },
+          {
+            "id": 40,
+            "title": "Sztuczne podbijanie atrakcyjności",
+            "details": "Wykrywanie w tekście agresywnego marketingu handlowego (fraz typu: „igła”, „jedyna taka”, „stan kolekcjonerski”, „płakał jak sprzedawał”), które system AI oznacza jako próbę odwrócenia uwagi od wad technicznych."
+          }
+        ]
+      }
+    ],
+    "paid_post_analysis_modules": {
+      "questions_to_seller": {
+        "title": "Istotne pytania do sprzedawcy",
+        "description": "Zestaw dedykowanych, precyzyjnych pytań technicznych i prawnych do wygenerowania dla użytkownika na podstawie wykrytych luk w ogłoszeniu."
+      },
+      "estimated_initial_costs": {
+        "title": "Wyliczenie szacowanych kosztów początkowych",
+        "description": "Kalkulacja szacowanych wydatków obejmująca m.in. pakiet startowy (płyny, filtry), wycenę transportu gabarytowego oraz konieczne naprawy."
+      },
+      "negotiation_strategy": {
+        "title": "Rekomendowana strategia i propozycja negocjacji cenowej",
+        "description": "Argumenty cenowe przygotowane na podstawie słabych punktów oferty i wykrytych usterek."
+      }
+    }
+  }
+}

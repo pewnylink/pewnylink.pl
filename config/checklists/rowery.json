@@ -1,0 +1,128 @@
+{
+  "rowery": {
+    "category_name": "Rowery",
+    "category_slug": "rowery",
+    "description": "Analiza ogłoszeń rowerów szosowych, MTB, gravelowych oraz e-bike pod kątem uszkodzeń ramy, zużycia napędu i legalności.",
+    "free_checkpoints": [
+      {
+        "id": "free_1",
+        "title": "Weryfikacja metadanych ogłoszenia",
+        "description": "Ocena wieku ogłoszenia, stażu sprzedawcy, historii zmian ceny i autentyczności zdjęć."
+      },
+      {
+        "id": "free_2",
+        "title": "Analiza zwięzłości i detekcja zwrotów wymijających",
+        "description": "Wykrywanie fraz maskujących zużycie (np. 'do wyregulowania', 'lekkie luzy', 'stan jak na foto')."
+      },
+      {
+        "id": "free_3",
+        "title": "Podstawowa deklaracja typu dokumentu sprzedaży",
+        "description": "Identyfikacja dowodu zakupu (Faktura, Umowa K-S, Brak) pod kątem weryfikacji pochodzenia."
+      },
+      {
+        "id": "free_4",
+        "title": "Indeks kompletności dokumentacji technicznej w opisie",
+        "description": "Sprawdzenie obecności numeru ramy, dowodu zakupu i gwarancji producenta."
+      },
+      {
+        "id": "free_5",
+        "title": "Ogólny wskaźnik oceny ryzyka zakupu",
+        "description": "Zagregowany wskaźnik punktowy (Score 0-100) określający ryzyko zakupu."
+      }
+    ],
+    "paid_categories": [
+      {
+        "category_id": 1,
+        "category_name": "Legalność i Historia",
+        "checkpoints": [
+          {"id": 1, "title": "Widoczność numeru ramy na zdjęciach", "prompt": "Weryfikacja zdjęcia spodu ramy pod kątem zamazania lub braku numeru."},
+          {"id": 2, "title": "Dowód zakupu (Paragon/Faktura/Karta gwarancyjna)", "prompt": "Sprawdzenie obecności fizycznego dowodu zakupu ze sklepu."},
+          {"id": 3, "title": "Zgodność specyfikacji fabrycznej", "prompt": "Porównanie osprzętu ze zdjęć z fabrycznym katalogiem rocznika."},
+          {"id": 4, "title": "Liczba właścicieli i historia użytkowania", "prompt": "Sprawdzenie czy rower pochodzi z PL salonu, czy z prywatnego importu."},
+          {"id": 5, "title": "Przeszłość w wypożyczalniach / bikesharingu", "prompt": "Detekcja śladów użytkowania w wypożyczalniach górskich."},
+          {"id": 6, "title": "Ważność gwarancji producenta", "prompt": "Weryfikacja ograniczeń gwarancji na ramę dla drugiego właściciela."},
+          {"id": 7, "title": "Stan naklejek fabrycznych i ostrzegawczych", "prompt": "Sprawdzenie braku naklejek sugerującego powórne malowanie po pęknięciu."},
+          {"id": 8, "title": "Weryfikacja w rejestrach skradzionych rowerów", "prompt": "Sprawdzenie opisów w internetowych bazach rowerów skradzionych."}
+        ]
+      },
+      {
+        "category_id": 2,
+        "category_name": "Rama i Zawieszenie",
+        "checkpoints": [
+          {"id": 9, "title": "Pęknięcia i uszkodzenia ram karbonowych", "prompt": "Detekcja rys i uszkodzeń karbonu wokół mufy suportu i sterów."},
+          {"id": 10, "title": "Spawy i pęknięcia ram aluminiowych", "prompt": "Analiza okolic spawów główki i rury podsiodłowej pod kątem pęknięć."},
+          {"id": 11, "title": "Stan uszczelniaczy i powłoki amortyzatora (Anoda)", "prompt": "Weryfikacja przetarć powłoki na goleniach upper legs i wycieków oleju."},
+          {"id": 12, "title": "Luz na łożyskach ramy (Full Suspension)", "prompt": "Ocena stanu luzów na łożyskach wahacza ramy zawieszonej."},
+          {"id": 13, "title": "Stan i czystość damperów", "prompt": "Sprawdzenie ugięcia i wycieków w tylnym amortyzatorze."},
+          {"id": 14, "title": "Prostość haka przerzutki", "prompt": "Weryfikacja czy wózek przerzutki nie nosi śladów skrzywienia po upadku."},
+          {"id": 15, "title": "Luz na sterach kierownicy", "prompt": "Sprawdzenie wzmianek o stabilności widelca i sterów."},
+          {"id": 16, "title": "Wysunięcie sztycy podsiodłowej", "prompt": "Weryfikacja ryzyka zapieczenia sztycy w rurze podsiodłowej."}
+        ]
+      },
+      {
+        "category_id": 3,
+        "category_name": "Napęd i Koła",
+        "checkpoints": [
+          {"id": 17, "title": "Zużycie łańcucha i kasety", "prompt": "Analiza zaostrzenia zębów kaset i korb na zdjęciach."},
+          {"id": 18, "title": "Stan techniczny kół (Centrowanie/Bicie)", "prompt": "Wyrywanie wzmianek o biciu kół i prostowaniu obręczy."},
+          {"id": 19, "title": "Klasa i stan piast kół", "prompt": "Ocena płynności pracy i stanu łożysk w piastach."},
+          {"id": 20, "title": "Naciąg i kompletność szprych", "prompt": "Sprawdzenie kompletności i wyważenia szprych."},
+          {"id": 21, "title": "Stan zużycia opon rowerowych", "prompt": "Ocena spękania gumy, głębokości bieżnika i ścianek bocznych."},
+          {"id": 22, "title": "Luz na osi suportu", "prompt": "Detekcja słów kluczy o stukach i luzach korby przy nacisku."},
+          {"id": 23, "title": "Typ osi kół (Sztywne osie vs QR)", "prompt": "Ocena standardu mocowania kół (sztywne osie Thru-Axle vs zaciski QR)."},
+          {"id": 24, "title": "Stan pedałów i systemów zatrzaskowych SPD", "prompt": "Ocena stanu zużycia zatrzasków pedałów."}
+        ]
+      },
+      {
+        "category_id": 4,
+        "category_name": "Hamulce i Komponenty",
+        "checkpoints": [
+          {"id": 25, "title": "Stan tarcz i klocków hamulcowych", "prompt": "Ocena grubości tarcz i fioletowych przebarwień od przegrzania."},
+          {"id": 26, "title": "Zapowietrzenie hamulców hydraulicznych", "prompt": "Detekcja fraz 'miękka klamka' lub 'do odpowietrzenia'."},
+          {"id": 27, "title": "Stan linek i pancerzy", "prompt": "Sprawdzenie korozji linek i pancerzy napędowych."},
+          {"id": 28, "title": "Kondycja elektronicznych grup osprzętu (Di2/AXS)", "prompt": "Sprawdzenie obecności ładowarki i stanu baterii osprzętu elektronicznego."},
+          {"id": 29, "title": "Stan owijki kierownicy / Gripów", "prompt": "Ocena wytarcia chwytów kierownicy jako wskaźnika przebiegu."},
+          {"id": 30, "title": "Stan techniczny regulowanej sztycy (Dropper Post)", "prompt": "Sprawdzenie płynności pracy sztycy regulowanej i braku luzów."},
+          {"id": 31, "title": "Stan siodełka", "prompt": "Detekcja rozdarć na poszyciu siodełka."},
+          {"id": 32, "title": "Materiał kierownicy i mostka", "prompt": "Weryfikacja obecności tanich zamienników karbonowych z azjatyckich portali."}
+        ]
+      },
+      {
+        "category_id": 5,
+        "category_name": "Komponenty E-Bike oraz Psychologia",
+        "checkpoints": [
+          {"id": 33, "title": "Kondycja baterii w E-Bike (SOH)", "prompt": "Weryfikacja obecności raportu stanu zdrowia baterii SOH."},
+          {"id": 34, "title": "Przebieg silnika elektrycznego", "prompt": "Sprawdzenie całkowitego przebiegu systemu wspomagania e-bike."},
+          {"id": 35, "title": "Obecność oryginalnego klucza i ładowarki", "prompt": "Weryfikacja braku klucza do baterii i ładowarki jako wskaźnika kradzieży."},
+          {"id": 36, "title": "Słowa klucze handlarzy rowerowych", "prompt": "Detekcja zwrotów 'stan sklepowy', 'używany sporadycznie przez kobietę'."},
+          {"id": 37, "title": "Przygotowanie roweru do sezonu", "prompt": "Ocena zakresu prac serwisowych startowych."},
+          {"id": 38, "title": "Tuning i zdejmowanie blokad prędkości w E-bike", "prompt": "Szukanie śladów montażu chipów znoszących limit 25 km/h."},
+          {"id": 39, "title": "Sezonowość oferty", "prompt": "Ocena wpływu pory roku na pozycję negocjacyjną."},
+          {"id": 40, "title": "Kompletność akcesoriów dodatkowych", "prompt": "Weryfikacja pozostawienia akcesoriów widocznych na zdjęciach."}
+        ]
+      }
+    ],
+    "ai_post_analysis_config": {
+      "seller_questions_keys": [
+        "numer_ramy_dowod_zakupu",
+        "ebike_soh_przebieg",
+        "serwis_zawieszenia_potwierdzenie",
+        "zuzycie_napedu_lancuch",
+        "karbon_prawnosc_naprawy"
+      ],
+      "cost_estimation_categories": [
+        {"key": "serwis_zerowy", "label": "Serwis zerowy i odpowietrzanie hamulców", "min": 150, "max": 350},
+        {"key": "wymiana_napedu", "label": "Wymiana łańcucha i kasety", "min": 200, "max": 1200},
+        {"key": "serwis_zawieszenia", "label": "Serwis amortyzatora i dampera", "min": 400, "max": 950},
+        {"key": "opony_tubeless", "label": "Opony i konwersja Tubeless", "min": 250, "max": 650},
+        {"key": "transport_kurier", "label": "Transport / Przesyłka gabarytowa", "min": 80, "max": 220}
+      ],
+      "negotiation_triggers": {
+        "worn_drivetrain_deduction_pct": 10,
+        "suspension_service_due_deduction_pct": 8,
+        "no_receipt_deduction_pct": 12,
+        "default_opening_discount_pct": 15
+      }
+    }
+  }
+}
