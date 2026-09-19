@@ -26,10 +26,10 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 CATEGORY_DISPLAY_NAMES = {
     "automotive": "Motoryzacja",
     "real_estate": "Nieruchomości",
-    "heavy_machinery": "Maszyny ciężkie",
+    "heavy_machinery": "Maszyny rolnicze i budowlane",
     "bicycles": "Rowery",
     "medical_devices": "Sprzęt medyczny",
-    "general": "Inne / Ogólne",
+    "consumer electronics & IT": "Elektronika użytkowa i sprzęt IT",
 }
 
 
