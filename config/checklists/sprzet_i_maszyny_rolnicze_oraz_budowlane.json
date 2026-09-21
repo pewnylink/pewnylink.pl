@@ -1,14 +1,15 @@
 {
   "freemium_checkpoints": [
-    "Weryfikacja metadanych ogłoszenia (wiek ogłoszenia, staż ogłoszeniodawcy na portalu ogłoszeniowym, historia zmian ceny, stabilność lokalizacji, czy zdjęcia w ogłoszeniu budzą wątpliwości tzn. czy przedstawiają sprzedawany produkt czy są ściągnięte z innych stron np. producenta)",
-    "Analiza zwięzłości i detekcja zwrotów wymijających (np. 'stan jak na zdjęciach', 'do poprawek')",
-    "Podstawowa deklaracja typu dokumentu sprzedaży (Faktura VAT 23%, VAT-marża, Umowa K-S)",
+    "Weryfikacja metadanych ogłoszenia...",
+    "Analiza zwięzłości i detekcja zwrotów wymijających...",
+    "Podstawowa deklaracja typu dokumentu sprzedaży...",
     "Indeks kompletności dokumentacji technicznej/serwisowej w opisie",
     "Ogólny wskaźnik oceny ryzyka zakupu (Score 0-100)"
   ],
-  "heavy_machinery": {
-    "id": "heavy_machinery",
+  "maszyny_rolnicze_i_budowlane": {
+    "id": "maszyny_rolnicze_i_budowlane",
     "name": "Sprzęt i maszyny rolnicze oraz budowlane",
+    "title": "Sprzęt i maszyny rolnicze oraz budowlane",
     "categories": [
       {
         "id": 1,
@@ -33,7 +34,7 @@
           {
             "id": 4,
             "title": "Kraj pochodzenia i pierwsza rejestracja",
-            "details": "Analiza, czy maszyna pochodzi z rynku krajowego, czy została sprowadzona (np. z Francji, Niemiec) – co drastically zmienia historię serwisową i podatkową."
+            "details": "Analiza, czy maszyna pochodzi z rynku krajowego, czy została sprowadzona (np. z Francji, Niemiec) – co drastycznie zmienia historię serwisową i podatkową."
           },
           {
             "id": 5,
@@ -179,7 +180,7 @@
           {
             "id": 29,
             "title": "Szybkozłącze osprzętu (rodzaj i stan)",
-            "details": "Czy maszyna ma szybkozłącze hydrauliczne czy mechaniczne (np. Verachtert, Lehnhoff) i czy w zestaw są łyżki/widły."
+            "details": "Czy maszyna ma szybkozłącze hydrauliczne czy mechaniczne (np. Verachtert, Lehnhoff) i czy w zestawie są łyżki/widły."
           },
           {
             "id": 30,
@@ -210,8 +211,8 @@
           },
           {
             "id": 34,
-            "title": "Historia rotacji ogłoszeń dewelopera",
-            "details": "Czy dany numer telefonu lub konto wystawia setki maszyn rocznie, co sugeruje komis i doliczanie marży pośrednika."
+            "title": "Historia rotacji ogłoszeń sprzedawcy",
+            "details": "Czy dany numer telefonu lub konto wystawia setki maszyn rocznie, co sugeruje komis/handlarza i doliczanie marży pośrednika."
           },
           {
             "id": 35,
