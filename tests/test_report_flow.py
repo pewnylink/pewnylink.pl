@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+import pytest
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(BASE_DIR))
@@ -9,19 +10,29 @@ from app.core.affiliates import get_affiliate_widgets
 
 CHECKLISTS_DIR = BASE_DIR / "config" / "checklists"
 
+
+def get_all_industry_ids():
+    """Pobiera listę nazw branż na podstawie plików JSON w katalogu checklists."""
+    if not CHECKLISTS_DIR.exists():
+        return []
+    return [f.stem for f in CHECKLISTS_DIR.glob("*.json")]
+
+
+# Pobieramy listę branż do parametryzacji testu
+INDUSTRY_IDS = get_all_industry_ids()
+
+
+@pytest.mark.parametrize("industry_id", INDUSTRY_IDS if INDUSTRY_IDS else ["default"])
 def test_single_industry(industry_id: str):
     print(f"\n==================================================")
     print(f"🔍 Rozpoczynam diagnostykę dla branży: '{industry_id}'...")
     print(f"==================================================")
 
     # 1. Wczytanie pliku JSON
-    try:
-        checklist = load_checklist_by_industry(industry_id)
-        print("✅ [1/4] Plik JSON wczytany z sukcesem.")
-        print(f"   • Dostępne klucze główne: {list(checklist.keys())}")
-    except Exception as e:
-        print(f"❌ [1/4] Błąd wczytywania JSON: {e}")
-        return False
+    checklist = load_checklist_by_industry(industry_id)
+    assert checklist is not None, f"Nie udało się wczytać checklisty dla branży {industry_id}"
+    print("✅ [1/4] Plik JSON wczytany z sukcesem.")
+    print(f"   • Dostępne klucze główne: {list(checklist.keys())}")
 
     # 2. Nazwa branży
     industry_name = (
@@ -32,8 +43,7 @@ def test_single_industry(industry_id: str):
     )
     print(f"\n🏷️ [2/4] Nazwa branży: {industry_name}")
 
-    # 3. Zliczanie punktów (wsparcie dla nowej i legacy struktury)
-    # 3a. Punkty darmowe
+    # 3. Zliczanie punktów
     free_checkpoints = checklist.get("freemium_checkpoints")
     if free_checkpoints is not None and isinstance(free_checkpoints, list):
         free_points = len(free_checkpoints)
@@ -41,7 +51,6 @@ def test_single_industry(industry_id: str):
         free_summary = checklist.get("public_free_summary", {})
         free_points = len(free_summary.get("points", [])) if isinstance(free_summary, dict) else 0
 
-    # 3b. Kategorie i punkty płatne
     categories = checklist.get("categories")
     if categories is None:
         paid_analysis = checklist.get("paid_detailed_analysis", {})
@@ -50,7 +59,6 @@ def test_single_industry(industry_id: str):
     paid_points = 0
     for cat in categories:
         if isinstance(cat, dict):
-            # Nowa struktura: 'checkpoints', legacy: 'points'
             checkpoints = cat.get("checkpoints") or cat.get("points") or []
             paid_points += len(checkpoints)
 
@@ -63,8 +71,6 @@ def test_single_industry(industry_id: str):
     action_plan = checklist.get("paid_post_analysis_modules") or checklist.get("ai_generated_action_plan", {})
     
     if isinstance(action_plan, dict):
-        # W nowej strukturze moduły są słownikiem (questions_to_seller, estimated_initial_costs, negotiation_strategy)
-        # W legacy były listą pod kluczem "modules"
         if "modules" in action_plan and isinstance(action_plan["modules"], list):
             modules_list = action_plan["modules"]
         else:
@@ -78,17 +84,12 @@ def test_single_industry(industry_id: str):
     print("\n💡 [3/4] Weryfikacja planu działań AI:")
     print(f"   • Sekcja: {section_title}")
     print(f"   • Liczba modułów: {len(modules_list)}/3 {'✅' if len(modules_list) >= 3 else '⚠️'}")
-    for mod in modules_list:
-        if isinstance(mod, dict):
-            print(f"     - {mod.get('title') or mod.get('name')}")
 
     # 5. Test pobierania afiliacji
     print("\n🔗 [4/4] Test pobierania afiliacji:")
     try:
         affiliates = get_affiliate_widgets(industry_id, placement="report")
         print(f"   • Znalezione oferty dla placement='report': {len(affiliates)}")
-        for aff in affiliates:
-            print(f"     - {aff}")
     except TypeError:
         try:
             affiliates = get_affiliate_widgets(placement="report", industry_id=industry_id)
@@ -98,32 +99,7 @@ def test_single_industry(industry_id: str):
     except Exception as e:
         print(f"   ⚠️ Błąd podczas pobierania afiliacji: {e}")
 
-    return True
-
-
-def run_test(target_industry_id: str = None):
-    if target_industry_id:
-        test_single_industry(target_industry_id)
-    else:
-        # Automatycznie testuje wszystkie pliki .json w katalogu config/checklists/
-        json_files = list(CHECKLISTS_DIR.glob("*.json"))
-        if not json_files:
-            print(f"❌ Nie znaleziono żadnych plików .json w {CHECKLISTS_DIR}")
-            return
-
-        print(f"🚀 Wyryto {len(json_files)} checklist branżowych w {CHECKLISTS_DIR}. Rozpoczynam testy masowe...\n")
-        
-        success_count = 0
-        for file_path in json_files:
-            industry_id = file_path.stem
-            if test_single_industry(industry_id):
-                success_count += 1
-        
-        print(f"\n==================================================")
-        print(f"🎉 Zakończono testy! Sukces: {success_count}/{len(json_files)} branż.")
-        print(f"==================================================")
 
 if __name__ == "__main__":
-    # Możesz podać konkretne ID jako argument, np. run_test("sprzet_i_maszyny_rolnicze_oraz_budowlane")
-    # Zostawiając None testujesz wszystkie pliki z katalogu config/checklists/
-    run_test()
+    for ind_id in INDUSTRY_IDS:
+        test_single_industry(ind_id)
