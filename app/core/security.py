@@ -1,5 +1,6 @@
 # app/core/security.py
 import hashlib
+import hmac
 import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Any
@@ -7,7 +8,6 @@ import jwt
 from fastapi import Request, HTTPException, status
 
 from app.core.config import settings
-# Poprawiony import modelu z db_models.py
 from app.models.db_models import User
 
 
@@ -19,13 +19,14 @@ def hash_password(password: str) -> str:
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Weryfikuje zgodność wpisanego hasła z zaszyfrowanym ciągiem z bazy."""
+    """Weryfikuje zgodność wpisanego hasła z zaszyfrowanym ciągiem z bazy w czasie stałym."""
     try:
         salt_hex, hash_hex = hashed_password.split(":")
         salt = bytes.fromhex(salt_hex)
         expected_hash = bytes.fromhex(hash_hex)
         pwd_hash = hashlib.pbkdf2_hmac('sha256', plain_password.encode('utf-8'), salt, 100000)
-        return pwd_hash == expected_hash
+        # Użycie hmac.compare_digest zapobiega atakom typu Timing Attack
+        return hmac.compare_digest(pwd_hash, expected_hash)
     except Exception:
         return False
 
@@ -60,7 +61,8 @@ def get_token_from_request(request: Request) -> Optional[str]:
 
 def verify_active_access(user: User) -> bool:
     """Weryfikacja praw dostępu (ADMIN vs zwykły użytkownik)."""
-    role_val = str(getattr(user, "role", "")).upper()
+    role_attr = getattr(user, "role", "")
+    role_val = str(getattr(role_attr, "value", role_attr)).upper()
     is_admin_flag = getattr(user, "is_admin", False)
 
     # 1. Administratorzy i właściciele mają zawsze pełny dostęp
@@ -72,7 +74,6 @@ def verify_active_access(user: User) -> bool:
     now_utc = datetime.now(timezone.utc)
 
     if access_until is None:
-        # Jeśli użytkownik nie jest adminem i nie ma ustawionej daty dostępu
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Brak aktywnego dostępu do generowania raportów. Odnów pakiet subskrypcyjny."

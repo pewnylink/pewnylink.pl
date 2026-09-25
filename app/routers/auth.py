@@ -1,15 +1,14 @@
 # app/routers/auth.py
 from datetime import datetime, timezone, timedelta
-from typing import Dict, Any
-from fastapi import APIRouter, HTTPException, status, Depends, Response
+from typing import Dict, Any, Optional
+import jwt
+from fastapi import APIRouter, HTTPException, status, Depends, Response, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.db.session import get_db
-# Modele bazy danych (SQLAlchemy)
+from app.core.config import settings
 from app.models.db_models import User, Voucher
-
-# Schematy walidacji danych API (Pydantic)
 from app.models.user import (
     UserRegister,
     UserLogin,
@@ -19,11 +18,32 @@ from app.models.user import (
     VoucherCreate,
     VoucherRedeem
 )
-from app.core.security import hash_password, verify_password, create_access_token
+from app.core.security import hash_password, verify_password, create_access_token, get_token_from_request
 from app.dependencies import get_current_user_required
 
-# Prefiks API dla modułu autoryzacji
 router = APIRouter(prefix="/api/v1/auth", tags=["Auth & Access"])
+
+
+async def get_optional_current_user(
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+) -> Optional[User]:
+    """Pobiera zalogowanego użytkownika z ciasteczka/nagłówka JWT, lub zwraca None gdy niezalogowany."""
+    try:
+        token = get_token_from_request(request)
+        if not token:
+            return None
+        
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
+            return None
+        
+        stmt = select(User).where(User.id == (int(user_id) if str(user_id).isdigit() else user_id))
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+    except Exception:
+        return None
 
 
 @router.post("/register", response_model=TokenResponse)
@@ -34,7 +54,6 @@ async def register(
 ):
     email_clean = payload.email.lower().strip()
 
-    # 1. Sprawdzenie unikalności adresu e-mail
     stmt = select(User).where(User.email == email_clean)
     result = await db.execute(stmt)
     existing_user = result.scalar_one_or_none()
@@ -45,7 +64,6 @@ async def register(
             detail="Konto z tym adresem e-mail już istnieje."
         )
 
-    # 2. Tworzenie obiektu użytkownika w PostgreSQL (tylko z polami obecnymi w db_models.py)
     role_val = UserRole.USER.value if hasattr(UserRole.USER, 'value') else str(UserRole.USER)
     now_utc = datetime.now(timezone.utc)
 
@@ -64,7 +82,6 @@ async def register(
     role_str = new_user.role.value if hasattr(new_user.role, 'value') else str(new_user.role)
     token = create_access_token(user_id=new_user.id, role=role_str)
 
-    # Zapis w ciasteczku pod kątem widoków www / Jinja2
     response.set_cookie(key="access_token", value=token, httponly=True, path="/", samesite="lax")
 
     user_resp = UserResponse(
@@ -100,7 +117,6 @@ async def login(
     role_str = user.role.value if hasattr(user.role, 'value') else str(user.role)
     token = create_access_token(user_id=user.id, role=role_str)
 
-    # Zapis w ciasteczku pod kątem widoków www / Jinja2
     response.set_cookie(key="access_token", value=token, httponly=True, path="/", samesite="lax")
 
     user_resp = UserResponse(
@@ -154,14 +170,20 @@ async def create_voucher(
     if voucher:
         voucher.days_validity = payload.days_validity
         voucher.max_uses = payload.max_uses
+        if hasattr(voucher, "is_active"):
+            voucher.is_active = True
     else:
-        voucher = Voucher(
-            code=code_clean,
-            days_validity=payload.days_validity,
-            max_uses=payload.max_uses,
-            uses_count=0,
-            created_at=datetime.now(timezone.utc)
-        )
+        voucher_kwargs = {
+            "code": code_clean,
+            "days_validity": payload.days_validity,
+            "max_uses": payload.max_uses,
+            "uses_count": 0,
+            "created_at": datetime.now(timezone.utc)
+        }
+        if hasattr(Voucher, "is_active"):
+            voucher_kwargs["is_active"] = True
+
+        voucher = Voucher(**voucher_kwargs)
         db.add(voucher)
 
     await db.commit()
@@ -177,7 +199,6 @@ async def redeem_voucher(
     """Realizacja vouchera przez użytkownika."""
     code_clean = payload.code.upper().strip()
     
-    # 1. Pobranie vouchera
     stmt_v = select(Voucher).where(Voucher.code == code_clean)
     res_v = await db.execute(stmt_v)
     voucher = res_v.scalar_one_or_none()
@@ -188,13 +209,18 @@ async def redeem_voucher(
             detail="Podany kod jest nieprawidłowy."
         )
 
+    if hasattr(voucher, "is_active") and not voucher.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="Ten kod jest nieaktywny."
+        )
+
     if voucher.uses_count >= voucher.max_uses:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, 
             detail="Ten kod został już wykorzystany limit razy."
         )
 
-    # 2. Wyliczanie nowej daty ważności konta
     now = datetime.now(timezone.utc)
     current_access = getattr(current_user, "access_until", None)
     
@@ -204,13 +230,15 @@ async def redeem_voucher(
     base_date = current_access if (current_access and current_access > now) else now
     new_access_until = base_date + timedelta(days=voucher.days_validity)
 
-    # 3. Aktualizacja danych użytkownika i wykorzystania kodu
     if hasattr(current_user, "access_until"):
         current_user.access_until = new_access_until
     
     vip_role = UserRole.VIP_GUEST.value if hasattr(UserRole.VIP_GUEST, 'value') else str(UserRole.VIP_GUEST)
     current_user.role = vip_role
     voucher.uses_count += 1
+
+    if voucher.uses_count >= voucher.max_uses and hasattr(voucher, "is_active"):
+        voucher.is_active = False
 
     await db.commit()
 

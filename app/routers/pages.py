@@ -12,6 +12,7 @@ from app.db.session import get_db
 from app.dependencies import get_current_user_optional
 from app.models.db_models import ReportModel as DBReport, User as DBUser
 from app.services.audit_service import AuditEngine
+from app.services.checklist_service import load_checklist_by_industry
 from app.services.report_generator import generate_audit_report
 from app.services.report_repository import ReportRepository
 
@@ -25,11 +26,17 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 CATEGORY_DISPLAY_NAMES = {
     "automotive": "Motoryzacja",
+    "motoryzacja": "Motoryzacja",
     "real_estate": "Nieruchomości",
+    "nieruchomosci": "Nieruchomości",
     "heavy_machinery": "Maszyny rolnicze i budowlane",
+    "sprzet_i_maszyny_rolnicze_oraz_budowlane": "Maszyny rolnicze i budowlane",
     "bicycles": "Rowery",
+    "rowery": "Rowery",
     "medical_devices": "Sprzęt medyczny",
+    "sprzet_i_urzadzenia_medyczne": "Sprzęt medyczny",
     "consumer electronics & IT": "Elektronika użytkowa i sprzęt IT",
+    "elektronika_uzytkowa_i_sprzet_IT": "Elektronika użytkowa i sprzęt IT",
 }
 
 
@@ -37,10 +44,13 @@ def check_is_admin(user: Optional[DBUser]) -> bool:
     """Sprawdzenie uprawnień administratora u użytkownika."""
     if not user:
         return False
+    
+    role_attr = getattr(user, "role", None)
+    role_str = str(getattr(role_attr, "value", role_attr)).upper()
+    
     return (
         getattr(user, "is_admin", False)
-        or getattr(user, "role", None) in ["ADMIN", "admin"]
-        or getattr(getattr(user, "role", None), "value", None) == "ADMIN"
+        or role_str in ["ADMIN", "SUPER_ADMIN"]
     )
 
 
@@ -63,6 +73,7 @@ def render_safe_template(request: Request, template_name: str, context: dict) ->
         name=template_name,
         context=context
     )
+
 
 # --- STRONA GŁÓWNA I UŻYTKOWA ---
 
@@ -165,7 +176,7 @@ async def get_report(
     request: Request, 
     url: str = Query(..., description="Adres URL oferty"), 
     admin: bool = Query(False, description="Flaga dostępu administratora"),
-    industry: str = Query("general", description="Kategoria / Branża oferty"),
+    industry: str = Query("elektronika_uzytkowa_i_sprzet_IT", description="Kategoria / Branża oferty"),
     current_user: Optional[DBUser] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db)
 ):
@@ -199,7 +210,7 @@ async def get_report(
 async def create_report_post(
     request: Request,
     url: str = Form(...),
-    industry: str = Form("general"),
+    industry: str = Form("elektronika_uzytkowa_i_sprzet_IT"),
     current_user: Optional[DBUser] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db)
 ):
@@ -268,17 +279,34 @@ async def get_report_by_id(
             "is_unlocked": db_report.is_unlocked or is_admin,
             "risk_score": db_report.risk_score,
             "risk_level": db_report.risk_level,
-            "freemium_preview": db_report.freemium_preview,
-            "digital_footprint": db_report.digital_footprint,
-            "financial_analysis": db_report.financial_analysis,
-            "expert_checkpoints": db_report.expert_checkpoints,
-            "negotiation_assistant": db_report.negotiation_assistant,
+            "freemium_preview": db_report.freemium_preview or {},
+            "digital_footprint": db_report.digital_footprint or {},
+            "financial_analysis": db_report.financial_analysis or {},
+            "expert_checkpoints": db_report.expert_checkpoints or {},
+            "negotiation_assistant": db_report.negotiation_assistant or {},
             "created_at_formatted": db_report.created_at.strftime("%d.%m.%Y") if db_report.created_at else ""
         }
 
     if is_admin:
         doc["is_unlocked"] = True
         doc["is_paid"] = True
+
+    # --- POWIĄZANIE CHECKLISTY JSON DLA XTEMPLATU ---
+    industry_key = doc.get("category") or "elektronika_uzytkowa_i_sprzet_IT"
+    checklist_data = load_checklist_by_industry(industry_key)
+    
+    categories = checklist_data.get("categories") or checklist_data.get("paid_detailed_analysis", {}).get("categories", [])
+    paid_modules = checklist_data.get("paid_post_analysis_modules") or checklist_data.get("ai_generated_action_plan", [])
+    freemium_checkpoints = checklist_data.get("freemium_checkpoints") or checklist_data.get("public_free_summary", [])
+
+    if not doc.get("expert_checkpoints") or not doc["expert_checkpoints"].get("categories"):
+        doc["expert_checkpoints"] = {"categories": categories}
+    
+    if not doc.get("freemium_preview"):
+        doc["freemium_preview"] = freemium_checkpoints
+
+    doc["categories"] = categories
+    doc["paid_modules"] = paid_modules
 
     return render_safe_template(
         request, 
@@ -287,7 +315,9 @@ async def get_report_by_id(
             "report": doc,
             "user": current_user,
             "target_url": doc.get("target_url", ""),
-            "is_admin": is_admin
+            "is_admin": is_admin,
+            "categories": categories,
+            "paid_modules": paid_modules
         }
     )
 
