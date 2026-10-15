@@ -23,7 +23,7 @@
         a[href^="/pricing"] {
             display: none !important;
         }
-        .filter.blur-\[4px\] {
+        .blur-target {
             filter: none !important;
             opacity: 1 !important;
             pointer-events: auto !important;
@@ -54,7 +54,7 @@
                     </a>
                 </h1>
                 <p class="text-slate-400 text-sm">
-                    Kategoria: <strong class="text-slate-200">{{ report.industry_name | default(report.category) | default("Brak danych") }}</strong> • 
+                    Kategoria: <strong class="text-slate-200">{{ report.industry_name | default(report.category) | default("Brak danych") }}</strong> &bull; 
                     Data analizy: <span class="text-slate-300">{{ report.created_at_formatted | default("01.08.2026") }}</span>
                 </p>
             </div>
@@ -177,7 +177,7 @@
                 </span>
             </div>
 
-            <div class="{% if not report.is_unlocked %}select-none filter blur-[4px] opacity-45 pointer-events-none min-h-[300px]{% endif %} space-y-4">
+            <div class="blur-target {% if not report.is_unlocked %}select-none filter blur-[4px] opacity-45 pointer-events-none min-h-[300px]{% endif %} space-y-4">
                 {% if report.is_unlocked and report.expert_checkpoints is defined %}
                     {% for item in report.expert_checkpoints %}
                     <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-700/50 flex flex-col justify-between gap-1">
@@ -204,20 +204,52 @@
             </div>
 
             {% if not report.is_unlocked %}
-            <div class="absolute inset-x-0 bottom-0 top-[88px] frosted-glass-overlay flex flex-col items-center justify-center p-6 text-center z-10">
-                <div class="w-14 h-14 bg-indigo-600/20 border border-indigo-500/40 rounded-full flex items-center justify-center text-2xl mb-3 text-indigo-400 shadow-inner">
+            <div class="absolute inset-x-0 bottom-0 top-[88px] frosted-glass-overlay flex flex-col items-center justify-center p-6 text-center z-10 overflow-y-auto">
+                <div class="w-12 h-12 bg-indigo-600/20 border border-indigo-500/40 rounded-full flex items-center justify-center text-xl mb-2 text-indigo-400 shadow-inner">
                     🔐
                 </div>
-                <h3 class="text-xl font-bold text-white mb-2">Odblokuj 40 Punktów Audytu Głębokie</h3>
-                <p class="text-slate-300 max-w-lg mb-5 text-sm">
-                    Uzyskaj dostęp do kompletnej weryfikacji klauzul, drobnego druku i ukrytych wyłączeń odpowiedzialności.
+                <h3 class="text-lg font-bold text-white mb-1">Odblokuj 40 Punktów Audytu Głębokie</h3>
+                <p class="text-slate-300 max-w-md mb-3 text-xs">
+                    Wpisz kod vouchera, zaakceptuj wymagane zgody i odblokuj natychmiast pełną treść cyfrową.
                 </p>
-                <div class="flex flex-col sm:flex-row gap-3 w-full max-w-md">
-                    <a href="/checkout?type=single&report={{ report.report_id }}" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-5 rounded-xl shadow-lg transition text-center text-sm">
-                        Jednorazowy Raport (9,90 PLN)
+
+                <!-- FORMULARZ VOUCHERA Z WYMAGANYMI ZGODAMI UOKiK -->
+                <form id="voucher-form" class="space-y-3 text-left w-full max-w-md bg-slate-900/90 p-4 rounded-xl border border-slate-700">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Kod Vouchera</label>
+                        <input type="text" id="voucher_code_input" required 
+                               class="w-full bg-slate-950 border border-slate-700 text-xs text-white rounded-lg p-2.5 uppercase font-mono focus:outline-none focus:border-indigo-500" 
+                               placeholder="np. START2026">
+                    </div>
+
+                    <div class="flex items-start gap-2.5">
+                        <input type="checkbox" id="accept_terms" required
+                               class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-950 text-indigo-600 focus:ring-indigo-500 shrink-0">
+                        <label for="accept_terms" class="text-[11px] text-slate-300 leading-tight cursor-pointer">
+                            Akceptuję <a href="/regulamin" target="_blank" class="text-indigo-400 underline">Regulamin</a> oraz <a href="/polityka-prywatnosci" target="_blank" class="text-indigo-400 underline">Politykę Prywatności</a>. <span class="text-rose-400">*</span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-start gap-2.5">
+                        <input type="checkbox" id="express_consent" required
+                               class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-950 text-indigo-600 focus:ring-indigo-500 shrink-0">
+                        <label for="express_consent" class="text-[11px] text-slate-300 leading-tight cursor-pointer">
+                            Wyrażam zgodę na dostarczenie treści cyfrowej przed upływem 14 dni i przyjmuję do wiadomości, że <strong class="text-white">tracę prawo odstąpienia od umowy</strong>. <span class="text-rose-400">*</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-lg transition shadow-md">
+                        🎟️ Odblokuj Pełny Raport Voucherem
+                    </button>
+                </form>
+                <div id="form-error-msg" class="text-rose-400 text-xs mt-2 hidden font-medium"></div>
+
+                <div class="flex gap-2 w-full max-w-md mt-3">
+                    <a href="/checkout?type=single&report={{ report.report_id }}" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 px-3 rounded-lg border border-slate-700 transition text-center text-xs">
+                        💳 Płatność Online
                     </a>
-                    <a href="/pricing" class="flex-1 bg-slate-800 hover:bg-slate-700 text-indigo-400 border border-indigo-500/30 font-bold py-3 px-5 rounded-xl transition text-center text-sm">
-                        Pakiety Standard / PRO
+                    <a href="/pricing" class="flex-1 bg-slate-800 hover:bg-slate-700 text-indigo-400 border border-slate-700 font-semibold py-2 px-3 rounded-lg transition text-center text-xs">
+                        📦 Pakiety PRO
                     </a>
                 </div>
             </div>
@@ -298,7 +330,7 @@
                     </div>
                 </div>
 
-                {# 3. MIEJSCE 2: ZIELONE ŚWIATŁO / KOŃCOWE REKOMENDACJE I PARTNERZY (Bezpieczny Zakup, Rzeczoznawcy, Transport) #}
+                {# 3. MIEJSCE 2: ZIELONE ŚWIATŁO / KOŃCOWE REKOMENDACJE I PARTNERZY #}
                 <div class="border-t border-slate-700/60 pt-6">
                     <div class="mb-3">
                         <h3 class="text-md font-bold text-emerald-400 flex items-center gap-2">
@@ -312,17 +344,14 @@
             </div>
 
             {% if not report.is_unlocked %}
-            <div class="absolute inset-x-0 bottom-0 top-[88px] frosted-glass-overlay flex flex-col items-center justify-center p-6 text-center z-10">
-                <div class="w-12 h-12 bg-indigo-600/20 border border-indigo-500/40 rounded-full flex items-center justify-center text-xl mb-3 text-indigo-400 shadow-inner">
+            <div class="absolute inset-x-0 bottom-0 top-[88px] frosted-glass-overlay flex flex-col items-center justify-center p-6 text-center z-10 overflow-y-auto">
+                <div class="w-12 h-12 bg-indigo-600/20 border border-indigo-500/40 rounded-full flex items-center justify-center text-xl mb-2 text-indigo-400 shadow-inner">
                     💡
                 </div>
                 <h3 class="text-lg font-bold text-white mb-1">Odblokuj Asystenta Negocjacji & Pytania AI</h3>
-                <p class="text-slate-300 max-w-md mb-4 text-xs leading-relaxed">
-                    Otrzymaj gotowe argumenty do rozmowy ze sprzedawcą oraz precyzyjne kwoty obniżki wyliczone przez naszą sztuczną inteligencję.
+                <p class="text-slate-300 max-w-md mb-3 text-xs leading-relaxed">
+                    Wpisz kod vouchera i zaznacz zgody konsumenckie powyżej, aby odblokować pełny dostęp.
                 </p>
-                <a href="/checkout?type=single&report={{ report.report_id }}" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg transition text-sm">
-                    Odblokuj Dostęp do Raportu
-                </a>
             </div>
             {% endif %}
         </div>
@@ -340,4 +369,57 @@
     </div>
 
 </div>
+
+<!-- SKRYPT JAVASCRIPT OBSŁUGUJĄCY WYSYŁANIE VOUCHERA I ZGÓD -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('voucher-form');
+        if (!form) return;
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const voucherCode = document.getElementById('voucher_code_input').value.trim();
+            const acceptTerms = document.getElementById('accept_terms').checked;
+            const expressConsent = document.getElementById('express_consent').checked;
+            const errorDiv = document.getElementById('form-error-msg');
+            
+            errorDiv.classList.add('hidden');
+            errorDiv.textContent = '';
+
+            if (!acceptTerms || !expressConsent) {
+                errorDiv.textContent = "Musisz zaznaczyć wszystkie wymagane zgody konsumenckie, aby odblokować raport.";
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            const reportId = "{{ report.report_id }}"; 
+
+            try {
+                const response = await fetch(`/api/v1/reports/${reportId}/voucher`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        voucher_code: voucherCode,
+                        accept_terms: acceptTerms,
+                        express_consent: expressConsent
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    errorDiv.textContent = data.detail || "Wystąpił błąd podczas weryfikacji vouchera.";
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Błąd sieci:", err);
+                errorDiv.textContent = "Błąd połączenia z serwerem. Spróbuj ponownie.";
+                errorDiv.classList.remove('hidden');
+            }
+        });
+    });
+</script>
 {% endblock %}

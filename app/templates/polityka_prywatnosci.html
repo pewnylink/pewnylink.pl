@@ -1,37 +1,123 @@
 {% extends "base.html" %}
-{% block title %}Polityka Prywatności i Cookies - pewnylink.pl{% endblock %}
+
+{% block title %}Polityka Prywatności i RODO - pewnylink.pl{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <h1 class="mb-4">Polityka Prywatności i Plików Cookies</h1>
-  <p class="text-muted">Obowiązuje od dnia: 28 sierpnia 2026 r.</p>
-  <hr />
+<div class="max-w-4xl mx-auto bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6 sm:p-10 space-y-6 text-slate-300">
+    <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight border-b border-slate-700 pb-4">
+        Polityka Prywatności i Ochrony Danych Osobowych (RODO)
+    </h1>
+    <p class="text-xs text-slate-400">Obowiązuje od dnia: 28 sierpnia 2026 r.</p>
 
-  <h5>1. Administrator Danych Osobowych (ADO)</h5>
-  <p>Administratorem danych osobowych Użytkowników Serwisu pewnylink.pl jest [NAZWA FIRMY SP. Z O.O. / JEDNOOSOBOWA DZIAŁALNOŚĆ] z siedzibą w [MIEJSCOWOŚĆ], NIP: [NUMER NIP]. Kontakt w sprawach ochrony danych: <strong>rodo@pewnylink.pl</strong>.</p>
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§1. Administrator Danych Osobowych (ADO)</h2>
+        <ol class="list-decimal list-inside text-sm space-y-2 leading-relaxed">
+            <li>Administratorem danych osobowych Użytkowników Serwisu Internetowego <strong class="text-white">pewnylink.pl</strong> (zwanego dalej „Serwisem”) jest spółka <strong class="text-white">SevArt sp. z o.o.</strong> z siedzibą w [MIEJSCOWOŚĆ], ul. [ULICA I NUMER], NIP: [NUMER NIP], REGON: [NUMER REGON] (zwana dalej „Administratorem”).</li>
+            <li>W sprawach związanych z ochroną danych osobowych, realizacją praw oraz przetwarzaniem danych można kontaktować się z Administratorem drogą elektroniczną pod adresem e-mail: <strong class="text-white">rodo@pewnylink.pl</strong> lub pisemnie na adres siedziby Administratora.</li>
+        </ol>
+    </section>
 
-  <h5 class="mt-4">2. Cele i Podstawy Przetwarzania Danych</h5>
-  <ul>
-    <li><strong>Rejestracja i obsługa Konta:</strong> art. 6 ust. 1 lit. b RODO (wykonanie umowy).</li>
-    <li><strong>Realizacja zamówień i generowanie Raportów:</strong> art. 6 ust. 1 lit. b RODO.</li>
-    <li><strong>Rozliczenia podatkowo-księgowe:</strong> art. 6 ust. 1 lit. c RODO (obowiązek prawny).</li>
-    <li><strong>Analityka i bezpieczeństwo Serwisu:</strong> art. 6 ust. 1 lit. f RODO (prawnie uzasadniony interes Administratora).</li>
-  </ul>
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§2. Cele, Podstawy Prawne i Okres Przetwarzania Danych Użytkowników</h2>
+        <p class="text-sm leading-relaxed">
+            Administrator przetwarza wyłącznie dane osobowe Użytkowników zarejestrowanych w Serwisie w następujących celach:
+        </p>
 
-  <h5 class="mt-4">3. Odbiorcy Danych (Podmioty Przetwarzające)</h5>
-  <p>Dane Użytkowników mogą być przekazywane podmiotom świadczącym usługi na rzecz Administratora:</p>
-  <ul>
-    <li>Dostawcom usług hostingowych i serwerowych (np. serwery VPS w chmurze).</li>
-    <li>Operatorom płatności elektronicznych (w celu dokonania płatności za Raport).</li>
-    <li>Dostawcom zewnętrznych interfejsów API (np. OpenAI API, Scraper API) – w zakresie niezbędnym do przeprowadzenia analizy technicznej wklejonego linku.</li>
-  </ul>
+        <div class="overflow-x-auto my-4 rounded-xl border border-slate-700">
+            <table class="w-full text-left text-xs sm:text-sm text-slate-300">
+                <thead class="bg-slate-900/80 text-white font-semibold border-b border-slate-700">
+                    <tr>
+                        <th class="p-3">Cel przetwarzania</th>
+                        <th class="p-3">Podstawa prawna (RODO)</th>
+                        <th class="p-3">Zakres danych</th>
+                        <th class="p-3">Okres przechowywania</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700/60 bg-slate-800/40">
+                    <tr>
+                        <td class="p-3">Rejestracja, obsługa Konta oraz identyfikacja Użytkownika</td>
+                        <td class="p-3">Art. 6 ust. 1 lit. b (wykonanie umowy)</td>
+                        <td class="p-3">Adres e-mail, zaszyfrowane hasło, adres IP</td>
+                        <td class="p-3">Do czasu usunięcia Konta przez Użytkownika</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3">Realizacja płatności, obsługa Voucherów i rozliczenia księgowe</td>
+                        <td class="p-3">Art. 6 ust. 1 lit. c (obowiązek prawny/podatkowy)</td>
+                        <td class="p-3">Dane do faktury, historia transakcji, kod vouchera</td>
+                        <td class="p-3">5 lat od końca roku podatkowego</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3">Obsługa zgłoszeń reklamacyjnych i kontaktowych</td>
+                        <td class="p-3">Art. 6 ust. 1 lit. c oraz lit. f (prawnie uzasadniony interes)</td>
+                        <td class="p-3">Imię, e-mail, treść wiadomości, ID raportu</td>
+                        <td class="p-3">Do zakończenia postępowania + 1 rok</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3">Analityka, bezpieczeństwo (anti-fraud) i ochrona techniczna serwisu</td>
+                        <td class="p-3">Art. 6 ust. 1 lit. f (prawnie uzasadniony interes ADO)</td>
+                        <td class="p-3">Logi systemowe, adres IP, typ przeglądarki, User-Agent</td>
+                        <td class="p-3">Do 12 miesięcy od zapisania logu</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-  <h5 class="mt-4">4. Prawa Użytkownika</h5>
-  <p>Użytkownikowi przysługuje prawo dostępu do swoich danych, ich sprostowania, usunięcia („prawo do bycia zapomnianym”), ograniczenia przetwarzania, przenoszenia danych oraz wniesienia sprzeciwu. Użytkownik ma również prawo do wniesienia skargi do Prezesa Urzędu Ochrony Danych Osobowych (PUODO).</p>
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§3. Analiza Linków Zewnętrznych a Brak Zbiórek Danych Osób Trzecich</h2>
+        <ol class="list-decimal list-inside text-sm space-y-2 leading-relaxed">
+            <li><strong class="text-white">SevArt sp. z o.o.</strong> ani Serwis <strong class="text-white">pewnylink.pl nie pobierają, nie gromadzą ani nie budują baz danych osobowych osób trzecich</strong> (np. sprzedawców publikujących ogłoszenia w zewnętrznych serwisach ogłoszeniowych).</li>
+            <li>Wprowadzany przez Użytkownika adres URL ogłoszenia zewnętrznego przetwarzany jest <strong class="text-white">wyłącznie w czasie rzeczywistym (w locie)</strong> przez systemy analityczne i modele sztucznej inteligencji (AI) wyłącznie na potrzeby wygenerowania jednorazowego Raportu Audytowego dla danego Użytkownika.</li>
+            <li>Dane zawarte w analizowanych ogłoszeniach osób trzecich nie są trwale zapisywane w celach marketingowych, profilowania ani tworzenia rejestrów sprzedawców. SevArt sp. z o.o. nie przetwarza danych osobowych sprzedawców w sposób niezależny od bieżącego, technicznego żądania Użytkownika.</li>
+        </ol>
+    </section>
 
-  <h5 class="mt-4">5. Polityka Plików Cookies</h5>
-  <p>1. Serwis stosuje pliki cookies (ciasteczka) stanowiące dane informatyczne przechowywane na urządzeniu końcowym Użytkownika.</p>
-  <p>2. Serwis wykorzystuje cookies niezbędne (do prawidłowego działania sesji i zalogowania) oraz analityczne.</p>
-  <p>3. Użytkownik może w każdej chwili zmienić ustawienia dotyczące plików cookies w swojej przeglądarce internetowej.</p>
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§4. Odbiorcy Danych i Podmioty Przetwarzające (Subprocesorzy)</h2>
+        <p class="text-sm leading-relaxed">
+            W celu prawidłowego świadczenia usług Administrator korzysta wyłącznie z zaufanych dostawców infrastruktury technologicznej, którym powierza przetwarzanie danych na podstawie umów DPA (Data Processing Agreement):
+        </p>
+        <ul class="list-disc list-inside text-sm space-y-2 leading-relaxed">
+            <li><strong class="text-white">Dostawcy infrastruktury chmurowej i hostingu:</strong> dostawcy bezpiecznych serwerów bazy danych oraz serwerów aplikacji zlokalizowanych w Europejskim Obszarze Gospodarczym (EOG).</li>
+            <li><strong class="text-white">Operatorzy płatności elektronicznych:</strong> zintegrowane bramki płatnicze realizujące bezpieczne transakcje online.</li>
+            <li><strong class="text-white">Dostawcy silników AI i systemów analitycznych:</strong> dostawcy interfejsów API (np. OpenAI API, Scraper API) – wykorzystywani wyłącznie do technicznego przetworzenia treści linku w locie. Dane te przesyłane są szyfrowanymi kanałami (TLS/SSL) i nie są wykorzystywane przez dostawców do publicznego trenowania modeli sztucznej inteligencji.</li>
+            <li><strong class="text-white">Biuro rachunkowe / system księgowy:</strong> w celu obsługi rozliczeń podatkowo-księgowych spółki.</li>
+        </ul>
+    </section>
+
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§5. Prawa Użytkownika wynikające z RODO</h2>
+        <p class="text-sm leading-relaxed">
+            Każdemu Użytkownikowi przysługują następujące prawa związane z przetwarzaniem jego danych osobowych:
+        </p>
+        <ul class="list-disc list-inside text-sm space-y-1 pl-2">
+            <li><strong class="text-white">Prawo dostępu do danych:</strong> prawo uzyskania potwierdzenia, czy przetwarzamy Twoje dane oraz prawo dostępu do nich.</li>
+            <li><strong class="text-white">Prawo do sprostowania:</strong> prawo żądania poprawienia nieprawidłowych lub uzupełnienia niekompletnych danych.</li>
+            <li><strong class="text-white">Prawo do usunięcia danych („prawo do bycia zapomnianym”):</strong> prawo żądania usunięcia konta oraz powiązanych danych.</li>
+            <li><strong class="text-white">Prawo do ograniczenia przetwarzania:</strong> prawo żądania wstrzymania operacji na danych w określonych przypadkach.</li>
+            <li><strong class="text-white">Prawo do przenoszenia danych:</strong> prawo otrzymania danych w ustrukturyzowanym formacie.</li>
+            <li><strong class="text-white">Prawo do wniesienia sprzeciwu:</strong> prawo sprzeciwu wobec przetwarzania opartego na prawnie uzasadnionym interesie Administratora.</li>
+        </ul>
+        <p class="text-sm leading-relaxed">
+            W celu realizacji swoich praw skontaktuj się z nami pod adresem: <strong class="text-white">rodo@pewnylink.pl</strong>.
+        </p>
+        <p class="text-sm leading-relaxed">
+            Użytkownikowi przysługuje również prawo wniesienia skargi do organu nadzorczego – <strong class="text-white">Prezesa Urzędu Ochrony Danych Osobowych (PUODO)</strong>, ul. Stawki 2, 00-193 Warszawa.
+        </p>
+    </section>
+
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§6. Bezpieczeństwo Danych</h2>
+        <p class="text-sm leading-relaxed">
+            Administrator stosuje odpowiednie środki techniczne i organizacyjne (w tym szyfrowanie transmisji danych SSL/TLS, bezpieczne hasła, kontrolę dostępu do baz danych oraz izolowane środowiska testowe) zapewniające ochronę przetwarzanych danych osobowych Użytkowników przed ich utratą, zniszczeniem, nieuprawnioną modyfikacją lub ujawnieniem.
+        </p>
+    </section>
+
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§7. Odnośnik do Polityki Plików Cookies</h2>
+        <p class="text-sm leading-relaxed">
+            Szczegółowe informacje dotyczące technologii śledzących, plików cookies oraz partnerów afiliacyjnych znajdują się w odrębnym dokumencie: <a href="/polityka-cookies" class="text-indigo-400 hover:text-indigo-300 underline">Polityka Plików Cookies</a>.
+        </p>
+    </section>
 </div>
 {% endblock %}

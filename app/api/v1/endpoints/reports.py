@@ -4,7 +4,7 @@ import logging
 from typing import Optional, List, Dict, Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -44,8 +44,20 @@ class AnalyzeLinkRequest(BaseModel):
     industry_id: Optional[str] = None
 
 
-class VoucherUnlockRequest(BaseModel):
-    voucher_code: str
+class CheckoutWithConsentsRequest(BaseModel):
+    accept_terms: bool = Field(..., description="Wymagana akceptacja Regulaminu i Polityki Prywatności")
+    express_consent: bool = Field(..., description="Wymagana zgoda na utratę prawa do odstąpienia od umowy dla treści cyfrowych")
+
+    @field_validator('accept_terms', 'express_consent')
+    @classmethod
+    def validate_mandatory_consents(cls, v: bool) -> bool:
+        if not v:
+            raise ValueError("Wszystkie wymagane zgody konsumenckie muszą zostać zaznaczone.")
+        return v
+
+
+class VoucherUnlockRequest(CheckoutWithConsentsRequest):
+    voucher_code: str = Field(..., min_length=2, max_length=64)
 
 
 def check_is_admin(user: Optional[User]) -> bool:
@@ -406,9 +418,13 @@ async def get_report(
     return response_payload
 
 
-@router.post("/{report_id}/mock-checkout", summary="Symulacja opłacenia raportu")
-async def mock_checkout(report_id: str, db: AsyncSession = Depends(get_db)):
-    """Odblokowuje raport w trybie testowym."""
+@router.post("/{report_id}/mock-checkout", summary="Symulacja opłacenia raportu z wymaganymi zgodami")
+async def mock_checkout(
+    report_id: str, 
+    payload: CheckoutWithConsentsRequest, 
+    db: AsyncSession = Depends(get_db)
+):
+    """Odblokowuje raport w trybie testowym po weryfikacji zgód konsumenckich UOKiK."""
     stmt = select(ReportModel).where(ReportModel.report_id == report_id)
     result = await db.execute(stmt)
     report = result.scalar_one_or_none()
@@ -429,17 +445,17 @@ async def mock_checkout(report_id: str, db: AsyncSession = Depends(get_db)):
         "report_id": report.report_id,
         "is_unlocked": report.is_unlocked,
         "is_paid": report.is_paid,
-        "message": "Raport został pomyślnie odblokowany."
+        "message": "Raport został pomyślnie odblokowany po spełnieniu wymogów prawnych."
     }
 
 
-@router.post("/{report_id}/voucher", summary="Odblokuj raport voucherem")
+@router.post("/{report_id}/voucher", summary="Odblokuj raport voucherem z wymaganymi zgodami")
 async def unlock_with_voucher(
     report_id: str,
     payload: VoucherUnlockRequest,
     db: AsyncSession = Depends(get_db)
 ):
-    """Weryfikuje kod vouchera i odblokowuje raport."""
+    """Weryfikuje kod vouchera, sprawdza wymagane zgody konsumenckie i odblokowuje raport."""
     stmt = select(ReportModel).where(ReportModel.report_id == report_id)
     result = await db.execute(stmt)
     report = result.scalar_one_or_none()

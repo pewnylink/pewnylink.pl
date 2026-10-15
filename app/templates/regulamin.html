@@ -1,45 +1,105 @@
 {% extends "base.html" %}
+
 {% block title %}Regulamin Serwisu - pewnylink.pl{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <h1 class="mb-4">Regulamin Świadczenia Usług Drogą Elektroniczną</h1>
-  <p class="text-muted">Obowiązuje od dnia: 28 sierpnia 2026 r.</p>
-  <hr />
+<div class="max-w-4xl mx-auto bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6 sm:p-10 space-y-6 text-slate-300">
+    <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight border-b border-slate-700 pb-4">
+        Regulamin Świadczenia Usług Drogą Elektroniczną
+    </h1>
+    <p class="text-xs text-slate-400">Obowiązuje od dnia: 28 sierpnia 2026 r.</p>
 
-  <h5>§1. Postanowienia Ogólne</h5>
-  <p>1. Właścicielem i operatorem Serwisu Internetowego dostępnego pod adresem https://pewnylink.pl (zwanego dalej „Serwisem”) jest [NAZWA FIRMY SP. Z O.O. / JEDNOOSOBOWA DZIAŁALNOŚĆ], z siedzibą w [MIEJSCOWOŚĆ], ul. [ULICA I NUMER], NIP: [NUMER NIP], REGON: [NUMER REGON], zwany dalej „Usługodawcą”.</p>
-  <p>2. Niniejszy Regulamin określa zasady korzystania z Serwisu pewnylink.pl, rodzaj i zakres usług świadczonych drogą elektroniczną, zasady generowania Raportów Audytowych, procedurę reklamacyjną oraz zasady ochrony danych osobowych.</p>
-  <p>3. Kontakt z Usługodawcą jest możliwy za pośrednictwem poczty elektronicznej pod adresem: <strong>kontakt@pewnylink.pl</strong>.</p>
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§1. Postanowienia Ogólne</h2>
+        <ol class="list-decimal list-inside text-sm space-y-2 leading-relaxed">
+            <li>Właścicielem i operatorem Serwisu Internetowego dostępnego pod adresem https://pewnylink.pl (zwanego dalej „Serwisem”) jest spółka <strong class="text-white">SevArt sp. z o.o.</strong> z siedzibą w [MIEJSCOWOŚĆ], ul. [ULICA I NUMER], NIP: [NUMER NIP], REGON: [NUMER REGON] (zwana dalej „Usługodawcą”).</li>
+            <li>Niniejszy Regulamin określa zasady korzystania z Serwisu, rodzaj i zakres usług świadczonych drogą elektroniczną, zasady generowania Raportów Audytowych przez algorytmy i sztuczną inteligencję (AI), zasady korzystania z Voucherów, politykę linków afiliacyjnych, procedurę reklamacyjną oraz zasady ochrony danych osobowych.</li>
+            <li>Kontakt z Usługodawcą jest możliwy za pośrednictwem poczty elektronicznej pod adresem: <strong class="text-white">kontakt@pewnylink.pl</strong>.</li>
+        </ol>
+    </section>
 
-  <h5 class="mt-4">§2. Definicje</h5>
-  <ul>
-    <li><strong>Użytkownik</strong> – osoba fizyczna posiadająca pełną zdolność do czynności prawnych, osoba prawna lub jednostka organizacyjna nieposiadająca osobowości prawnej, korzystająca z Serwisu.</li>
-    <li><strong>Raport Audytowy</strong> – treść cyfrowa generowana przez algorytmy Serwisu oraz sztuczną inteligencję (AI) zawierająca analizę ryzyka i weryfikację publicznego ogłoszenia/oferty na podstawie podanego adresu URL.</li>
-    <li><strong>Konto</strong> – indywidualny profil Użytkownika w Serwisie aktywowany po rejestracji.</li>
-    <li><strong>Usługa Freemium / Płatna</strong> – usługa generowania Raportów w wersji bezpłatnej (podstawowej) lub pełnej (płatnej).</li>
-  </ul>
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§2. Definicje</h2>
+        <ul class="list-disc list-inside text-sm space-y-2 leading-relaxed">
+            <li><strong class="text-white">Użytkownik</strong> – osoba fizyczna posiadająca pełną zdolność do czynności prawnych, osoba prawna lub jednostka organizacyjna nieposiadająca osobowości prawnej, korzystająca z Serwisu.</li>
+            <li><strong class="text-white">Raport Audytowy</strong> – treść cyfrowa generowana automatycznie przez algorytmy Serwisu oraz modele sztucznej inteligencji (AI), zawierająca analizę ryzyka, weryfikację ogłoszenia oraz punkty kontrolne na podstawie podanego przez Użytkownika adresu URL.</li>
+            <li><strong class="text-white">Konto</strong> – indywidualny profil Użytkownika w Serwisie, umożliwiający dostęp do historii raportów i zarządzanie usługami.</li>
+            <li><strong class="text-white">Usługa Freemium / Płatna</strong> – usługa generowania Raportów w wersji bezpłatnej (podstawowej, okrojonej) lub pełnej (odblokowanej po uiszczeniu opłaty lub użyciu ważnego Vouchera).</li>
+            <li><strong class="text-white">Voucher</strong> – unikalny kod cyfrowy uprawniający do bezpłatnego lub ulgowego odblokowania Raportu Płatnego, podlegający określonym w niniejszym Regulaminie limitom użyć oraz terminom ważności.</li>
+        </ul>
+    </section>
 
-  <h5 class="mt-4">§3. Wymagania Techniczne</h5>
-  <p>Do korzystania z Serwisu niezbędne są: urządzenie końcowe z dostępem do sieci Internet, aktualna wersja przeglądarki internetowej (Chrome, Firefox, Edge, Safari) z włączoną obsługą JavaScript i plików Cookies oraz aktywne konto e-mail.</p>
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§3. Wymagania Techniczne</h2>
+        <p class="text-sm leading-relaxed">
+            Do prawidłowego korzystania z Serwisu niezbędne są: urządzenie końcowe z dostępem do sieci Internet, aktualna wersja przeglądarki internetowej (Chrome, Firefox, Edge, Safari) z włączoną obsługą JavaScript i plików Cookies oraz aktywne konto e-mail.
+        </p>
+    </section>
 
-  <h5 class="mt-4">§4. Zakres Usług i Odpowiedzialność (Disclaimer)</h5>
-  <p>1. Serwis dostarcza zautomatyzowane narzędzia analityczne wspomagające ocenę wiarygodności ofert internetowych.</p>
-  <p>2. <strong>Ograniczenie odpowiedzialności:</strong> Wyniki zawarte w Raportach Audytowych mają charakter wyłącznie informacyjny i pomocniczy. Raporty nie stanowią ekspertyzy rzeczoznawcy, opinii biegłego, wyceny rzeczoznawczej ani porady prawnej/finansowej. Usługodawca nie ponosi odpowiedzialności za decyzje zakupowe, transakcyjne lub majątkowe podjęte przez Użytkownika na podstawie Raportu.</p>
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§4. Zakres Usług, Charakter Raportów i Ograniczenie Odpowiedzialności (Disclaimer)</h2>
+        <ol class="list-decimal list-inside text-sm space-y-2 leading-relaxed">
+            <li>Serwis dostarcza zautomatyzowane narzędzia analityczne i systemy monitoringu rynku wspomagające ocenę wiarygodności ogłoszeń internetowych w oparciu o publicznie dostępne dane i algorytmy AI.</li>
+            <li><strong class="text-white">Charakter informacyjny:</strong> Wyniki zawarte w Raportach Audytowych mają charakter wyłącznie orientacyjny, analityczny i pomocniczy. Raporty nie stanowią oficjalnej ekspertyzy rzeczoznawcy technicznego, opinii biegłego sądowego, wyceny rynkowej ani wiążącej porady prawnej lub finansowej.</li>
+            <li><strong class="text-white">Ograniczenie odpowiedzialności:</strong> Usługodawca nie weryfikuje fizycznie przedmiotów ogłoszeń w świecie rzeczywistym i nie ponosi odpowiedzialności za stan faktyczny, wady ukryte, legalność pochodzenia oferowanych towarów/usług ani za jakikolwiek decyzje zakupowe, inwestycyjne lub majątkowe podjęte przez Użytkownika na podstawie wygenerowanego Raportu.</li>
+        </ol>
+    </section>
 
-  <h5 class="mt-4">§5. Płatności i Dostarczanie Treści Cyfrowych</h5>
-  <p>1. Ceny Raportów Płatnych podawane są w złotych polskich (PLN) i zawierają podatki.</p>
-  <p>2. Płatności realizowane są za pośrednictwem zintegrowanych operatorów płatności elektronicznych.</p>
-  <p>3. Raport generowany jest automatycznie po zaksięgowaniu płatności i udostępniany w ramach profilu Użytkownika lub pod dedykowanym adresem URL.</p>
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§5. Płatności, Vouchery i Dostarczanie Treści Cyfrowych</h2>
+        <ol class="list-decimal list-inside text-sm space-y-2 leading-relaxed">
+            <li>Ceny Raportów Płatnych podawane są w złotych polskich (PLN) i zawierają podatek VAT.</li>
+            <li>Płatności realizowane są za pośrednictwem zewnętrznych, zintegrowanych operatorów płatności elektronicznych.</li>
+            <li><strong class="text-white">Zasady dotyczące Voucherów:</strong>
+                <ul class="list-disc list-inside text-sm space-y-1 pl-4 mt-1">
+                    <li>Voucher może posiadać określoną datę ważności (określoną w dniach od jego wygenerowania) oraz limit dozwolonych użyć (np. jednorazowy lub wielorazowy).</li>
+                    <li>Wygasły, w pełni wykorzystany lub nieaktywny Voucher nie podlega realizacji ani wymianie na ekwiwalent pieniężny.</li>
+                    <li>Próba użycia kodu niezgodnego z regulaminem skutkuje odrzuceniem transakcji komunikatem o błędzie.</li>
+                </ul>
+            </li>
+            <li>Raport pełny generowany jest automatycznie niezwłocznie po pozytywnej autoryzacji płatności lub prawidłowej walidacji Vouchera i udostępniany w koncie Użytkownika lub pod dedykowanym adresem URL.</li>
+        </ol>
+    </section>
 
-  <h5 class="mt-4">§6. Prawo do Odstąpienia od Umowy (Konsumenci)</h5>
-  <p>1. Zgodnie z art. 38 pkt 13 Ustawy z dnia 30 maja 2014 r. o prawach konsumenta, prawo do odstąpienia od umowy zawartej na odległość <strong>nie przysługuje konsumentowi</strong> w odniesieniu do umów o dostarczanie treści cyfrowych niedostarczanych na nośniku materialnym, jeżeli spełnianie świadczenia rozpoczęło się za wyraźną zgodą konsumenta przed upływem terminu do odstąpienia od umowy i po poinformowaniu go przez Usługodawcę o utracie prawa do odstąpienia od umowy.</p>
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§6. Linki Afiliacyjne i Współpraca z Partnerami</h2>
+        <ol class="list-decimal list-inside text-sm space-y-2 leading-relaxed">
+            <li>W ramach Serwisu oraz przesyłanych materiałów mogą pojawiać się linki afiliacyjne, banery reklamowe lub rekomendacje produktów i usług podmiotów trzecich (Partnerów Serwisu, np. dostawców finansowania, ubezpieczeń czy raportów historycznych).</li>
+            <li>Kliknięcie w link afiliacyjny i skorzystanie z oferty Partnera może skutkować otrzymaniem przez Usługodawcę prowizji od transakcji.</li>
+            <li>Obecność linków afiliacyjnych i partnerstw komercyjnych w żaden sposób nie wpływa na obiektywizm algorytmów generujących Raporty Audytowe na pewnylink.pl.</li>
+        </ol>
+    </section>
 
-  <h5 class="mt-4">§7. Postępowanie Reklamacyjne</h5>
-  <p>1. Reklamacje dotyczące działania Serwisu lub generowania Raportów należy zgłaszać na adres e-mail: <strong>reklamacje@pewnylink.pl</strong>.</p>
-  <p>2. Usługodawca rozpatruje reklamację w terminie 14 dni od dnia jej otrzymania.</p>
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§7. Prawo do Odstąpienia od Umowy (Konsumenci)</h2>
+        <p class="text-sm leading-relaxed">
+            Zgodnie z art. 38 pkt 13 Ustawy z dnia 30 maja 2014 r. o prawach konsumenta, prawo do odstąpienia od umowy zawartej na odległość <strong class="text-white">nie przysługuje konsumentowi</strong> w odniesieniu do umów o dostarczanie treści cyfrowych niedostarczanych na nośniku materialnym, jeżeli spełnianie świadczenia rozpoczęło się za wyraźną i uprzednią zgodą konsumenta przed upływem terminu do odstąpienia od umowy i po poinformowaniu go przez Usługodawcę o utracie tego prawa (co następuje bezpośrednio przed dokonaniem płatności i odblokowaniem Raportu).
+        </p>
+    </section>
 
-  <h5 class="mt-4">§8. Umowa Powierzenia Przetwarzania Danych (B2B)</h5>
-  <p>W przypadku klientów biznesowych (B2B) wymagających zawarcia odrębnej Umowy Powierzenia Przetwarzania Danych Osobowych (DPA) zgodnie z art. 28 RODO, standardowy wzór umowy udostępniany jest na wniosek wysłany na adres: kontakt@pewnylink.pl.</p>
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§8. Postępowanie Reklamacyjne</h2>
+        <ol class="list-decimal list-inside text-sm space-y-2 leading-relaxed">
+            <li>Wszelkie reklamacje dotyczące funkcjonowania Serwisu, błędów w działaniu algorytmów lub problemów z płatnościami/voucherami należy zgłaszać drogą elektroniczną na adres: <strong class="text-white">reklamacje@pewnylink.pl</strong>.</li>
+            <li>Zgłoszenie reklamacyjne powinno zawierać dane identyfikacyjne Użytkownika, numer/identyfikator raportu oraz dokładny opis zgłaszanego problemu.</li>
+            <li>Usługodawca rozpatruje reklamację w terminie 14 dni od dnia jej otrzymania, przesyłając odpowiedź na adres e-mail wskazany przez zgłaszającego.</li>
+        </ol>
+    </section>
+
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§9. Ochrona Danych Osobowych (RODO)</h2>
+        <p class="text-sm leading-relaxed">
+            Administratorem danych osobowych Użytkowników jest Usługodawca. Zasady przetwarzania danych osobowych, wykorzystywania plików cookies oraz uprawnień przysługujących Użytkownikom opisane są w odrębnej <a href="/polityka-prywatnosci" class="text-indigo-400 hover:text-indigo-300 underline">Polityce Prywatności</a> dostępnej w stopce Serwisu.
+        </p>
+    </section>
+
+    <section class="space-y-3">
+        <h2 class="text-lg font-bold text-indigo-400">§10. Postanowienia Końcowe</h2>
+        <ol class="list-decimal list-inside text-sm space-y-2 leading-relaxed">
+            <li>W sprawach nieuregulowanych w niniejszym Regulaminie zastosowanie mają powszechnie obowiązujące przepisy prawa polskiego.</li>
+            <li>W przypadku klientów biznesowych (B2B) wymagających zawarcia odrębnej Umowy Powierzenia Przetwarzania Danych Osobowych (DPA) zgodnie z art. 28 RODO, standardowy wzór udostępniany jest na wniosek pod adresem: kontakt@pewnylink.pl.</li>
+            <li>Usługodawca zastrzega sobie prawo do zmiany Regulaminu z ważnych przyczyn prawnych lub technicznych. Zmiany wchodzą w życie w terminie wskazanym przez Usługodawcę, nie krótszym niż 14 dni od ich opublikowania w Serwisie.</li>
+        </ol>
+    </section>
 </div>
 {% endblock %}
